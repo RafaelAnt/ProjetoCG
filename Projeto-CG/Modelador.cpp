@@ -31,60 +31,10 @@ static void writeVertexToXML(tinyxml2::XMLNode * pRoot, double x, double y, doub
 	pRoot->InsertEndChild(elem);
 }
 
-void drawCubeXML(double size){
-	int i;
-	using namespace tinyxml2;
-	XMLNode *pRoot = xmlDoc.NewElement("cubo");
-	xmlDoc.InsertFirstChild(pRoot);
-	XMLElement *mode = xmlDoc.NewElement("mode");
-	mode->SetText("QUAD");
-	pRoot->InsertEndChild(mode);
-
-	// Top face (y = size)
-	writeVertexToXML(pRoot, size, size, -size);
-	writeVertexToXML(pRoot, -size, size, -size);
-	writeVertexToXML(pRoot, -size, size, size);
-	writeVertexToXML(pRoot, size, size, size);
-
-	// Bottom face (y = -size)
-	writeVertexToXML(pRoot, size, -size, size);
-	writeVertexToXML(pRoot, -size, -size, size);
-	writeVertexToXML(pRoot, -size, -size, -size);
-	writeVertexToXML(pRoot, size, -size, -size);
-
-	// Front face  (z = size)
-	writeVertexToXML(pRoot, size, size, size);
-	writeVertexToXML(pRoot, -size, size, size);
-	writeVertexToXML(pRoot, -size, -size, size);
-	writeVertexToXML(pRoot, size, -size, size);
-
-	// Back face (z = -size)
-	writeVertexToXML(pRoot, size, -size, -size);
-	writeVertexToXML(pRoot, -size, -size, -size);
-	writeVertexToXML(pRoot, -size, size, -size);
-	writeVertexToXML(pRoot, size, size, -size);
-
-	// Left face (x = -size)
-	writeVertexToXML(pRoot, -size, size, size);
-	writeVertexToXML(pRoot, -size, size, -size);
-	writeVertexToXML(pRoot, -size, -size, -size);
-	writeVertexToXML(pRoot, -size, -size, size);
-
-	// Right face (x = size)
-	writeVertexToXML(pRoot, size, size, -size);
-	writeVertexToXML(pRoot, size, size, size);
-	writeVertexToXML(pRoot, size, -size, size);
-	writeVertexToXML(pRoot, size, -size, -size);
-	
-
-	xmlDoc.SaveFile("cubo.3d");
-}
-
 void drawSphereXML(double r, int stacks, int slices){
 	using namespace tinyxml2;
 	XMLNode * pRoot = xmlDoc.NewElement("esfera");
 	xmlDoc.InsertFirstChild(pRoot);
-	double theta1, theta2, phi1, phi2;
 	int t, p;
 	for ( t= 0; t < stacks; t++){ // stacks are ELEVATION so they count theta
 		double theta1 = ((double)(t) / stacks)*M_PI;

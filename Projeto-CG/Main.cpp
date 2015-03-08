@@ -10,6 +10,7 @@
 #include <math.h>
 #include "tinyxml2.h"
 #include "Modelador.h"
+#include "Draw.h"
 #include <sstream>
 
 using namespace std;
@@ -19,73 +20,6 @@ using namespace std;
 float GLOBAL_height = 1, GLOBAL_angle = 0, GLOBAL_barrelroll = 0;
 float posx = 0, posy = 0, posz = 0;
 double size = 1;
-
-void drawVertices(vector<GLfloat> vertices, int mode){
-	if (mode == GL_QUADS){
-		for (unsigned int i = 0, j = 0; i < vertices.size(); i += 3, j++){
-			glBegin(mode);
-			glNormal3f(vertices[i], vertices[i + 1], vertices[i + 2]);
-			glVertex3f(vertices[i], vertices[i + 1], vertices[i + 2]);
-			i += 3;
-			glNormal3f(vertices[i], vertices[i + 1], vertices[i + 2]);
-			glVertex3f(vertices[i], vertices[i + 1], vertices[i + 2]);
-			i += 3;
-			glNormal3f(vertices[i], vertices[i + 1], vertices[i + 2]);
-			glVertex3f(vertices[i], vertices[i + 1], vertices[i + 2]);
-			i += 3;
-			glNormal3f(vertices[i], vertices[i + 1], vertices[i + 2]);
-			glVertex3f(vertices[i], vertices[i + 1], vertices[i + 2]);
-			glEnd();
-			glColor3f(rand() / ((float)RAND_MAX + 1), rand() / ((float)RAND_MAX + 1), rand() / ((float)RAND_MAX + 1));
-		}
-	}
-	else{
-		for (unsigned int i = 0, j = 0; i < vertices.size(); i += 3, j++){
-			//multiplica-se por size, para aumentar o tamanho da esfera (relembrar coordenadas polares)
-			glBegin(GL_TRIANGLES);
-			glNormal3f(vertices[i] * size, vertices[i + 1] * size, vertices[i + 2] * size);
-			glVertex3f(vertices[i] * size, vertices[i + 1] * size, vertices[i + 2] * size);
-			i += 3;
-			glNormal3f(vertices[i] * size, vertices[i + 1] * size, vertices[i + 2] * size);
-			glVertex3f(vertices[i] * size, vertices[i + 1] * size, vertices[i + 2] * size);
-			i += 3;
-			glNormal3f(vertices[i] * size, vertices[i + 1] * size, vertices[i + 2] * size);
-			glVertex3f(vertices[i] * size, vertices[i + 1] * size, vertices[i + 2] * size);
-			glEnd();
-			glColor3f(rand() / ((float)RAND_MAX + 1), rand() / ((float)RAND_MAX + 1), rand() / ((float)RAND_MAX + 1));
-		}
-	}
-}
-
-static void drawFromXML(tinyxml2::XMLElement *pElement, int mode){
-	float x, y, z;
-	const char *aux;
-	std::vector<GLfloat> vertices;
-	while (pElement != NULL) {
-		aux = pElement->GetText();
-		sscanf_s(aux, "X=%f Y=%f Z=%f", &x, &y, &z);
-		vertices.push_back(x);
-		vertices.push_back(y);
-		vertices.push_back(z);
-		pElement = pElement->NextSiblingElement("vertex");
-	}
-	drawVertices(vertices, mode);
-}
-
-void drawModel(const char *filename) {
-	using namespace tinyxml2;
-	tinyxml2::XMLDocument xmlDoc;
-	XMLError eResult = xmlDoc.LoadFile(filename);
-	XMLNode * pRoot = xmlDoc.FirstChild();
-	if (pRoot == nullptr){
-		return;
-	}
-	XMLElement *elem = pRoot->FirstChildElement("mode");
-	if (elem == nullptr)
-		drawFromXML(pRoot->FirstChildElement("vertex"), GL_TRIANGLES);
-	else if (strcmp(elem->GetText(), "QUAD") == 0)
-		drawFromXML(pRoot->FirstChildElement("vertex"), GL_QUADS);
-}
 
 void changeSize(int w, int h) {
 
@@ -124,7 +58,9 @@ void renderScene(void) {
 	glRotatef(GLOBAL_angle, 0, 1, 0);
 	glRotatef(GLOBAL_barrelroll, 1, 0, 0);
 	glShadeModel(GL_SMOOTH);
-	drawModel("esfera.3d");
+	glColor3f(1, 0.2, 0.3);
+
+	drawVertices(readVertices("esfera.3d"));
 
 	// fim do frame
 	glutSwapBuffers();
@@ -194,7 +130,6 @@ void init(void){
 // awkward main func do windows, just copy paste
 int WINAPI WinMain(HINSTANCE inst, HINSTANCE prev, LPSTR cmd, int show) {
 	srand(time(NULL));
-	drawCubeXML(1);
 
 	// init de cenas
 	glutInit(&__argc, __argv);
