@@ -32,53 +32,52 @@ static void writeVertexToXML(tinyxml2::XMLNode * pRoot, double x, double y, doub
 }
 
 void drawCubeXML(double size){
-	#define X size
-	const float cubevertex[] = {
-		-X, -X, -X, 
-		-X, -X, X,
-		-X, X, X,
-		X, X, -X, 
-		-X, -X, -X,
-		-X, X, -X,
-		X, -X, X,
-		-X, -X, -X,
-		X, -X, -X,
-		X, X, -X,
-		X, -X, -X,
-		-X, -X, -X,
-		-X, -X, -X,
-		-X, X, X,
-		-X, X, -X,
-		X, -X, X,
-		-X, -X, X,
-		-X, -X, -X,
-		-X, X, X,
-		-X, -X, X,
-		X, -X, X,
-		X, X, X,
-		X, -X, -X,
-		X, X, -X,
-		X, -X, -X,
-		X, X, X,
-		X, -X, X,
-		X, X, X,
-		X, X, -X,
-		-X, X, -X,
-		X, X, X,
-		-X, X, -X,
-		-X, X, X,
-		X, X, X,
-		-X, X, X,
-		X, -X, X
-	};
 	int i;
 	using namespace tinyxml2;
-	XMLNode * pRoot = xmlDoc.NewElement("cubo");
+	XMLNode *pRoot = xmlDoc.NewElement("cubo");
 	xmlDoc.InsertFirstChild(pRoot);
-	for (i = 0; i < 108; i+=3){
-		writeVertexToXML(pRoot, cubevertex[i], cubevertex[i + 1], cubevertex[i+2]);
-	}
-	xmlDoc.SaveFile("/modeos/cubo.3d");
+	XMLElement *mode = xmlDoc.NewElement("mode");
+	mode->SetText("QUAD");
+	pRoot->InsertEndChild(mode);
+
+	// Top face (y = size)
+	writeVertexToXML(pRoot, size, size, -size);
+	writeVertexToXML(pRoot, -size, size, -size);
+	writeVertexToXML(pRoot, -size, size, size);
+	writeVertexToXML(pRoot, size, size, size);
+
+	// Bottom face (y = -size)
+	writeVertexToXML(pRoot, size, -size, size);
+	writeVertexToXML(pRoot, -size, -size, size);
+	writeVertexToXML(pRoot, -size, -size, -size);
+	writeVertexToXML(pRoot, size, -size, -size);
+
+	// Front face  (z = size)
+	writeVertexToXML(pRoot, size, size, size);
+	writeVertexToXML(pRoot, -size, size, size);
+	writeVertexToXML(pRoot, -size, -size, size);
+	writeVertexToXML(pRoot, size, -size, size);
+
+	// Back face (z = -size)
+	writeVertexToXML(pRoot, size, -size, -size);
+	writeVertexToXML(pRoot, -size, -size, -size);
+	writeVertexToXML(pRoot, -size, size, -size);
+	writeVertexToXML(pRoot, size, size, -size);
+
+	// Left face (x = -size)
+	writeVertexToXML(pRoot, -size, size, size);
+	writeVertexToXML(pRoot, -size, size, -size);
+	writeVertexToXML(pRoot, -size, -size, -size);
+	writeVertexToXML(pRoot, -size, -size, size);
+
+	// Right face (x = size)
+	writeVertexToXML(pRoot, size, size, -size);
+	writeVertexToXML(pRoot, size, size, size);
+	writeVertexToXML(pRoot, size, -size, size);
+	writeVertexToXML(pRoot, size, -size, -size);
+	
+
+	xmlDoc.SaveFile("cubo.3d");
 }
 
 void drawSphereXML(double r, int stacks, int slices){
@@ -86,7 +85,6 @@ void drawSphereXML(double r, int stacks, int slices){
 	XMLNode * pRoot = xmlDoc.NewElement("esfera");
 	xmlDoc.InsertFirstChild(pRoot);
 	double theta1, theta2, phi1, phi2;
-	char aux[1024];
 	int t, p;
 	for ( t= 0; t < stacks; t++){ // stacks are ELEVATION so they count theta
 		double theta1 = ((double)(t) / stacks)*M_PI;
@@ -137,7 +135,7 @@ void drawSphereXML(double r, int stacks, int slices){
 			}
 		}
 	}
-	xmlDoc.SaveFile("/modelos/esfera.3d");
+	xmlDoc.SaveFile("esfera.3d");
 }
 
 

@@ -20,27 +20,46 @@ float GLOBAL_height = 1, GLOBAL_angle = 0, GLOBAL_barrelroll = 0;
 float posx = 0, posy = 0, posz = 0;
 double size = 1;
 
-void drawVertices(vector<GLfloat> vertices){
-	int i;
-	for (int i = 0,j=0; i < vertices.size(); i += 3,j++){
-		//multiplica-se por size, para aumentar o tamanho da esfera (relembrar coordenadas polares)
-		glBegin(GL_TRIANGLES);
-		glNormal3f(vertices[i] * size, vertices[i + 1] * size, vertices[i + 2] * size);
-		glVertex3f(vertices[i] * size, vertices[i + 1] * size, vertices[i + 2] * size);
-		i += 3;
-		glNormal3f(vertices[i] * size, vertices[i + 1] * size, vertices[i + 2] * size);
-		glVertex3f(vertices[i] * size, vertices[i + 1] * size, vertices[i + 2] * size);
-		i += 3;
-		glNormal3f(vertices[i] * size, vertices[i + 1] * size, vertices[i + 2] * size);
-		glVertex3f(vertices[i] * size, vertices[i + 1] * size, vertices[i + 2] * size);
-		glEnd();
+void drawVertices(vector<GLfloat> vertices, int mode){
+	if (mode == GL_QUADS){
+		for (unsigned int i = 0, j = 0; i < vertices.size(); i += 3, j++){
+			glBegin(mode);
+			glNormal3f(vertices[i], vertices[i + 1], vertices[i + 2]);
+			glVertex3f(vertices[i], vertices[i + 1], vertices[i + 2]);
+			i += 3;
+			glNormal3f(vertices[i], vertices[i + 1], vertices[i + 2]);
+			glVertex3f(vertices[i], vertices[i + 1], vertices[i + 2]);
+			i += 3;
+			glNormal3f(vertices[i], vertices[i + 1], vertices[i + 2]);
+			glVertex3f(vertices[i], vertices[i + 1], vertices[i + 2]);
+			i += 3;
+			glNormal3f(vertices[i], vertices[i + 1], vertices[i + 2]);
+			glVertex3f(vertices[i], vertices[i + 1], vertices[i + 2]);
+			glEnd();
+			glColor3f(rand() / ((float)RAND_MAX + 1), rand() / ((float)RAND_MAX + 1), rand() / ((float)RAND_MAX + 1));
+		}
+	}
+	else{
+		for (unsigned int i = 0, j = 0; i < vertices.size(); i += 3, j++){
+			//multiplica-se por size, para aumentar o tamanho da esfera (relembrar coordenadas polares)
+			glBegin(GL_TRIANGLES);
+			glNormal3f(vertices[i] * size, vertices[i + 1] * size, vertices[i + 2] * size);
+			glVertex3f(vertices[i] * size, vertices[i + 1] * size, vertices[i + 2] * size);
+			i += 3;
+			glNormal3f(vertices[i] * size, vertices[i + 1] * size, vertices[i + 2] * size);
+			glVertex3f(vertices[i] * size, vertices[i + 1] * size, vertices[i + 2] * size);
+			i += 3;
+			glNormal3f(vertices[i] * size, vertices[i + 1] * size, vertices[i + 2] * size);
+			glVertex3f(vertices[i] * size, vertices[i + 1] * size, vertices[i + 2] * size);
+			glEnd();
+			glColor3f(rand() / ((float)RAND_MAX + 1), rand() / ((float)RAND_MAX + 1), rand() / ((float)RAND_MAX + 1));
+		}
 	}
 }
 
-static void drawFromXML(tinyxml2::XMLElement *pElement){
+static void drawFromXML(tinyxml2::XMLElement *pElement, int mode){
 	float x, y, z;
 	const char *aux;
-	char aux1[10];
 	std::vector<GLfloat> vertices;
 	while (pElement != NULL) {
 		aux = pElement->GetText();
@@ -50,12 +69,7 @@ static void drawFromXML(tinyxml2::XMLElement *pElement){
 		vertices.push_back(z);
 		pElement = pElement->NextSiblingElement("vertex");
 	}
-	sprintf_s(aux1, "%d", vertices.size());
-	if ((vertices.size() / 3) % 3 != 0){
-		MessageBox(NULL, TEXT("Modelo XML inválido!"), NULL, MB_ICONERROR);
-		exit(-1);
-	}
-	drawVertices(vertices);
+	drawVertices(vertices, mode);
 }
 
 void drawModel(const char *filename) {
@@ -64,10 +78,13 @@ void drawModel(const char *filename) {
 	XMLError eResult = xmlDoc.LoadFile(filename);
 	XMLNode * pRoot = xmlDoc.FirstChild();
 	if (pRoot == nullptr){
-		puts("RIP");
 		return;
 	}
-	drawFromXML(pRoot->FirstChildElement("vertex"));
+	XMLElement *elem = pRoot->FirstChildElement("mode");
+	if (elem == nullptr)
+		drawFromXML(pRoot->FirstChildElement("vertex"), GL_TRIANGLES);
+	else if (strcmp(elem->GetText(), "QUAD") == 0)
+		drawFromXML(pRoot->FirstChildElement("vertex"), GL_QUADS);
 }
 
 void changeSize(int w, int h) {
@@ -177,6 +194,7 @@ void init(void){
 // awkward main func do windows, just copy paste
 int WINAPI WinMain(HINSTANCE inst, HINSTANCE prev, LPSTR cmd, int show) {
 	srand(time(NULL));
+	drawCubeXML(1);
 
 	// init de cenas
 	glutInit(&__argc, __argv);
@@ -195,7 +213,9 @@ int WINAPI WinMain(HINSTANCE inst, HINSTANCE prev, LPSTR cmd, int show) {
 	// alguns settings para OpenGL
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
+	glEnable(GL_CULL_FACE);
 	glCullFace(GL_FRONT);
+	glFrontFace(GL_CW);
 
 	// entrar no loop do glut
 	glutMainLoop();
