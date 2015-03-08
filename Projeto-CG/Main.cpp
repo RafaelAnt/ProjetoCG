@@ -137,7 +137,7 @@ int WINAPI WinMain(HINSTANCE inst, HINSTANCE prev, LPSTR cmd, int show) {
 	glutInitWindowPosition(100, 100);
 	glutInitWindowSize(400, 400);
 	glutCreateWindow("Modelador");
-	//init();
+	init();
 
 	// registo de funcs
 	glutDisplayFunc(renderScene);
