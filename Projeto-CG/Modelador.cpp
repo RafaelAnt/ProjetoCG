@@ -92,7 +92,7 @@ void drawSphereXML(double r, int stacks, int slices){
 		double theta1 = ((double)(t) / stacks)*M_PI;
 		double theta2 = ((double)(t + 1) / stacks)*M_PI;
 
-		for (p = 0; p < slices; p++){ // slices are ORANGE SLICES so the count azimuth
+		for (p = 0; p < slices; p++){ // slices are ORANGE SLICES so they count azimuth
 			double phi1 = ((double)(p) / slices) * 2 * M_PI; // azimuth goes around 0 .. 2*PI
 			double phi2 = ((double)(p + 1) / slices) * 2 * M_PI;
 
