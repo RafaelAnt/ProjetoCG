@@ -78,7 +78,7 @@ void drawCubeXML(double size){
 	for (i = 0; i < 108; i+=3){
 		writeVertexToXML(pRoot, cubevertex[i], cubevertex[i + 1], cubevertex[i+2]);
 	}
-	xmlDoc.SaveFile("cubo.3d");
+	xmlDoc.SaveFile("/modeos/cubo.3d");
 }
 
 void drawSphereXML(double r, int stacks, int slices){
@@ -137,7 +137,7 @@ void drawSphereXML(double r, int stacks, int slices){
 			}
 		}
 	}
-	xmlDoc.SaveFile("esfera.3d");
+	xmlDoc.SaveFile("/modelos/esfera.3d");
 }
 
 
