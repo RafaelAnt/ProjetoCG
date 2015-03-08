@@ -22,7 +22,6 @@ float posx = 0, posy = 0, posz = 0;
 double size = 1;
 
 void changeSize(int w, int h) {
-
 	// Prevent a divide by zero, when window is too short
 	// (you cant make a window with zero width).
 	if (h == 0)
