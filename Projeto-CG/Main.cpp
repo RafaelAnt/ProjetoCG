@@ -12,14 +12,15 @@
 #include "Modelador.h"
 #include "Draw.h"
 #include <sstream>
+#include <algorithm>
+#include <valarray>
 
 using namespace std;
 
-//x do seno, tamanho do pote calculado
-//através do y do seno
 float GLOBAL_height = 1, GLOBAL_angle = 0, GLOBAL_barrelroll = 0;
 float posx = 0, posy = 0, posz = 0;
-double size = 1;
+GLfloat size = 1;
+std::valarray<GLfloat> vertices;
 
 void changeSize(int w, int h) {
 	// Prevent a divide by zero, when window is too short
@@ -59,7 +60,7 @@ void renderScene(void) {
 	glShadeModel(GL_SMOOTH);
 	glColor3f(1, 0.2, 0.3);
 
-	drawVertices(readVertices("esfera.3d"));
+	drawVertices(vertices*size);
 
 	// fim do frame
 	glutSwapBuffers();
@@ -129,6 +130,8 @@ void init(void){
 // awkward main func do windows, just copy paste
 int WINAPI WinMain(HINSTANCE inst, HINSTANCE prev, LPSTR cmd, int show) {
 	srand(time(NULL));
+
+	vertices = readVertices("esfera.3d");
 
 	// init de cenas
 	glutInit(&__argc, __argv);

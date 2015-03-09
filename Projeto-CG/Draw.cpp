@@ -1,3 +1,4 @@
+#include <valarray>
 #include <vector>
 #include "tinyxml2.h"
 #include "Draw.h"
@@ -5,7 +6,7 @@
 
 using namespace std;
 
-void drawVertices(vector<GLfloat> vertices){
+void drawVertices(valarray<GLfloat> vertices){
 	for (unsigned int i = 0, j = 0; i < vertices.size(); i += 3, j++){
 		glBegin(GL_TRIANGLES);
 		glNormal3f(vertices[i], vertices[i + 1], vertices[i + 2]);
@@ -35,7 +36,7 @@ static vector<GLfloat> readVertices_aux(tinyxml2::XMLElement *pElement){
 	return vertices;
 }
 
-vector<GLfloat> readVertices(const char *filename) {
+valarray<GLfloat> readVertices(const char *filename) {
 	using namespace tinyxml2;
 	tinyxml2::XMLDocument xmlDoc;
 	XMLError eResult = xmlDoc.LoadFile(filename);
@@ -43,5 +44,7 @@ vector<GLfloat> readVertices(const char *filename) {
 	if (pRoot == nullptr){
 		exit(-1);
 	}
-	return readVertices_aux(pRoot->FirstChildElement("vertex"));
+	vector<GLfloat> vec = readVertices_aux(pRoot->FirstChildElement("vertex"));
+	valarray<GLfloat> vertices(vec.data(),vec.size());
+	return vertices;
 }
