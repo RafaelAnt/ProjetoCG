@@ -29,34 +29,32 @@ static void normal(Triangle triangle){
 	v.y = triangle.p3.y - triangle.p1.y;
 	v.z = triangle.p3.z - triangle.p1.z;
 
-	normal.x = u.y*v.z - u.x*v.y;
-	normal.y = u.z*v.x - u.x*v.z;
-	normal.z = u.x*v.y - u.y*v.x;
+	normal.x = (u.y*v.z) - (u.x*v.y);
+	normal.y = (u.z*v.x) - (u.x*v.z);
+	normal.z = (u.x*v.y) - (u.y*v.x);
 
 	glNormal3f(normal.x, normal.y, normal.z);
-
 }
 
 void drawVertices(valarray<GLfloat> vertices){
 	Triangle t;
 	Point p1, p2, p3;
+	glBegin(GL_TRIANGLES);
 	for (unsigned int i = 0, j = 0; i < vertices.size(); i += 3, j++){
-		glBegin(GL_TRIANGLES);
 		p1.x = vertices[i]; p1.y = vertices[i + 1]; p1.z = vertices[i + 2];
-		glNormal3f(vertices[i], vertices[i + 1], vertices[i + 2]);
-		glVertex3f(vertices[i], vertices[i + 1], vertices[i + 2]);
+		glNormal3f(p1.x, p1.y, p1.z);
+		glVertex3f(p1.x, p1.y, p1.z);
 		i += 3;
 		p2.x = vertices[i]; p2.y = vertices[i + 1]; p2.z = vertices[i + 2];
-		glNormal3f(vertices[i], vertices[i + 1], vertices[i + 2]);
-		glVertex3f(vertices[i], vertices[i + 1], vertices[i + 2]);
+		glNormal3f(p2.x, p2.y, p2.z);
+		glVertex3f(p2.x, p2.y, p2.z);
 		i += 3;
 		p3.x = vertices[i]; p3.y = vertices[i + 1]; p3.z = vertices[i + 2];
-		glNormal3f(vertices[i], vertices[i + 1], vertices[i + 2]);
-		glVertex3f(vertices[i], vertices[i + 1], vertices[i + 2]);
-		glEnd();
+		glNormal3f(p3.x, p3.y, p3.z);
+		glVertex3f(p3.x, p3.y, p3.z);
 		t.p1 = p1; t.p2 = p2; t.p3 = p3;
-		normal(t);
 	}
+	glEnd();
 }
 
 static vector<GLfloat> readVertices_aux(tinyxml2::XMLElement *pElement){

@@ -60,6 +60,7 @@ void renderScene(void) {
 	glShadeModel(GL_SMOOTH);
 	glColor3f(1, 0.2, 0.3);
 
+	//glutSolidSphere(1,20,20);
 	drawVertices(vertices*size);
 
 	// fim do frame
@@ -132,6 +133,8 @@ int WINAPI WinMain(HINSTANCE inst, HINSTANCE prev, LPSTR cmd, int show) {
 	srand(time(NULL));
 
 	drawPyramidXML(0.5, 1);
+	drawParallelpipedXML(1, 2, 1);
+	drawSphereXML(1, 20, 20);
 
 	vertices = readVertices("esfera.3d");
 
