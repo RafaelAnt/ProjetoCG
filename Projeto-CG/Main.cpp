@@ -131,6 +131,8 @@ void init(void){
 int WINAPI WinMain(HINSTANCE inst, HINSTANCE prev, LPSTR cmd, int show) {
 	srand(time(NULL));
 
+	drawPyramidXML(0.5, 1);
+
 	vertices = readVertices("esfera.3d");
 
 	// init de cenas
@@ -150,9 +152,9 @@ int WINAPI WinMain(HINSTANCE inst, HINSTANCE prev, LPSTR cmd, int show) {
 	// alguns settings para OpenGL
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
-	glEnable(GL_CULL_FACE);
+	glEnable(GL_NORMALIZE);
 	glCullFace(GL_FRONT);
-	glFrontFace(GL_CW);
+	glFrontFace(GL_CCW);
 
 	// entrar no loop do glut
 	glutMainLoop();
