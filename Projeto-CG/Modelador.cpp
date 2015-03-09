@@ -31,6 +31,78 @@ static void writeVertexToXML(tinyxml2::XMLNode * pRoot, double x, double y, doub
 	pRoot->InsertEndChild(elem);
 }
 
+void drawParallelpipedXML(float width, float height, float lenght){
+	using namespace tinyxml2;
+	XMLNode * pRoot = xmlDoc.NewElement("paralelipipedo");
+	xmlDoc.InsertFirstChild(pRoot);
+
+	//face frente
+	writeVertexToXML(pRoot, width / 2, height / 2, lenght / 2);
+	writeVertexToXML(pRoot, width / 2, -height / 2, lenght / 2);
+	writeVertexToXML(pRoot, -width / 2, height / 2, lenght / 2);
+
+
+	writeVertexToXML(pRoot, -width / 2, height / 2, lenght / 2);
+	writeVertexToXML(pRoot, width / 2, -height / 2, lenght / 2);
+	writeVertexToXML(pRoot, -width / 2, -height / 2, lenght / 2);
+
+
+	//face direita
+	writeVertexToXML(pRoot, width / 2, height / 2, lenght / 2);
+	writeVertexToXML(pRoot, width / 2, height / 2, -lenght / 2);
+	writeVertexToXML(pRoot, width / 2, -height / 2, -lenght / 2);
+
+
+	writeVertexToXML(pRoot, width / 2, height / 2, lenght / 2);
+	writeVertexToXML(pRoot, width / 2, -height / 2, -lenght / 2);
+	writeVertexToXML(pRoot, width / 2, -height / 2, lenght / 2);
+
+
+	//face  cima
+	writeVertexToXML(pRoot, width / 2, height / 2, lenght / 2);
+	writeVertexToXML(pRoot, -width / 2, height / 2, lenght / 2);
+	writeVertexToXML(pRoot, width / 2, height / 2, -lenght / 2);
+
+
+	writeVertexToXML(pRoot, -width / 2, height / 2, lenght / 2);
+	writeVertexToXML(pRoot, -width / 2, height / 2, -lenght / 2);
+	writeVertexToXML(pRoot, width / 2, height / 2, -lenght / 2);
+
+
+	//face esquerda
+	writeVertexToXML(pRoot, -width / 2, height / 2, lenght / 2);
+	writeVertexToXML(pRoot, -width / 2, -height / 2, -lenght / 2);
+	writeVertexToXML(pRoot, -width / 2, height / 2, -lenght / 2);
+
+	writeVertexToXML(pRoot, -width / 2, height / 2, lenght / 2);
+	writeVertexToXML(pRoot, -width / 2, -height / 2, lenght / 2);
+	writeVertexToXML(pRoot, -width / 2, -height / 2, -lenght / 2);
+
+	//face baixo
+	writeVertexToXML(pRoot, -width / 2, -height / 2, lenght / 2);
+	writeVertexToXML(pRoot, width / 2, -height / 2, -lenght / 2);
+	writeVertexToXML(pRoot, -width / 2, -height / 2, -lenght / 2);
+
+
+	writeVertexToXML(pRoot, width / 2, -height / 2, lenght / 2);
+	writeVertexToXML(pRoot, width / 2, -height / 2, -lenght / 2);
+	writeVertexToXML(pRoot, -width / 2, -height / 2, lenght / 2);
+
+
+	//face traz
+	writeVertexToXML(pRoot, -width / 2, -height / 2, -lenght / 2);
+	writeVertexToXML(pRoot, width / 2, height / 2, -lenght / 2);
+	writeVertexToXML(pRoot, -width / 2, height / 2, -lenght / 2);
+
+
+	writeVertexToXML(pRoot, width / 2, -height / 2, -lenght / 2);
+	writeVertexToXML(pRoot, width / 2, height / 2, -lenght / 2);
+	writeVertexToXML(pRoot, -width / 2, -height / 2, -lenght / 2);
+
+
+	xmlDoc.SaveFile("paralelipipedo.3d");
+}
+
 void drawPyramidXML(float base, float height){
 	using namespace tinyxml2;
 	XMLNode * pRoot = xmlDoc.NewElement("piramide");
