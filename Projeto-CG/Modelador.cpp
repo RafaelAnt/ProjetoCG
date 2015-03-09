@@ -31,7 +31,39 @@ static void writeVertexToXML(tinyxml2::XMLNode * pRoot, double x, double y, doub
 	pRoot->InsertEndChild(elem);
 }
 
-void drawSphereXML(double r, int stacks, int slices){
+void drawPyramidXML(float base, float height){
+	using namespace tinyxml2;
+	XMLNode * pRoot = xmlDoc.NewElement("piramide");
+	xmlDoc.InsertFirstChild(pRoot);
+
+	writeVertexToXML(pRoot,base, 0, -base);
+	writeVertexToXML(pRoot,base, 0, base);
+	writeVertexToXML(pRoot,0, height, 0);
+
+	writeVertexToXML(pRoot,-base, 0, base);
+	writeVertexToXML(pRoot,-base, 0, -base);
+	writeVertexToXML(pRoot,0, height, 0);
+	
+	writeVertexToXML(pRoot,base, 0, base);
+	writeVertexToXML(pRoot,-base, 0, base);
+	writeVertexToXML(pRoot,0, height, 0);
+	
+	writeVertexToXML(pRoot,-base, 0, -base);
+	writeVertexToXML(pRoot,base, 0, -base);
+	writeVertexToXML(pRoot,0, height, 0);
+	
+	writeVertexToXML(pRoot,base, 0, base);
+	writeVertexToXML(pRoot,base, 0, -base);
+	writeVertexToXML(pRoot,-base, 0, base);
+	
+	writeVertexToXML(pRoot,-base, 0, -base);
+	writeVertexToXML(pRoot,-base, 0, base);
+	writeVertexToXML(pRoot,base, 0, -base);
+
+	xmlDoc.SaveFile("piramide.3d");
+}
+
+void drawSphereXML(float r, int stacks, int slices){
 	using namespace tinyxml2;
 	XMLNode * pRoot = xmlDoc.NewElement("esfera");
 	xmlDoc.InsertFirstChild(pRoot);
