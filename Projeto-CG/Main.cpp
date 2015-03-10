@@ -101,6 +101,7 @@ void keyboard(unsigned char key, int x, int y){
 		break;
 	case 'a':
 		GLOBAL_angle -= 1;
+		break;
 	case 'w':
 		GLOBAL_barrelroll += 1;
 		break;
@@ -136,7 +137,7 @@ int WINAPI WinMain(HINSTANCE inst, HINSTANCE prev, LPSTR cmd, int show) {
 	drawParallelpipedXML(1, 2, 1);
 	drawSphereXML(1, 20, 20);
 
-	vertices = readVertices("esfera.3d");
+	vertices = readVertices("paralelipipedo.3d");
 
 	// init de cenas
 	glutInit(&__argc, __argv);
