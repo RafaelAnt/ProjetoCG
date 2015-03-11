@@ -16,11 +16,11 @@ typedef struct triangle{
 	Point p1;
 	Point p2;
 	Point p3;
-}Triangle ;
+}Triangle;
 
 static void normal(Triangle triangle){
 	Point u, v, normal;
-	
+
 	u.x = triangle.p2.x - triangle.p1.x;
 	u.y = triangle.p2.y - triangle.p1.y;
 	u.z = triangle.p2.z - triangle.p1.z;
@@ -39,6 +39,7 @@ static void normal(Triangle triangle){
 void drawVertices(valarray<GLfloat> vertices){
 	Triangle t;
 	Point p1, p2, p3;
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glBegin(GL_TRIANGLES);
 	for (unsigned int i = 0, j = 0; i < vertices.size(); i += 3, j++){
 		p1.x = vertices[i]; p1.y = vertices[i + 1]; p1.z = vertices[i + 2];
@@ -57,10 +58,10 @@ void drawVertices(valarray<GLfloat> vertices){
 	glEnd();
 }
 
-static vector<GLfloat> readVertices_aux(tinyxml2::XMLElement *pElement){
+static vector<GLfloat> readVertices_aux(tinyxml2::XMLElement *pElement, vector<GLfloat> vertices){
+	int i = 0;
 	float x, y, z;
 	const char *aux;
-	vector<GLfloat> vertices;
 	while (pElement != NULL) {
 		aux = pElement->GetText();
 		sscanf_s(aux, "X=%f Y=%f Z=%f", &x, &y, &z);
@@ -68,19 +69,27 @@ static vector<GLfloat> readVertices_aux(tinyxml2::XMLElement *pElement){
 		vertices.push_back(y);
 		vertices.push_back(z);
 		pElement = pElement->NextSiblingElement("vertex");
+		i++;
 	}
+	if (i != 3) throw 1;
 	return vertices;
 }
 
 valarray<GLfloat> readVertices(const char *filename) {
 	using namespace tinyxml2;
+	vector<GLfloat> vec;
 	tinyxml2::XMLDocument xmlDoc;
 	XMLError eResult = xmlDoc.LoadFile(filename);
 	XMLNode * pRoot = xmlDoc.FirstChild();
+	XMLElement *pElement;
 	if (pRoot == nullptr){
 		exit(-1);
 	}
-	vector<GLfloat> vec = readVertices_aux(pRoot->FirstChildElement("vertex"));
-	valarray<GLfloat> vertices(vec.data(),vec.size());
+	pElement = pRoot->FirstChildElement("triangle");
+	while (pElement != NULL){
+		vec = readVertices_aux(pElement->FirstChildElement("vertex"),vec);
+		pElement = pElement->NextSiblingElement("triangle");
+	}
+	valarray<GLfloat> vertices(vec.data(), vec.size());
 	return vertices;
 }

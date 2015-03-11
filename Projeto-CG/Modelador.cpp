@@ -31,6 +31,16 @@ static void writeVertexToXML(tinyxml2::XMLNode * pRoot, double x, double y, doub
 	pRoot->InsertEndChild(elem);
 }
 
+static void writeTriangleToXML(tinyxml2::XMLNode * pRoot, Vertex v1, Vertex v2, Vertex v3){
+	using namespace tinyxml2;
+	char text[1024];
+	XMLNode *triangle = xmlDoc.NewElement("triangle");
+	writeVertexToXML(triangle, v1);
+	writeVertexToXML(triangle, v2);
+	writeVertexToXML(triangle, v3);
+	pRoot->InsertEndChild(triangle);
+}
+
 void drawParallelpipedXML(float width, float height, float lenght){
 	using namespace tinyxml2;
 	XMLNode * pRoot = xmlDoc.NewElement("paralelipipedo");
@@ -105,32 +115,37 @@ void drawParallelpipedXML(float width, float height, float lenght){
 
 void drawPyramidXML(float base, float height){
 	using namespace tinyxml2;
+	Vertex v1,v2,v3;
 	XMLNode * pRoot = xmlDoc.NewElement("piramide");
 	xmlDoc.InsertFirstChild(pRoot);
 
-	writeVertexToXML(pRoot,base, 0, -base);
-	writeVertexToXML(pRoot,base, 0, base);
-	writeVertexToXML(pRoot,0, height, 0);
+	v3.x = 0; v3.y = height; v3.z = 0;
 
-	writeVertexToXML(pRoot,-base, 0, base);
-	writeVertexToXML(pRoot,-base, 0, -base);
-	writeVertexToXML(pRoot,0, height, 0);
+	v1.x = base; v1.y = 0; v1.z = -base;
+	v2.x = base; v2.y = 0; v2.z = base;
+	writeTriangleToXML(pRoot, v1, v2, v3);
+
+	v1.x = -base; v1.y = 0; v1.z = base;
+	v2.x = -base; v2.y = 0; v2.z = -base;
+	writeTriangleToXML(pRoot, v1, v2, v3);
 	
-	writeVertexToXML(pRoot,base, 0, base);
-	writeVertexToXML(pRoot,-base, 0, base);
-	writeVertexToXML(pRoot,0, height, 0);
-	
-	writeVertexToXML(pRoot,-base, 0, -base);
-	writeVertexToXML(pRoot,base, 0, -base);
-	writeVertexToXML(pRoot,0, height, 0);
-	
-	writeVertexToXML(pRoot,base, 0, base);
-	writeVertexToXML(pRoot,base, 0, -base);
-	writeVertexToXML(pRoot,-base, 0, base);
-	
-	writeVertexToXML(pRoot,-base, 0, -base);
-	writeVertexToXML(pRoot,-base, 0, base);
-	writeVertexToXML(pRoot,base, 0, -base);
+	v1.x = base; v1.y = 0; v1.z = base;
+	v2.x = -base; v2.y = 0; v2.z =base;
+	writeTriangleToXML(pRoot, v1, v2, v3);
+
+	v1.x = -base; v1.y = 0; v1.z = -base;
+	v2.x = base; v2.y = 0; v2.z = -base;
+	writeTriangleToXML(pRoot, v1, v2, v3);
+
+	v1.x = base; v1.y = 0; v1.z = base;
+	v2.x = base; v2.y = 0; v2.z = -base;
+	v3.x = -base; v3.y = 0; v3.z = base;
+	writeTriangleToXML(pRoot, v1, v2, v3);
+
+	v1.x = -base; v1.y = 0; v1.z= - base;
+	v2.x = -base; v2.y = 0; v2.z=base;
+	v3.x = base; v3.y = 0; v3.z=- base;
+	writeTriangleToXML(pRoot, v1, v2, v3);
 
 	xmlDoc.SaveFile("piramide.3d");
 }
@@ -170,22 +185,14 @@ void drawSphereXML(float r, int stacks, int slices){
 
 			// facing out
 			if (t == 0){ // top cap
-				writeVertexToXML(pRoot, vertex1);
-				writeVertexToXML(pRoot, vertex3);
-				writeVertexToXML(pRoot, vertex4);
+				writeTriangleToXML(pRoot, vertex1, vertex3, vertex4);
 			}
 			else if (t + 1 == stacks){ //end cap
-				writeVertexToXML(pRoot, vertex3);
-				writeVertexToXML(pRoot, vertex1);
-				writeVertexToXML(pRoot, vertex2);
+				writeTriangleToXML(pRoot, vertex3, vertex1, vertex2);
 			}
 			else{
-				writeVertexToXML(pRoot, vertex1);
-				writeVertexToXML(pRoot, vertex2);
-				writeVertexToXML(pRoot, vertex4);
-				writeVertexToXML(pRoot, vertex2);
-				writeVertexToXML(pRoot, vertex3);
-				writeVertexToXML(pRoot, vertex4);
+				writeTriangleToXML(pRoot, vertex1, vertex2, vertex4);
+				writeTriangleToXML(pRoot, vertex2, vertex3, vertex4);
 			}
 		}
 	}
