@@ -33,7 +33,6 @@ static void writeVertexToXML(tinyxml2::XMLNode * pRoot, double x, double y, doub
 
 static void writeTriangleToXML(tinyxml2::XMLNode * pRoot, Vertex v1, Vertex v2, Vertex v3){
 	using namespace tinyxml2;
-	char text[1024];
 	XMLNode *triangle = xmlDoc.NewElement("triangle");
 	writeVertexToXML(triangle, v1);
 	writeVertexToXML(triangle, v2);
@@ -199,42 +198,6 @@ void drawSphereXML(float r, int stacks, int slices){
 	xmlDoc.SaveFile("esfera.3d");
 }
 
+int main(int argc, char **argv){
 
-
-/*
-void drawSphereXML2(double r, int lats, int longs) {
-	using namespace tinyxml2;
-	tinyxml2::XMLDocument xmlDoc;
-	XMLNode * pRoot = xmlDoc.NewElement("esfera");
-	xmlDoc.InsertFirstChild(pRoot);
-	char aux[1024];
-	std::string elemText;
-	int i, j, total = 1;
-	for (i = 0; i <= lats; i++) {
-
-		double lat0 = M_PI * (-0.5 + (double)(i - 1) / lats);
-		double z0 = sin(lat0);
-		double zr0 = cos(lat0);
-
-		double lat1 = M_PI * (-0.5 + (double)i / lats);
-		double z1 = sin(lat1);
-		double zr1 = cos(lat1);
-
-		for (j = 0; j <= longs; j++) {
-			double lng = 2 * M_PI * (double)(j - 1) / longs;
-			double x = cos(lng);
-			double y = sin(lng);
-
-			sprintf_s(aux, "X=%g Y=%g Z=%g", x * zr0, y * zr0, z0);
-			XMLElement *elem = xmlDoc.NewElement("vertex");
-			elem->SetText(aux);
-			pRoot->InsertEndChild(elem);
-			sprintf_s(aux, "X=%g Y=%g Z=%g", x * zr1, y * zr1, z1);
-			elem = xmlDoc.NewElement("vertex");
-			elem->SetText(aux);
-			pRoot->InsertEndChild(elem);
-		}
-
-	}
-	xmlDoc.SaveFile("esfera.3d");
-}*/
+}

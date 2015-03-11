@@ -116,10 +116,6 @@ void keyboard(unsigned char key, int x, int y){
 int main() {
 	srand(time(NULL));
 
-	drawPyramidXML(0.5, 1);
-	drawParallelpipedXML(1, 2, 1);
-	//drawSphereXML(1, 20, 20);
-
 	try{ vertices = readVertices("esfera.3d"); }
 	catch (int e){ 
 		puts("Erro na leitura dos triangulos, formato do ficheiro XML invalido!"); 
