@@ -211,5 +211,8 @@ int main(int argc, char **argv){
 				printf("Erro nos argumentos!\n");
 			}
 		}
+		else{
+			printf("Figura invalida!");
+		}
 	}
 }
