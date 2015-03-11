@@ -114,7 +114,7 @@ void drawParallelpipedXML(float width, float height, float lenght){
 
 void drawPyramidXML(float base, float height){
 	using namespace tinyxml2;
-	Vertex v1,v2,v3;
+	Vertex v1, v2, v3;
 	XMLNode * pRoot = xmlDoc.NewElement("piramide");
 	xmlDoc.InsertFirstChild(pRoot);
 
@@ -127,9 +127,9 @@ void drawPyramidXML(float base, float height){
 	v1.x = -base; v1.y = 0; v1.z = base;
 	v2.x = -base; v2.y = 0; v2.z = -base;
 	writeTriangleToXML(pRoot, v1, v2, v3);
-	
+
 	v1.x = base; v1.y = 0; v1.z = base;
-	v2.x = -base; v2.y = 0; v2.z =base;
+	v2.x = -base; v2.y = 0; v2.z = base;
 	writeTriangleToXML(pRoot, v1, v2, v3);
 
 	v1.x = -base; v1.y = 0; v1.z = -base;
@@ -141,20 +141,20 @@ void drawPyramidXML(float base, float height){
 	v3.x = -base; v3.y = 0; v3.z = base;
 	writeTriangleToXML(pRoot, v1, v2, v3);
 
-	v1.x = -base; v1.y = 0; v1.z= - base;
-	v2.x = -base; v2.y = 0; v2.z=base;
-	v3.x = base; v3.y = 0; v3.z=- base;
+	v1.x = -base; v1.y = 0; v1.z = -base;
+	v2.x = -base; v2.y = 0; v2.z = base;
+	v3.x = base; v3.y = 0; v3.z = -base;
 	writeTriangleToXML(pRoot, v1, v2, v3);
 
 	xmlDoc.SaveFile("piramide.3d");
 }
 
-void drawSphereXML(float r, int stacks, int slices){
+void drawSphereXML(float r, int stacks, int slices, char *filename){
 	using namespace tinyxml2;
 	XMLNode * pRoot = xmlDoc.NewElement("esfera");
 	xmlDoc.InsertFirstChild(pRoot);
 	int t, p;
-	for ( t= 0; t < stacks; t++){ // stacks are ELEVATION so they count theta
+	for (t = 0; t < stacks; t++){ // stacks are ELEVATION so they count theta
 		double theta1 = ((double)(t) / stacks)*M_PI;
 		double theta2 = ((double)(t + 1) / stacks)*M_PI;
 
@@ -195,9 +195,21 @@ void drawSphereXML(float r, int stacks, int slices){
 			}
 		}
 	}
-	xmlDoc.SaveFile("esfera.3d");
+	xmlDoc.SaveFile(filename);
 }
 
 int main(int argc, char **argv){
-
+	int stacks, slices;
+	float radius;
+	if (argc > 1){
+		if (strcmp(argv[1], "esfera") == 0){
+			if (argc == 6){
+				drawSphereXML((float)atof(argv[2]), atoi(argv[3]), atoi(argv[4]), argv[5]);
+				printf("Esfera gravada em %s com %Lf de raio, %d camadas e %d fatias.\n", argv[5], (float)atof(argv[2]), atoi(argv[3]), atoi(argv[4]));
+			}
+			else{
+				printf("Erro nos argumentos!\n");
+			}
+		}
+	}
 }

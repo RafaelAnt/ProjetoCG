@@ -9,7 +9,6 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include "tinyxml2.h"
-#include "Modelador.h"
 #include "Draw.h"
 #include <sstream>
 #include <algorithm>
@@ -116,7 +115,7 @@ void keyboard(unsigned char key, int x, int y){
 int main() {
 	srand(time(NULL));
 
-	try{ vertices = readVertices("esfera.3d"); }
+	try{ vertices = readVertices("esfera2.3d"); }
 	catch (int e){ 
 		puts("Erro na leitura dos triangulos, formato do ficheiro XML invalido!"); 
 		exit(-1); 
