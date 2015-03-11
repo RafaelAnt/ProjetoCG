@@ -18,12 +18,15 @@
     <ClCompile Include="..\Projeto-CG\tinyxml2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Projeto-CG\Modelador.cpp">
+    <ClCompile Include="Modelador.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Projeto-CG\Modelador.h">
+    <ClInclude Include="Modelador.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Projeto-CG\tinyxml2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

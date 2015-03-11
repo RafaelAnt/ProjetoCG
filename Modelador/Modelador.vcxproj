@@ -78,11 +78,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\Projeto-CG\Modelador.cpp" />
     <ClCompile Include="..\Projeto-CG\tinyxml2.cpp" />
+    <ClCompile Include="Modelador.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Projeto-CG\Modelador.h" />
+    <ClInclude Include="..\Projeto-CG\tinyxml2.h" />
+    <ClInclude Include="Modelador.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
