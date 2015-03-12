@@ -58,6 +58,7 @@ void renderScene(void) {
 		0, 0, 0,
 		0.0f, 1.0f, 0.0f);
 
+	/* SISTEMA SOLAR (sort of)
 	glPushMatrix();
 	glScalef(0.75, 0.75, 0.75);
 	drawVertices(vertices);
@@ -77,7 +78,9 @@ void renderScene(void) {
 	}
 	if (angle1 == 360){
 		angle1 = 0;
-	}
+	}*/
+
+	drawVertices(vertices);
 
 	// fim do frame
 	glutSwapBuffers();
@@ -115,11 +118,10 @@ void keyboard(unsigned char key, int x, int y){
 	}
 }
 
-// awkward main func do windows, just copy paste
 int main() {
 	srand(time(NULL));
 
-	try{ vertices = readVertices("esfera.3d"); }
+	try{ vertices = readVertices("cilindro.3d"); }
 	catch (int e){
 		puts("Erro na leitura dos triangulos, formato do ficheiro XML invalido!");
 		exit(-1);
