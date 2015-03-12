@@ -16,7 +16,7 @@
 
 using namespace std;
 
-float angle = 0;
+float angle = 0, angle1=0;
 float alfa = 0, beta = 0, raio = 5, step = 0.02;
 float posx = 0, posy = 0, posz = 0;
 GLfloat size = 1;
@@ -58,15 +58,26 @@ void renderScene(void) {
 		0, 0, 0,
 		0.0f, 1.0f, 0.0f);
 
+	glPushMatrix();
+	glScalef(0.75, 0.75, 0.75);
 	drawVertices(vertices);
+	glPopMatrix();
 
 
 	glPushMatrix();
-	glRotatef(angle+=0.05, 0.0, 0.0, 1.0); // 2. Rotate the object.
-	glTranslatef(5, 0, 0); // 1. Translate to the origin.
+	glRotatef(angle+=0.5, 0.0, 0.0, 1.0); // 2. Rotate the object.
+	glTranslatef(3, 0, 0); // 1. Translate to the origin.
+	glRotatef(angle1 += 1, 0, 0, 1);
 	glScalef(0.25, 0.25, 0.25);
 	drawVertices(vertices);
 	glPopMatrix();
+
+	if (angle == 360){
+		angle = 0;
+	}
+	if (angle1 == 360){
+		angle1 = 0;
+	}
 
 	// fim do frame
 	glutSwapBuffers();
@@ -90,7 +101,6 @@ void keyboardSpecial(int key, int x, int y){
 		alfa += step;
 		break;
 	}
-	glutPostRedisplay();
 }
 
 void keyboard(unsigned char key, int x, int y){
@@ -103,7 +113,6 @@ void keyboard(unsigned char key, int x, int y){
 		raio += 0.05;
 		break;
 	}
-	glutPostRedisplay();
 }
 
 // awkward main func do windows, just copy paste

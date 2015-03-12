@@ -112,7 +112,7 @@ void drawParallelpipedXML(float width, float height, float lenght){
 	xmlDoc.SaveFile("paralelipipedo.3d");
 }
 
-void drawPyramidXML(float base, float height){
+void drawPyramidXML(float base, float height, char *filename){
 	using namespace tinyxml2;
 	Vertex v1, v2, v3;
 	XMLNode * pRoot = xmlDoc.NewElement("piramide");
@@ -146,7 +146,7 @@ void drawPyramidXML(float base, float height){
 	v3.x = base; v3.y = 0; v3.z = -base;
 	writeTriangleToXML(pRoot, v1, v2, v3);
 
-	xmlDoc.SaveFile("piramide.3d");
+	xmlDoc.SaveFile(filename);
 }
 
 void drawSphereXML(float r, int stacks, int slices, char *filename){
@@ -206,6 +206,15 @@ int main(int argc, char **argv){
 			if (argc == 6){
 				drawSphereXML((float)atof(argv[2]), atoi(argv[3]), atoi(argv[4]), argv[5]);
 				printf("Esfera gravada em %s com %Lf de raio, %d camadas e %d fatias.\n", argv[5], (float)atof(argv[2]), atoi(argv[3]), atoi(argv[4]));
+			}
+			else{
+				printf("Erro nos argumentos!\n");
+			}
+		}
+		if (strcmp(argv[1], "piramide") == 0){
+			if (argc == 5){
+				drawPyramidXML((float)atof(argv[2]), (float)atof(argv[3]), argv[4]);
+				printf("Piramide criada com %Lf de base e %Lf de altura\n", (float)atof(argv[2]), (float)atof(argv[3]));
 			}
 			else{
 				printf("Erro nos argumentos!\n");
