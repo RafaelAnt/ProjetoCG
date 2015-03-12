@@ -149,89 +149,6 @@ void drawPyramidXML(float base, float height, char *filename){
 	xmlDoc.SaveFile(filename);
 }
 
-void drawCylinderToXML(float height, float radius, int slices, int stacks, char *filename) {
-	using namespace tinyxml2;
-	XMLNode * pRoot = xmlDoc.NewElement("cilindro");
-	xmlDoc.InsertFirstChild(pRoot);
-
-	float pi = 3.1415f, h1, h2;
-
-	//base cima
-	for (float i = 0; i < 2 * pi; i += 2 * pi / slices) {
-		vertex vertex1;
-		vertex1.x = radius*sin(i);
-		vertex1.y = height;
-		vertex1.z = radius*cos(i);
-
-		vertex vertex2;
-		vertex2.x = 0;
-		vertex2.y = height;
-		vertex2.z = 0;
-
-		vertex vertex3;
-		vertex3.x = radius*sin(i + 2 * pi / slices);
-		vertex3.y = height;
-		vertex3.z = radius*cos(i + 2 * pi / slices);
-
-		writeTriangleToXML(pRoot, vertex1, vertex2, vertex3);
-	}
-
-	//base baixo
-	for (float i = 0; i < 2 * pi; i += 2 * pi / slices) {
-
-		vertex vertex1;
-		vertex1.x = radius*sin(i);
-		vertex1.y = 0;
-		vertex1.z = radius*cos(i);
-
-		vertex vertex2;
-		vertex2.x = 0;
-		vertex2.y = 0;
-		vertex2.z = 0;
-
-		vertex vertex3;
-		vertex3.x = radius*sin(i + 2 * pi / slices);
-		vertex3.y = 0;
-		vertex3.z = radius*cos(i + 2 * pi / slices);
-
-		writeTriangleToXML(pRoot, vertex1, vertex3, vertex2);
-	}
-
-	//face curva
-
-	for (float l = height / stacks, h1 = 0.0f, h2 = l; h2 <= height; h1 = h2, h2 = h2 + l) {
-		for (float i = 0; i < 2 * pi; i += 2 * pi / slices) {
-
-			vertex vertex1;
-			vertex1.x = radius*sin(i);
-			vertex1.y = h2;
-			vertex1.z = radius*cos(i);
-
-			vertex vertex2;
-			vertex2.x = radius*sin(i + 2 * pi / slices);
-			vertex2.y = h2;
-			vertex2.z = radius*cos(i + 2 * pi / slices);
-
-			vertex vertex3;
-			vertex3.x = radius*sin(i);
-			vertex3.y = h1;
-			vertex3.z = radius*cos(i);
-
-			vertex vertex4;
-			vertex4.x = radius*sin(i + 2 * pi / slices);
-			vertex4.y = h1;
-			vertex4.z = radius*cos(i + 2 * pi / slices);
-
-			writeTriangleToXML(pRoot, vertex1, vertex2, vertex3);
-			writeTriangleToXML(pRoot, vertex2, vertex4, vertex3);
-		}
-	}
-
-
-
-	xmlDoc.SaveFile(filename);
-}
-
 void drawSphereXML(float r, int stacks, int slices, char *filename){
 	using namespace tinyxml2;
 	XMLNode * pRoot = xmlDoc.NewElement("esfera");
@@ -281,6 +198,115 @@ void drawSphereXML(float r, int stacks, int slices, char *filename){
 	xmlDoc.SaveFile(filename);
 }
 
+void drawCylinderXML(float height, float radius, int slices, int stacks, char *filename) {
+	using namespace tinyxml2;
+	XMLNode * pRoot = xmlDoc.NewElement("cilindro");
+	xmlDoc.InsertFirstChild(pRoot);
+
+	float pi = 3.1415f, h1, h2 = 0;
+
+	//base cima
+	for (float i = 0; i < 2 * pi; i += 2 * pi / slices) {
+		vertex vertex1;
+		vertex1.x = radius*sin(i);
+		vertex1.y = height;
+		vertex1.z = radius*cos(i);
+
+		vertex vertex2;
+		vertex2.x = 0;
+		vertex2.y = height;
+		vertex2.z = 0;
+
+		vertex vertex3;
+		vertex3.x = radius*sin(i + 2 * pi / slices);
+		vertex3.y = height;
+		vertex3.z = radius*cos(i + 2 * pi / slices);
+
+		writeTriangleToXML(pRoot, vertex1, vertex2, vertex3);
+	}
+
+	//base baixo
+	for (float i = 0; i < 2 * pi; i += 2 * pi / slices) {
+
+		vertex vertex1;
+		vertex1.x = radius*sin(i);
+		vertex1.y = 0;
+		vertex1.z = radius*cos(i);
+
+		vertex vertex2;
+		vertex2.x = 0;
+		vertex2.y = 0;
+		vertex2.z = 0;
+
+		vertex vertex3;
+		vertex3.x = radius*sin(i + 2 * pi / slices);
+		vertex3.y = 0;
+		vertex3.z = radius*cos(i + 2 * pi / slices);
+
+		writeTriangleToXML(pRoot, vertex1, vertex3, vertex2);
+	}
+
+	//face curva
+
+	for (float l = height / stacks, h1 = 0.0f, h2 = l; h2<height; h1 = h2, h2 = h2 + l) {
+		for (float i = 0; i < 2 * pi; i += 2 * pi / slices) {
+
+			vertex vertex1;
+			vertex1.x = radius*sin(i);
+			vertex1.y = h2;
+			vertex1.z = radius*cos(i);
+
+			vertex vertex2;
+			vertex2.x = radius*sin(i + 2 * pi / slices);
+			vertex2.y = h2;
+			vertex2.z = radius*cos(i + 2 * pi / slices);
+
+			vertex vertex3;
+			vertex3.x = radius*sin(i);
+			vertex3.y = h1;
+			vertex3.z = radius*cos(i);
+
+			vertex vertex4;
+			vertex4.x = radius*sin(i + 2 * pi / slices);
+			vertex4.y = h1;
+			vertex4.z = radius*cos(i + 2 * pi / slices);
+
+			writeTriangleToXML(pRoot, vertex1, vertex2, vertex3);
+			writeTriangleToXML(pRoot, vertex2, vertex4, vertex3);
+		}
+
+	}
+	for (float i = 0; i < 2 * pi; i += 2 * pi / slices) {
+
+		vertex vertex1;
+		vertex1.x = radius*sin(i);
+		vertex1.y = height;
+		vertex1.z = radius*cos(i);
+
+		vertex vertex2;
+		vertex2.x = radius*sin(i + 2 * pi / slices);
+		vertex2.y = height;
+		vertex2.z = radius*cos(i + 2 * pi / slices);
+
+		vertex vertex3;
+		vertex3.x = radius*sin(i);
+		vertex3.y = height - height / stacks;
+		vertex3.z = radius*cos(i);
+
+		vertex vertex4;
+		vertex4.x = radius*sin(i + 2 * pi / slices);
+		vertex4.y = height - height / stacks;
+		vertex4.z = radius*cos(i + 2 * pi / slices);
+
+		writeTriangleToXML(pRoot, vertex1, vertex2, vertex3);
+		writeTriangleToXML(pRoot, vertex2, vertex4, vertex3);
+	}
+
+
+
+	xmlDoc.SaveFile(filename);
+}
+
 int main(int argc, char **argv){
 	int stacks, slices;
 	float radius;
@@ -308,7 +334,7 @@ int main(int argc, char **argv){
 		}
 		if (strcmp(argv[1], "cilindro") == 0){
 			if (argc == 7){
-				drawCylinderToXML((float)atof(argv[2]), (float)atof(argv[3]), atoi(argv[4]), atoi(argv[5]), argv[6]);
+				drawCylinderXML((float)atof(argv[2]), (float)atof(argv[3]), atoi(argv[4]), atoi(argv[5]), argv[6]);
 				printf("Cilindro gravado em %s com %Lf de altura, %Lf de raio, %d camadas e %d fatias.\n", argv[6], (float)atof(argv[2]), (float)atof(argv[3]), atoi(argv[4]), atoi(argv[5]));
 			}
 
