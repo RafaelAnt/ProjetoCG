@@ -16,7 +16,8 @@
 
 using namespace std;
 
-float GLOBAL_height = 1, GLOBAL_angle = 0, GLOBAL_barrelroll = 0;
+float angle = 0;
+float alfa = 0, beta = 0, raio = 5, step = 0.02;
 float posx = 0, posy = 0, posz = 0;
 GLfloat size = 1;
 std::valarray<GLfloat> vertices;
@@ -48,19 +49,24 @@ void changeSize(int w, int h) {
 void renderScene(void) {
 	// clear buffers
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	// set the camera
-	glLoadIdentity();
-	gluLookAt(0, 3, 5, 0, 0, 0, 0, 1, 0);
-
-	glTranslatef(posx, posy, posz);
-	glRotatef(GLOBAL_angle, 0, 1, 0);
-	glRotatef(GLOBAL_barrelroll, 1, 0, 0);
 	glShadeModel(GL_SMOOTH);
 	glColor3f(1, 0.2, 0.3);
+	// set the camera
+	glLoadIdentity();
 
-	//glutSolidSphere(1,20,20);
-	drawVertices(vertices*size);
+	gluLookAt(raio*cos(beta)*sin(alfa), raio*sin(beta), raio*cos(beta)*cos(alfa),
+		0, 0, 0,
+		0.0f, 1.0f, 0.0f);
+
+	drawVertices(vertices);
+
+
+	glPushMatrix();
+	glRotatef(angle+=0.05, 0.0, 0.0, 1.0); // 2. Rotate the object.
+	glTranslatef(5, 0, 0); // 1. Translate to the origin.
+	glScalef(0.25, 0.25, 0.25);
+	drawVertices(vertices);
+	glPopMatrix();
 
 	// fim do frame
 	glutSwapBuffers();
@@ -68,19 +74,20 @@ void renderScene(void) {
 
 // escrever função de processamento do teclado
 void keyboardSpecial(int key, int x, int y){
-	float step = 0.05;
 	switch (key){
 	case GLUT_KEY_UP:
-		posz -= step;
+		if (beta < (M_PI / 2 - step))
+			beta += step;
 		break;
 	case GLUT_KEY_DOWN:
-		posz += step;
+		if (beta > -(M_PI / 2 - step))
+			beta -= step;
 		break;
 	case GLUT_KEY_LEFT:
-		posx -= step;
+		alfa -= step;
 		break;
 	case GLUT_KEY_RIGHT:
-		posx += step;
+		alfa += step;
 		break;
 	}
 	glutPostRedisplay();
@@ -90,22 +97,10 @@ void keyboard(unsigned char key, int x, int y){
 	float step = 0.05;
 	switch (key){
 	case '+':
-		size += 0.05;
+		raio -= 0.05;
 		break;
 	case '-':
-		size -= 0.05;
-		break;
-	case 'd':
-		GLOBAL_angle += 1;
-		break;
-	case 'a':
-		GLOBAL_angle -= 1;
-		break;
-	case 'w':
-		GLOBAL_barrelroll += 1;
-		break;
-	case 's':
-		GLOBAL_barrelroll -= 1;
+		raio += 0.05;
 		break;
 	}
 	glutPostRedisplay();
@@ -115,10 +110,10 @@ void keyboard(unsigned char key, int x, int y){
 int main() {
 	srand(time(NULL));
 
-	try{ vertices = readVertices("esfera2.3d"); }
-	catch (int e){ 
-		puts("Erro na leitura dos triangulos, formato do ficheiro XML invalido!"); 
-		exit(-1); 
+	try{ vertices = readVertices("esfera.3d"); }
+	catch (int e){
+		puts("Erro na leitura dos triangulos, formato do ficheiro XML invalido!");
+		exit(-1);
 	}
 
 	// init de cenas
@@ -131,6 +126,7 @@ int main() {
 	// registo de funcs
 	glutDisplayFunc(renderScene);
 	glutReshapeFunc(changeSize);
+	glutIdleFunc(renderScene);
 	glutSpecialFunc(keyboardSpecial);
 	glutKeyboardFunc(keyboard);
 
