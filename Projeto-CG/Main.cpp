@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <windows.h>
 #include <GL/glut.h>
 #include <GL/GLU.h>
 #include <GL/GL.h>
@@ -116,6 +115,34 @@ void keyboard(unsigned char key, int x, int y){
 		raio += 0.05;
 		break;
 	}
+}
+
+void readScene(const char *filename){
+	using namespace tinyxml2;
+		//Carregar o ficheiro xml
+		XMLDocument xmlDoc;
+		XMLError eResult = xmlDoc.LoadFile(filename);
+
+		//Ler o ficheiro xml
+
+		printf("Loaded %s\n", filename);
+
+		XMLNode * pRoot = xmlDoc.FirstChild();
+		if (pRoot == NULL)
+			throw 20;
+
+		XMLElement * pListElement = pRoot->FirstChildElement("modelo");
+
+		std::vector<const char*> nomes;
+
+		while (pListElement != NULL) {
+			const char * nome;
+			nome = pListElement->Attribute("ficheiro");
+			if (nome != NULL) {
+				nomes.push_back(nome);
+			}
+			pListElement = pListElement->NextSiblingElement("modelo");
+		}
 }
 
 int main() {
