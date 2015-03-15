@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <GL/glew.h>
 #include <GL/glut.h>
 #include <GL/GLU.h>
 #include <GL/GL.h>
@@ -12,10 +13,18 @@
 #include <sstream>
 #include <algorithm>
 #include <valarray>
+#include <iostream>
+
+#pragma comment(lib,"glew32.lib")
+
+#ifndef XMLCheckResult
+#define XMLCheckResult(a_eResult) if (a_eResult != XML_SUCCESS) { printf("Error: %i\n", a_eResult);}
+#endif
 
 using namespace std;
 
-float angle = 0, angle1=0;
+GLuint* buffers; vector<int> sizes;
+float angle = 0, angle1 = 0;
 float alfa = 0, beta = 0, raio = 5, step = 0.02;
 float posx = 0, posy = 0, posz = 0;
 GLfloat size = 1;
@@ -45,8 +54,31 @@ void changeSize(int w, int h) {
 	glMatrixMode(GL_MODELVIEW);
 }
 
+void prepareBuffers(vector<const char*> nomes){
+	int i;
+	vector<GLfloat> aux;
+	glEnableClientState(GL_VERTEX_ARRAY);
+	buffers = new GLuint[nomes.size()];
+	glGenBuffers(nomes.size(), buffers);
+	for (i = 0; i < nomes.size(); i++){
+		aux = readVertices(nomes[i]);
+		sizes.push_back(aux.size());
+		glBindBuffer(GL_ARRAY_BUFFER, buffers[i]);
+		glBufferData(GL_ARRAY_BUFFER, aux.size() * sizeof(GLfloat), &aux[0], GL_STATIC_DRAW);
+	}
+}
+
+void drawModels(){
+	for (int i = 0; i < sizes.size(); i++){
+		glBindBuffer(GL_ARRAY_BUFFER, buffers[i]);
+		glVertexPointer(3, GL_FLOAT, 0, 0);
+		glDrawArrays(GL_TRIANGLES, 0, sizes[i]);
+	}
+}
+
 void renderScene(void) {
 	// clear buffers
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glShadeModel(GL_SMOOTH);
 	glColor3f(1, 0.2, 0.3);
@@ -73,13 +105,13 @@ void renderScene(void) {
 	glPopMatrix();
 
 	if (angle == 360){
-		angle = 0;
+	angle = 0;
 	}
 	if (angle1 == 360){
-		angle1 = 0;
+	angle1 = 0;
 	}*/
 
-	drawVertices(vertices);
+	drawModels();
 
 	// fim do frame
 	glutSwapBuffers();
@@ -117,42 +149,35 @@ void keyboard(unsigned char key, int x, int y){
 	}
 }
 
-void readScene(const char *filename){
+void readScene(char *filename){
 	using namespace tinyxml2;
-		//Carregar o ficheiro xml
-		XMLDocument xmlDoc;
-		XMLError eResult = xmlDoc.LoadFile(filename);
+	//Carregar o ficheiro xml
+	XMLDocument xmlDoc;
+	XMLError eResult = xmlDoc.LoadFile(filename);
 
-		//Ler o ficheiro xml
+	XMLCheckResult(eResult);
 
-		printf("Loaded %s\n", filename);
+	printf("Loaded %s\n", filename);
 
-		XMLNode * pRoot = xmlDoc.FirstChild();
-		if (pRoot == NULL)
-			throw 20;
+	XMLNode * pRoot = xmlDoc.FirstChild();
+	if (pRoot == NULL)
+		throw 21;
 
-		XMLElement * pListElement = pRoot->FirstChildElement("modelo");
-
-		std::vector<const char*> nomes;
-
-		while (pListElement != NULL) {
-			const char * nome;
-			nome = pListElement->Attribute("ficheiro");
-			if (nome != NULL) {
-				nomes.push_back(nome);
-			}
-			pListElement = pListElement->NextSiblingElement("modelo");
+	XMLElement * pListElement = pRoot->FirstChildElement("modelo");
+	vector<const char*> nomes;
+	while (pListElement != NULL) {
+		const char * nome;
+		nome = pListElement->Attribute("ficheiro");
+		if (nome != NULL) {
+			nomes.push_back(nome);
 		}
+		pListElement = pListElement->NextSiblingElement("modelo");
+	}
+	prepareBuffers(nomes);
 }
 
 int main() {
 	srand(time(NULL));
-
-	try{ vertices = readVertices("cilindro.3d"); }
-	catch (int e){
-		puts("Erro na leitura dos triangulos, formato do ficheiro XML invalido!");
-		exit(-1);
-	}
 
 	// init de cenas
 	glutInit(&__argc, __argv);
@@ -167,7 +192,7 @@ int main() {
 	glutIdleFunc(renderScene);
 	glutSpecialFunc(keyboardSpecial);
 	glutKeyboardFunc(keyboard);
-
+	glewInit();
 	// alguns settings para OpenGL
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
@@ -175,6 +200,16 @@ int main() {
 	glCullFace(GL_FRONT);
 	glFrontFace(GL_CCW);
 
+	try{ readScene("cena.xml"); }
+	catch (int e){
+		if (e == 21){
+			puts("Erro na leitura da cena, formato do ficheiro invalido");
+		}
+		else{
+			puts("Erro na leitura dos triangulos, formato do ficheiro XML invalido!");
+		}
+		exit(-1);
+	}
 	// entrar no loop do glut
 	glutMainLoop();
 

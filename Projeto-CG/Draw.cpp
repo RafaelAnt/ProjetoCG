@@ -75,7 +75,7 @@ static vector<GLfloat> readVertices_aux(tinyxml2::XMLElement *pElement, vector<G
 	return vertices;
 }
 
-valarray<GLfloat> readVertices(const char *filename) {
+vector<GLfloat> readVertices(const char *filename) {
 	using namespace tinyxml2;
 	vector<GLfloat> vec;
 	tinyxml2::XMLDocument xmlDoc;
@@ -83,13 +83,12 @@ valarray<GLfloat> readVertices(const char *filename) {
 	XMLNode * pRoot = xmlDoc.FirstChild();
 	XMLElement *pElement;
 	if (pRoot == nullptr){
-		exit(-1);
+		throw 22;
 	}
 	pElement = pRoot->FirstChildElement("triangle");
 	while (pElement != NULL){
 		vec = readVertices_aux(pElement->FirstChildElement("vertex"),vec);
 		pElement = pElement->NextSiblingElement("triangle");
 	}
-	valarray<GLfloat> vertices(vec.data(), vec.size());
-	return vertices;
+	return vec;
 }

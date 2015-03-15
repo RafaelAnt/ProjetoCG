@@ -4,7 +4,7 @@
 
 using namespace std;
 
-valarray<GLfloat> readVertices(const char *filename);
+vector<GLfloat> readVertices(const char *filename);
 
 void drawVertices(valarray<GLfloat> vertices);
 
