@@ -1,5 +1,3 @@
 ﻿<cena>
-    <modelo ficheiro="cilindro.3d"/>
     <modelo ficheiro="esfera.3d"/>
-    <modelo ficheiro="piramide.3d"/>
 </cena>

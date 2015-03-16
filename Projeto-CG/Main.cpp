@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <GL/glew.h>
-#include <GL/glut.h>
+#include <GL/freeglut.h>
 #include <GL/GLU.h>
 #include <GL/GL.h>
 #include <time.h>
@@ -55,12 +55,11 @@ void changeSize(int w, int h) {
 }
 
 void prepareBuffers(vector<const char*> nomes){
-	int i;
 	vector<GLfloat> aux;
 	glEnableClientState(GL_VERTEX_ARRAY);
 	buffers = new GLuint[nomes.size()];
 	glGenBuffers(nomes.size(), buffers);
-	for (i = 0; i < nomes.size(); i++){
+	for (unsigned int i = 0; i < nomes.size(); i++){
 		aux = readVertices(nomes[i]);
 		sizes.push_back(aux.size());
 		glBindBuffer(GL_ARRAY_BUFFER, buffers[i]);
@@ -69,7 +68,7 @@ void prepareBuffers(vector<const char*> nomes){
 }
 
 void drawModels(){
-	for (int i = 0; i < sizes.size(); i++){
+	for (unsigned int i = 0; i < sizes.size(); i++){
 		glBindBuffer(GL_ARRAY_BUFFER, buffers[i]);
 		glVertexPointer(3, GL_FLOAT, 0, 0);
 		glDrawArrays(GL_TRIANGLES, 0, sizes[i]);
@@ -78,7 +77,6 @@ void drawModels(){
 
 void renderScene(void) {
 	// clear buffers
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glShadeModel(GL_SMOOTH);
 	glColor3f(1, 0.2, 0.3);
@@ -111,6 +109,7 @@ void renderScene(void) {
 	angle1 = 0;
 	}*/
 
+	//glutWireSphere(1, 10, 10);
 	drawModels();
 
 	// fim do frame
@@ -147,6 +146,21 @@ void keyboard(unsigned char key, int x, int y){
 		raio += 0.05;
 		break;
 	}
+}
+
+void menu(int op){
+	switch (op)
+	{
+	case 1:
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		break;
+	case 2:
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		break;
+	default:
+		break;
+	}
+	glutPostRedisplay();
 }
 
 void readScene(char *filename){
@@ -186,13 +200,24 @@ int main() {
 	glutInitWindowSize(400, 400);
 	glutCreateWindow("Projeto-CG");
 
+	// menu
+	glutCreateMenu(menu);
+	printf("%d\n", glutGetMenu());
+	glutAddMenuEntry("Wired", 1);
+	glutAddMenuEntry("Solid", 2);
+	glutAttachMenu(GLUT_LEFT_BUTTON);
+
 	// registo de funcs
 	glutDisplayFunc(renderScene);
-	glutReshapeFunc(changeSize);
 	glutIdleFunc(renderScene);
+	glutMouseFunc(NULL);
+	glutReshapeFunc(changeSize);
 	glutSpecialFunc(keyboardSpecial);
 	glutKeyboardFunc(keyboard);
+	
+
 	glewInit();
+
 	// alguns settings para OpenGL
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
@@ -212,6 +237,5 @@ int main() {
 	}
 	// entrar no loop do glut
 	glutMainLoop();
-
 	return 1;
 }

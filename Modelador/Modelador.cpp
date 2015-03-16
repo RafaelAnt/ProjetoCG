@@ -182,11 +182,10 @@ void drawSphereXML(float r, int stacks, int slices, char *filename){
 			vertex4.y = r*sin(theta2)*sin(phi1);
 			vertex4.z = r*cos(theta2);
 
-			// facing out
-			if (t == 0){ // top cap
+			if (t == 0){//inicio da camada
 				writeTriangleToXML(pRoot, vertex1, vertex3, vertex4);
 			}
-			else if (t + 1 == stacks){ //end cap
+			else if (t + 1 == stacks){ //fim da camada
 				writeTriangleToXML(pRoot, vertex3, vertex1, vertex2);
 			}
 			else{
@@ -323,7 +322,7 @@ int main(int argc, char **argv){
 		if (strcmp(argv[1], "piramide") == 0){
 			if (argc == 5){
 				drawPyramidXML((float)atof(argv[2]), (float)atof(argv[3]), argv[4]);
-				printf("Piramide criada com %Lf de base e %Lf de altura\n", (float)atof(argv[2]), (float)atof(argv[3]));
+				printf("Piramide gravada em %s com %Lf de base e %Lf de altura\n",argv[4], (float)atof(argv[2]), (float)atof(argv[3]));
 			}
 			else{
 				printf("Erro nos argumentos!\n");
