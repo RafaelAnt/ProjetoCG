@@ -1,9 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <GL/glew.h>
-#include <GL/freeglut.h>
-#include <GL/GLU.h>
-#include <GL/GL.h>
+#include <GL/glut.h>
 #include <time.h>
 #include <vector>
 #define _USE_MATH_DEFINES
@@ -87,29 +85,6 @@ void renderScene(void) {
 		0, 0, 0,
 		0.0f, 1.0f, 0.0f);
 
-	/* SISTEMA SOLAR (sort of)
-	glPushMatrix();
-	glScalef(0.75, 0.75, 0.75);
-	drawVertices(vertices);
-	glPopMatrix();
-
-
-	glPushMatrix();
-	glRotatef(angle+=0.5, 0.0, 0.0, 1.0); // 2. Rotate the object.
-	glTranslatef(3, 0, 0); // 1. Translate to the origin.
-	glRotatef(angle1 += 1, 0, 0, 1);
-	glScalef(0.25, 0.25, 0.25);
-	drawVertices(vertices);
-	glPopMatrix();
-
-	if (angle == 360){
-	angle = 0;
-	}
-	if (angle1 == 360){
-	angle1 = 0;
-	}*/
-
-	//glutWireSphere(1, 10, 10);
 	drawModels();
 
 	// fim do frame
@@ -190,6 +165,14 @@ void readScene(char *filename){
 	prepareBuffers(nomes);
 }
 
+void createMenu(){
+	glutCreateMenu(menu);
+	printf("%d\n", glutGetMenu());
+	glutAddMenuEntry("Wired", 1);
+	glutAddMenuEntry("Solid", 2);
+	glutAttachMenu(GLUT_RIGHT_BUTTON);
+}
+
 int main() {
 	srand(time(NULL));
 
@@ -199,13 +182,6 @@ int main() {
 	glutInitWindowPosition(100, 100);
 	glutInitWindowSize(400, 400);
 	glutCreateWindow("Projeto-CG");
-
-	// menu
-	glutCreateMenu(menu);
-	printf("%d\n", glutGetMenu());
-	glutAddMenuEntry("Wired", 1);
-	glutAddMenuEntry("Solid", 2);
-	glutAttachMenu(GLUT_LEFT_BUTTON);
 
 	// registo de funcs
 	glutDisplayFunc(renderScene);
@@ -235,6 +211,9 @@ int main() {
 		}
 		exit(-1);
 	}
+
+	createMenu();
+
 	// entrar no loop do glut
 	glutMainLoop();
 	return 1;
