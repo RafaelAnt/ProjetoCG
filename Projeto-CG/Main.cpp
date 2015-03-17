@@ -21,12 +21,8 @@
 
 using namespace std;
 
-GLuint* buffers; vector<int> sizes;
-float angle = 0, angle1 = 0;
+static GLuint buffer[1]; static vector<vector<GLfloat>> models;
 float alfa = 0, beta = 0, raio = 5, step = 0.02;
-float posx = 0, posy = 0, posz = 0;
-GLfloat size = 1;
-std::valarray<GLfloat> vertices;
 
 void changeSize(int w, int h) {
 	// Prevent a divide by zero, when window is too short
@@ -54,22 +50,22 @@ void changeSize(int w, int h) {
 
 void prepareBuffers(vector<const char*> nomes){
 	vector<GLfloat> aux;
-	glEnableClientState(GL_VERTEX_ARRAY);
-	buffers = new GLuint[nomes.size()];
-	glGenBuffers(nomes.size(), buffers);
 	for (unsigned int i = 0; i < nomes.size(); i++){
 		aux = readVertices(nomes[i]);
-		sizes.push_back(aux.size());
-		glBindBuffer(GL_ARRAY_BUFFER, buffers[i]);
-		glBufferData(GL_ARRAY_BUFFER, aux.size() * sizeof(GLfloat), &aux[0], GL_STATIC_DRAW);
+		models.push_back(aux);
 	}
 }
 
 void drawModels(){
-	for (unsigned int i = 0; i < sizes.size(); i++){
-		glBindBuffer(GL_ARRAY_BUFFER, buffers[i]);
+	for (unsigned int i = 0; i < models.size(); i++){
+		/*glEnableClientState(GL_VERTEX_ARRAY);
+		glGenBuffers(1, buffer);
+		glBindBuffer(GL_ARRAY_BUFFER, buffer[0]);
+		glBufferData(GL_ARRAY_BUFFER, models[i].size()*sizeof(GLfloat), models[i].data(), GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, buffer[0]);
 		glVertexPointer(3, GL_FLOAT, 0, 0);
-		glDrawArrays(GL_TRIANGLES, 0, sizes[i]);
+		glDrawArrays(GL_TRIANGLES, 0, models[i].size());*/
+		drawVertices(models[i]);
 	}
 }
 
@@ -109,6 +105,7 @@ void keyboardSpecial(int key, int x, int y){
 		alfa += step;
 		break;
 	}
+	glutPostRedisplay();
 }
 
 void keyboard(unsigned char key, int x, int y){
@@ -121,6 +118,7 @@ void keyboard(unsigned char key, int x, int y){
 		raio += 0.05;
 		break;
 	}
+	glutPostRedisplay();
 }
 
 void menu(int op){
@@ -185,12 +183,12 @@ int main() {
 
 	// registo de funcs
 	glutDisplayFunc(renderScene);
-	glutIdleFunc(renderScene);
+	//glutIdleFunc(renderScene);
 	glutMouseFunc(NULL);
 	glutReshapeFunc(changeSize);
 	glutSpecialFunc(keyboardSpecial);
 	glutKeyboardFunc(keyboard);
-	
+
 
 	glewInit();
 

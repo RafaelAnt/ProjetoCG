@@ -36,10 +36,10 @@ static void normal(Triangle triangle){
 	glNormal3f(normal.x, normal.y, normal.z);
 }
 
-void drawVertices(valarray<GLfloat> vertices){
+
+void drawVertices(vector<GLfloat> vertices){
 	Triangle t;
 	Point p1, p2, p3;
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glBegin(GL_TRIANGLES);
 	for (unsigned int i = 0, j = 0; i < vertices.size(); i += 3, j++){
 		p1.x = vertices[i]; p1.y = vertices[i + 1]; p1.z = vertices[i + 2];

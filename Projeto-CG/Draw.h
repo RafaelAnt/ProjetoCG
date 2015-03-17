@@ -6,5 +6,5 @@ using namespace std;
 
 vector<GLfloat> readVertices(const char *filename);
 
-void drawVertices(valarray<GLfloat> vertices);
+void drawVertices(vector<GLfloat> vertices);
 
