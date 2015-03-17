@@ -126,6 +126,8 @@ void menu(int op){
 	case 2:
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		break;
+	case 3:
+		glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
 	default:
 		break;
 	}
@@ -165,8 +167,9 @@ void readScene(char *filename){
 void createMenu(){
 	glutCreateMenu(menu);
 	printf("%d\n", glutGetMenu());
-	glutAddMenuEntry("Wired", 1);
-	glutAddMenuEntry("Solid", 2);
+	glutAddMenuEntry("Linha", 1);
+	glutAddMenuEntry("Preencher", 2);
+	glutAddMenuEntry("Ponto", 3);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
 
