@@ -155,12 +155,12 @@ void drawSphereXML(float r, int stacks, int slices, char *filename){
 	xmlDoc.InsertFirstChild(pRoot);
 	int t, p;
 	for (t = 0; t < stacks; t++){ // stacks are ELEVATION so they count theta
-		double theta1 = ((double)(t) / stacks)*M_PI;
-		double theta2 = ((double)(t + 1) / stacks)*M_PI;
+		float theta1 = ((float)(t) / stacks)*M_PI;
+		float theta2 = ((float)(t + 1) / stacks)*M_PI;
 
 		for (p = 0; p < slices; p++){ // slices are ORANGE SLICES so they count azimuth
-			double phi1 = ((double)(p) / slices) * 2 * M_PI; // azimuth goes around 0 .. 2*PI
-			double phi2 = ((double)(p + 1) / slices) * 2 * M_PI;
+			double phi1 = ((float)(p) / slices) * 2 * M_PI; // azimuth goes around 0 .. 2*PI
+			double phi2 = ((float)(p + 1) / slices) * 2 * M_PI;
 
 			Vertex vertex1;
 			vertex1.x = r*sin(theta1)*cos(phi1);
@@ -328,15 +328,15 @@ int main(int argc, char **argv){
 				printf("Erro nos argumentos!\n");
 			}
 		}
-		else{
-			printf("Figura invalida!");
-		}
 		if (strcmp(argv[1], "cilindro") == 0){
 			if (argc == 7){
 				drawCylinderXML((float)atof(argv[2]), (float)atof(argv[3]), atoi(argv[4]), atoi(argv[5]), argv[6]);
 				printf("Cilindro gravado em %s com %Lf de altura, %Lf de raio, %d camadas e %d fatias.\n", argv[6], (float)atof(argv[2]), (float)atof(argv[3]), atoi(argv[4]), atoi(argv[5]));
 			}
 
+		}
+		else{
+			printf("Figura invalida!");
 		}
 	}
 }
