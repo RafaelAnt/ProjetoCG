@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <GL/glew.h>
+//#include <GL/glew.h>
 #include <GL/glut.h>
 #include <time.h>
 #include <vector>
@@ -13,11 +13,7 @@
 #include <valarray>
 #include <iostream>
 
-#pragma comment(lib,"glew32.lib")
-
-#ifndef XMLCheckResult
-#define XMLCheckResult(a_eResult) if (a_eResult != XML_SUCCESS) { printf("Error: %i\n", a_eResult);}
-#endif
+//#pragma comment(lib,"glew32.lib")
 
 using namespace std;
 
@@ -142,7 +138,10 @@ void readScene(char *filename){
 	XMLDocument xmlDoc;
 	XMLError eResult = xmlDoc.LoadFile(filename);
 
-	XMLCheckResult(eResult);
+	if (eResult != XML_SUCCESS){
+		printf("Erro!! %s", xmlDoc.ErrorName());
+
+	}
 
 	printf("Loaded %s\n", filename);
 
@@ -174,6 +173,19 @@ void createMenu(){
 int main() {
 	srand(time(NULL));
 
+	try{ readScene("cena.xml"); }
+	catch (int e){
+		if (e == 21){
+			puts("Erro na leitura da cena, XML parsing error!");
+		} if (e == 22){
+			puts("Erro na leitura de um dos modelos!");
+		}
+		else{
+			puts("Erro na leitura dos triangulos, excepcao não tratada!");
+		}
+		exit(-1);
+	}
+
 	// init de cenas
 	glutInit(&__argc, __argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
@@ -190,7 +202,7 @@ int main() {
 	glutKeyboardFunc(keyboard);
 
 
-	glewInit();
+	//glewInit();
 
 	// alguns settings para OpenGL
 	glEnable(GL_DEPTH_TEST);
@@ -198,17 +210,6 @@ int main() {
 	glEnable(GL_NORMALIZE);
 	glCullFace(GL_FRONT);
 	glFrontFace(GL_CCW);
-
-	try{ readScene("cena.xml"); }
-	catch (int e){
-		if (e == 21){
-			puts("Erro na leitura da cena, formato do ficheiro invalido");
-		}
-		else{
-			puts("Erro na leitura dos triangulos, formato do ficheiro XML invalido!");
-		}
-		exit(-1);
-	}
 
 	createMenu();
 
