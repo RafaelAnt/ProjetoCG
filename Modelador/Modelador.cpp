@@ -321,6 +321,93 @@ void drawCylinderXML(float height, float radius, int slices, int stacks, char *f
 	xmlDoc.SaveFile(filename);
 }
 
+void drawConeXML(float height, float radius, int slices, int stacks, char *filename) {
+	using namespace tinyxml2;
+	XMLNode * pRoot = xmlDoc.NewElement("cone");
+	xmlDoc.InsertFirstChild(pRoot);
+
+	float pi = 3.1415f, h1, h2 = 0;
+
+	//base
+	for (float i = 0; i < 2 * pi; i += 2 * pi / slices) {
+
+		vertex vertex1;
+		vertex1.x = radius*sin(i);
+		vertex1.y = 0;
+		vertex1.z = radius*cos(i);
+
+		vertex vertex2;
+		vertex2.x = 0;
+		vertex2.y = 0;
+		vertex2.z = 0;
+
+		vertex vertex3;
+		vertex3.x = radius*sin(i + 2 * pi / slices);
+		vertex3.y = 0;
+		vertex3.z = radius*cos(i + 2 * pi / slices);
+
+		writeTriangleToXML(pRoot, vertex1, vertex3, vertex2);
+	}
+
+	//face curva
+	float rAct = radius;
+	float r = radius / stacks;
+	for (float l = height / stacks, h1 = 0.0f, h2 = l; h2 < height; h1 = h2, h2 = h2 + l) {
+		for (float i = 0; i < 2 * pi; i += 2 * pi / slices) {
+
+			vertex vertex1;
+			vertex1.x = (rAct - r)*sin(i);
+			vertex1.y = h2;
+			vertex1.z = (rAct - r)*cos(i);
+
+			vertex vertex2;
+			vertex2.x = (rAct - r)*sin(i + 2 * pi / slices);
+			vertex2.y = h2;
+			vertex2.z = (rAct - r)*cos(i + 2 * pi / slices);
+
+			vertex vertex3;
+			vertex3.x = rAct*sin(i);
+			vertex3.y = h1;
+			vertex3.z = rAct*cos(i);
+
+			vertex vertex4;
+			vertex4.x = rAct*sin(i + 2 * pi / slices);
+			vertex4.y = h1;
+			vertex4.z = rAct*cos(i + 2 * pi / slices);
+
+			writeTriangleToXML(pRoot, vertex1, vertex2, vertex3);
+			writeTriangleToXML(pRoot, vertex2, vertex4, vertex3);
+		}
+		rAct -= r;
+
+	}
+	for (float i = 0; i < 2 * pi; i += 2 * pi / slices) {
+
+		vertex vertex1;
+		vertex1.x = 0;
+		vertex1.y = height;
+		vertex1.z = 0;
+
+		vertex vertex2;
+		vertex2.x = r*sin(i);
+		vertex2.y = height - height / stacks;
+		vertex2.z = r*cos(i);
+
+		vertex vertex3;
+		vertex3.x = r*sin(i + 2 * pi / slices);
+
+		vertex3.y = height - height / stacks;
+		vertex3.z = r*cos(i + 2 * pi / slices);
+
+		writeTriangleToXML(pRoot, vertex1, vertex3, vertex2);
+
+	}
+
+
+
+	xmlDoc.SaveFile(filename);
+}
+
 int main(int argc, char **argv){
 	int stacks, slices;
 	float radius;
@@ -348,12 +435,27 @@ int main(int argc, char **argv){
 				drawCylinderXML((float)atof(argv[2]), (float)atof(argv[3]), atoi(argv[4]), atoi(argv[5]), argv[6]);
 				printf("Cilindro gravado em %s com %Lf de altura, %Lf de raio, %d camadas e %d fatias.\n", argv[6], (float)atof(argv[2]), (float)atof(argv[3]), atoi(argv[4]), atoi(argv[5]));
 			}
+			else{
+				printf("Erro nos argumentos!\n");
+			}
 
 		}
 		else if (strcmp(argv[1], "paralelipipedo") == 0){
 			if (argc == 6){
 				drawParallelpipedXML(atof(argv[2]), atof(argv[3]), atof(argv[4]), argv[5]);
 				printf("Paralelipipedo gravado em %s com %Lf de largura, %Lf de altura e %Lf de comprimento.\n", argv[5], atof(argv[2]), atof(argv[3]), atof(argv[4]));
+			}
+			else{
+				printf("Erro nos argumentos!\n");
+			}
+		}
+		else if (strcmp(argv[1], "cone") == 0){
+			if (argc == 7){
+				drawConeXML((float)atof(argv[2]), (float)atof(argv[3]), atoi(argv[4]), atoi(argv[5]), argv[6]);
+				printf("Cone gravado em %s com %Lf de altura, %Lf de raio, %d camadas e %d fatias.\n", argv[6], (float)atof(argv[2]), (float)atof(argv[3]), atoi(argv[4]), atoi(argv[5]));
+			}
+			else{
+				printf("Erro nos argumentos!\n");
 			}
 		}
 		else{
