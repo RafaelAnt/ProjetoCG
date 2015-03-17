@@ -166,7 +166,6 @@ void readScene(char *filename){
 
 void createMenu(){
 	glutCreateMenu(menu);
-	printf("%d\n", glutGetMenu());
 	glutAddMenuEntry("Linha", 1);
 	glutAddMenuEntry("Preencher", 2);
 	glutAddMenuEntry("Ponto", 3);
