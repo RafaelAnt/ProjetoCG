@@ -40,76 +40,91 @@ static void writeTriangleToXML(tinyxml2::XMLNode * pRoot, Vertex v1, Vertex v2, 
 	pRoot->InsertEndChild(triangle);
 }
 
-void drawParallelpipedXML(float width, float height, float lenght){
+void drawParallelpipedXML(float width, float height, float lenght, char* filename){
 	using namespace tinyxml2;
 	XMLNode * pRoot = xmlDoc.NewElement("paralelipipedo");
 	xmlDoc.InsertFirstChild(pRoot);
 
+	XMLNode *triangle = xmlDoc.NewElement("triangle");
 	//face frente
 	writeVertexToXML(pRoot, width / 2, height / 2, lenght / 2);
 	writeVertexToXML(pRoot, width / 2, -height / 2, lenght / 2);
 	writeVertexToXML(pRoot, -width / 2, height / 2, lenght / 2);
+	pRoot->InsertEndChild(triangle);
 
-
+	triangle = xmlDoc.NewElement("triangle");
 	writeVertexToXML(pRoot, -width / 2, height / 2, lenght / 2);
 	writeVertexToXML(pRoot, width / 2, -height / 2, lenght / 2);
 	writeVertexToXML(pRoot, -width / 2, -height / 2, lenght / 2);
+	xmlDoc.InsertFirstChild(pRoot);
 
-
+	triangle = xmlDoc.NewElement("triangle");
 	//face direita
 	writeVertexToXML(pRoot, width / 2, height / 2, lenght / 2);
 	writeVertexToXML(pRoot, width / 2, height / 2, -lenght / 2);
 	writeVertexToXML(pRoot, width / 2, -height / 2, -lenght / 2);
+	xmlDoc.InsertFirstChild(pRoot);
 
-
+	triangle = xmlDoc.NewElement("triangle");
 	writeVertexToXML(pRoot, width / 2, height / 2, lenght / 2);
 	writeVertexToXML(pRoot, width / 2, -height / 2, -lenght / 2);
 	writeVertexToXML(pRoot, width / 2, -height / 2, lenght / 2);
+	xmlDoc.InsertFirstChild(pRoot);
 
-
+	triangle = xmlDoc.NewElement("triangle");
 	//face  cima
 	writeVertexToXML(pRoot, width / 2, height / 2, lenght / 2);
 	writeVertexToXML(pRoot, -width / 2, height / 2, lenght / 2);
 	writeVertexToXML(pRoot, width / 2, height / 2, -lenght / 2);
+	xmlDoc.InsertFirstChild(pRoot);
 
-
+	triangle = xmlDoc.NewElement("triangle");
 	writeVertexToXML(pRoot, -width / 2, height / 2, lenght / 2);
 	writeVertexToXML(pRoot, -width / 2, height / 2, -lenght / 2);
 	writeVertexToXML(pRoot, width / 2, height / 2, -lenght / 2);
+	xmlDoc.InsertFirstChild(pRoot);
 
-
+	triangle = xmlDoc.NewElement("triangle");
 	//face esquerda
 	writeVertexToXML(pRoot, -width / 2, height / 2, lenght / 2);
 	writeVertexToXML(pRoot, -width / 2, -height / 2, -lenght / 2);
 	writeVertexToXML(pRoot, -width / 2, height / 2, -lenght / 2);
+	xmlDoc.InsertFirstChild(pRoot);
 
+	triangle = xmlDoc.NewElement("triangle");
 	writeVertexToXML(pRoot, -width / 2, height / 2, lenght / 2);
 	writeVertexToXML(pRoot, -width / 2, -height / 2, lenght / 2);
 	writeVertexToXML(pRoot, -width / 2, -height / 2, -lenght / 2);
+	xmlDoc.InsertFirstChild(pRoot);
 
+	triangle = xmlDoc.NewElement("triangle");
 	//face baixo
 	writeVertexToXML(pRoot, -width / 2, -height / 2, lenght / 2);
 	writeVertexToXML(pRoot, width / 2, -height / 2, -lenght / 2);
 	writeVertexToXML(pRoot, -width / 2, -height / 2, -lenght / 2);
+	xmlDoc.InsertFirstChild(pRoot);
 
-
+	triangle = xmlDoc.NewElement("triangle");
 	writeVertexToXML(pRoot, width / 2, -height / 2, lenght / 2);
 	writeVertexToXML(pRoot, width / 2, -height / 2, -lenght / 2);
 	writeVertexToXML(pRoot, -width / 2, -height / 2, lenght / 2);
+	xmlDoc.InsertFirstChild(pRoot);
 
-
+	triangle = xmlDoc.NewElement("triangle");
 	//face traz
 	writeVertexToXML(pRoot, -width / 2, -height / 2, -lenght / 2);
 	writeVertexToXML(pRoot, width / 2, height / 2, -lenght / 2);
 	writeVertexToXML(pRoot, -width / 2, height / 2, -lenght / 2);
+	xmlDoc.InsertFirstChild(pRoot);
 
-
+	triangle = xmlDoc.NewElement("triangle");
 	writeVertexToXML(pRoot, width / 2, -height / 2, -lenght / 2);
 	writeVertexToXML(pRoot, width / 2, height / 2, -lenght / 2);
 	writeVertexToXML(pRoot, -width / 2, -height / 2, -lenght / 2);
+	xmlDoc.InsertFirstChild(pRoot);
 
 
-	xmlDoc.SaveFile("paralelipipedo.3d");
+	xmlDoc.SaveFile(filename);
 }
 
 void drawPyramidXML(float base, float height, char *filename){
@@ -319,7 +334,7 @@ int main(int argc, char **argv){
 				printf("Erro nos argumentos!\n");
 			}
 		}
-		if (strcmp(argv[1], "piramide") == 0){
+		else if (strcmp(argv[1], "piramide") == 0){
 			if (argc == 5){
 				drawPyramidXML((float)atof(argv[2]), (float)atof(argv[3]), argv[4]);
 				printf("Piramide gravada em %s com %Lf de base e %Lf de altura\n",argv[4], (float)atof(argv[2]), (float)atof(argv[3]));
@@ -328,12 +343,18 @@ int main(int argc, char **argv){
 				printf("Erro nos argumentos!\n");
 			}
 		}
-		if (strcmp(argv[1], "cilindro") == 0){
+		else if (strcmp(argv[1], "cilindro") == 0){
 			if (argc == 7){
 				drawCylinderXML((float)atof(argv[2]), (float)atof(argv[3]), atoi(argv[4]), atoi(argv[5]), argv[6]);
 				printf("Cilindro gravado em %s com %Lf de altura, %Lf de raio, %d camadas e %d fatias.\n", argv[6], (float)atof(argv[2]), (float)atof(argv[3]), atoi(argv[4]), atoi(argv[5]));
 			}
 
+		}
+		else if (strcmp(argv[1], "paralelipipedo") == 0){
+			if (argc == 6){
+				drawParallelpipedXML(atof(argv[2]), atof(argv[3]), atof(argv[4]), argv[5]);
+				printf("Paralelipipedo gravado em %s com %Lf de largura, %Lf de altura e %Lf de comprimento.\n", argv[5], atof(argv[2]), atof(argv[3]), atof(argv[4]));
+			}
 		}
 		else{
 			printf("Figura invalida!");
