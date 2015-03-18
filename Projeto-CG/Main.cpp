@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-//#include <GL/glew.h>
 #include <GL/glut.h>
 #include <time.h>
 #include <vector>
@@ -8,16 +7,12 @@
 #include <math.h>
 #include "tinyxml2.h"
 #include "Draw.h"
-#include <sstream>
-#include <algorithm>
-#include <valarray>
-#include <iostream>
 
 //#pragma comment(lib,"glew32.lib")
 
 using namespace std;
 
-static GLuint buffer[1]; static vector<vector<GLfloat>> models;
+static vector<vector<GLfloat>> models;
 float alfa = 0, beta = 0, raio = 5, step = 0.02;
 
 void changeSize(int w, int h) {
@@ -44,7 +39,7 @@ void changeSize(int w, int h) {
 	glMatrixMode(GL_MODELVIEW);
 }
 
-void prepareBuffers(vector<const char*> nomes){
+void prepareModels(vector<const char*> nomes){
 	vector<GLfloat> aux;
 	for (unsigned int i = 0; i < nomes.size(); i++){
 		aux = readVertices(nomes[i]);
@@ -54,13 +49,6 @@ void prepareBuffers(vector<const char*> nomes){
 
 void drawModels(){
 	for (unsigned int i = 0; i < models.size(); i++){
-		/*glEnableClientState(GL_VERTEX_ARRAY);
-		glGenBuffers(1, buffer);
-		glBindBuffer(GL_ARRAY_BUFFER, buffer[0]);
-		glBufferData(GL_ARRAY_BUFFER, models[i].size()*sizeof(GLfloat), models[i].data(), GL_STATIC_DRAW);
-		glBindBuffer(GL_ARRAY_BUFFER, buffer[0]);
-		glVertexPointer(3, GL_FLOAT, 0, 0);
-		glDrawArrays(GL_TRIANGLES, 0, models[i].size());*/
 		drawVertices(models[i]);
 	}
 }
@@ -161,7 +149,7 @@ void readScene(char *filename){
 		}
 		pListElement = pListElement->NextSiblingElement("modelo");
 	}
-	prepareBuffers(nomes);
+	prepareModels(nomes);
 }
 
 void createMenu(){
