@@ -47,81 +47,81 @@ void drawParallelpipedXML(float width, float height, float lenght, char* filenam
 
 	XMLNode *triangle = xmlDoc.NewElement("triangle");
 	//face frente
-	writeVertexToXML(pRoot, width / 2, height / 2, lenght / 2);
-	writeVertexToXML(pRoot, width / 2, -height / 2, lenght / 2);
-	writeVertexToXML(pRoot, -width / 2, height / 2, lenght / 2);
+	writeVertexToXML(triangle, width / 2, height / 2, lenght / 2);
+	writeVertexToXML(triangle, width / 2, -height / 2, lenght / 2);
+	writeVertexToXML(triangle, -width / 2, height / 2, lenght / 2);
 	pRoot->InsertEndChild(triangle);
 
 	triangle = xmlDoc.NewElement("triangle");
-	writeVertexToXML(pRoot, -width / 2, height / 2, lenght / 2);
-	writeVertexToXML(pRoot, width / 2, -height / 2, lenght / 2);
-	writeVertexToXML(pRoot, -width / 2, -height / 2, lenght / 2);
-	xmlDoc.InsertFirstChild(pRoot);
+	writeVertexToXML(triangle, -width / 2, height / 2, lenght / 2);
+	writeVertexToXML(triangle, width / 2, -height / 2, lenght / 2);
+	writeVertexToXML(triangle, -width / 2, -height / 2, lenght / 2);
+	pRoot->InsertEndChild(triangle);
 
 	triangle = xmlDoc.NewElement("triangle");
 	//face direita
-	writeVertexToXML(pRoot, width / 2, height / 2, lenght / 2);
-	writeVertexToXML(pRoot, width / 2, height / 2, -lenght / 2);
-	writeVertexToXML(pRoot, width / 2, -height / 2, -lenght / 2);
-	xmlDoc.InsertFirstChild(pRoot);
+	writeVertexToXML(triangle, width / 2, height / 2, lenght / 2);
+	writeVertexToXML(triangle, width / 2, height / 2, -lenght / 2);
+	writeVertexToXML(triangle, width / 2, -height / 2, -lenght / 2);
+	pRoot->InsertEndChild(triangle);
 
 	triangle = xmlDoc.NewElement("triangle");
-	writeVertexToXML(pRoot, width / 2, height / 2, lenght / 2);
-	writeVertexToXML(pRoot, width / 2, -height / 2, -lenght / 2);
-	writeVertexToXML(pRoot, width / 2, -height / 2, lenght / 2);
-	xmlDoc.InsertFirstChild(pRoot);
+	writeVertexToXML(triangle, width / 2, height / 2, lenght / 2);
+	writeVertexToXML(triangle, width / 2, -height / 2, -lenght / 2);
+	writeVertexToXML(triangle, width / 2, -height / 2, lenght / 2);
+	pRoot->InsertEndChild(triangle);
 
 	triangle = xmlDoc.NewElement("triangle");
 	//face  cima
-	writeVertexToXML(pRoot, width / 2, height / 2, lenght / 2);
-	writeVertexToXML(pRoot, -width / 2, height / 2, lenght / 2);
-	writeVertexToXML(pRoot, width / 2, height / 2, -lenght / 2);
-	xmlDoc.InsertFirstChild(pRoot);
+	writeVertexToXML(triangle, width / 2, height / 2, lenght / 2);
+	writeVertexToXML(triangle, -width / 2, height / 2, lenght / 2);
+	writeVertexToXML(triangle, width / 2, height / 2, -lenght / 2);
+	pRoot->InsertEndChild(triangle);
 
 	triangle = xmlDoc.NewElement("triangle");
-	writeVertexToXML(pRoot, -width / 2, height / 2, lenght / 2);
-	writeVertexToXML(pRoot, -width / 2, height / 2, -lenght / 2);
-	writeVertexToXML(pRoot, width / 2, height / 2, -lenght / 2);
-	xmlDoc.InsertFirstChild(pRoot);
+	writeVertexToXML(triangle, -width / 2, height / 2, lenght / 2);
+	writeVertexToXML(triangle, -width / 2, height / 2, -lenght / 2);
+	writeVertexToXML(triangle, width / 2, height / 2, -lenght / 2);
+	pRoot->InsertEndChild(triangle);
 
 	triangle = xmlDoc.NewElement("triangle");
 	//face esquerda
-	writeVertexToXML(pRoot, -width / 2, height / 2, lenght / 2);
-	writeVertexToXML(pRoot, -width / 2, -height / 2, -lenght / 2);
-	writeVertexToXML(pRoot, -width / 2, height / 2, -lenght / 2);
-	xmlDoc.InsertFirstChild(pRoot);
+	writeVertexToXML(triangle, -width / 2, height / 2, lenght / 2);
+	writeVertexToXML(triangle, -width / 2, -height / 2, -lenght / 2);
+	writeVertexToXML(triangle, -width / 2, height / 2, -lenght / 2);
+	pRoot->InsertEndChild(triangle);
 
 	triangle = xmlDoc.NewElement("triangle");
-	writeVertexToXML(pRoot, -width / 2, height / 2, lenght / 2);
-	writeVertexToXML(pRoot, -width / 2, -height / 2, lenght / 2);
-	writeVertexToXML(pRoot, -width / 2, -height / 2, -lenght / 2);
-	xmlDoc.InsertFirstChild(pRoot);
+	writeVertexToXML(triangle, -width / 2, height / 2, lenght / 2);
+	writeVertexToXML(triangle, -width / 2, -height / 2, lenght / 2);
+	writeVertexToXML(triangle, -width / 2, -height / 2, -lenght / 2);
+	pRoot->InsertEndChild(triangle);
 
 	triangle = xmlDoc.NewElement("triangle");
 	//face baixo
-	writeVertexToXML(pRoot, -width / 2, -height / 2, lenght / 2);
-	writeVertexToXML(pRoot, width / 2, -height / 2, -lenght / 2);
-	writeVertexToXML(pRoot, -width / 2, -height / 2, -lenght / 2);
-	xmlDoc.InsertFirstChild(pRoot);
+	writeVertexToXML(triangle, -width / 2, -height / 2, lenght / 2);
+	writeVertexToXML(triangle, width / 2, -height / 2, -lenght / 2);
+	writeVertexToXML(triangle, -width / 2, -height / 2, -lenght / 2);
+	pRoot->InsertEndChild(triangle);
 
 	triangle = xmlDoc.NewElement("triangle");
-	writeVertexToXML(pRoot, width / 2, -height / 2, lenght / 2);
-	writeVertexToXML(pRoot, width / 2, -height / 2, -lenght / 2);
-	writeVertexToXML(pRoot, -width / 2, -height / 2, lenght / 2);
-	xmlDoc.InsertFirstChild(pRoot);
+	writeVertexToXML(triangle, width / 2, -height / 2, lenght / 2);
+	writeVertexToXML(triangle, width / 2, -height / 2, -lenght / 2);
+	writeVertexToXML(triangle, -width / 2, -height / 2, lenght / 2);
+	pRoot->InsertEndChild(triangle);
 
 	triangle = xmlDoc.NewElement("triangle");
 	//face traz
-	writeVertexToXML(pRoot, -width / 2, -height / 2, -lenght / 2);
-	writeVertexToXML(pRoot, width / 2, height / 2, -lenght / 2);
-	writeVertexToXML(pRoot, -width / 2, height / 2, -lenght / 2);
-	xmlDoc.InsertFirstChild(pRoot);
+	writeVertexToXML(triangle, -width / 2, -height / 2, -lenght / 2);
+	writeVertexToXML(triangle, width / 2, height / 2, -lenght / 2);
+	writeVertexToXML(triangle, -width / 2, height / 2, -lenght / 2);
+	pRoot->InsertEndChild(triangle);
 
 	triangle = xmlDoc.NewElement("triangle");
-	writeVertexToXML(pRoot, width / 2, -height / 2, -lenght / 2);
-	writeVertexToXML(pRoot, width / 2, height / 2, -lenght / 2);
-	writeVertexToXML(pRoot, -width / 2, -height / 2, -lenght / 2);
-	xmlDoc.InsertFirstChild(pRoot);
+	writeVertexToXML(triangle, width / 2, -height / 2, -lenght / 2);
+	writeVertexToXML(triangle, width / 2, height / 2, -lenght / 2);
+	writeVertexToXML(triangle, -width / 2, -height / 2, -lenght / 2);
+	pRoot->InsertEndChild(triangle);
 
 
 	xmlDoc.SaveFile(filename);
@@ -212,7 +212,7 @@ void drawSphereXML(float r, int stacks, int slices, char *filename){
 	xmlDoc.SaveFile(filename);
 }
 
-void drawCylinderXML(float height, float radius, int slices, int stacks, char *filename) {
+void drawCylinderXML(float height, float radius, int stacks, int slices, char *filename) {
 	using namespace tinyxml2;
 	XMLNode * pRoot = xmlDoc.NewElement("cilindro");
 	xmlDoc.InsertFirstChild(pRoot);
@@ -321,7 +321,7 @@ void drawCylinderXML(float height, float radius, int slices, int stacks, char *f
 	xmlDoc.SaveFile(filename);
 }
 
-void drawConeXML(float height, float radius, int slices, int stacks, char *filename) {
+void drawConeXML(float height, float radius, int stacks, int slices, char *filename) {
 	using namespace tinyxml2;
 	XMLNode * pRoot = xmlDoc.NewElement("cone");
 	xmlDoc.InsertFirstChild(pRoot);
@@ -408,6 +408,37 @@ void drawConeXML(float height, float radius, int slices, int stacks, char *filen
 	xmlDoc.SaveFile(filename);
 }
 
+void drawPlaneXML(float largura, float altura, char *filename){
+	using namespace tinyxml2;
+	XMLNode * pRoot = xmlDoc.NewElement("cone");
+	xmlDoc.InsertEndChild(pRoot);
+
+	Vertex v1, v2, v3, v4;
+	
+	v1.x = largura / 2;
+	v1.y = -altura / 2;
+	v1.z = 0;
+
+	v2.x = -largura / 2;
+	v2.y = -altura / 2;
+	v2.z = 0;
+
+	v3.x = -largura / 2;
+	v3.y = altura / 2;
+	v3.z = 0;
+
+	v4.x = largura / 2;
+	v4.y = altura / 2;
+	v4.z = 0;
+
+	
+	writeTriangleToXML(pRoot, v2, v3, v1);
+	writeTriangleToXML(pRoot, v3, v4, v1);
+
+	xmlDoc.SaveFile(filename);
+
+}
+
 int main(int argc, char **argv){
 	int stacks, slices;
 	float radius;
@@ -440,10 +471,10 @@ int main(int argc, char **argv){
 			}
 
 		}
-		else if (strcmp(argv[1], "paralelipipedo") == 0){
+		else if (strcmp(argv[1], "paralelepipedo") == 0){
 			if (argc == 6){
 				drawParallelpipedXML(atof(argv[2]), atof(argv[3]), atof(argv[4]), argv[5]);
-				printf("Paralelipipedo gravado em %s com %Lf de largura, %Lf de altura e %Lf de comprimento.\n", argv[5], atof(argv[2]), atof(argv[3]), atof(argv[4]));
+				printf("Paralelepipedo gravado em %s com %Lf de largura, %Lf de altura e %Lf de comprimento.\n", argv[5], atof(argv[2]), atof(argv[3]), atof(argv[4]));
 			}
 			else{
 				printf("Erro nos argumentos!\n");
@@ -453,6 +484,15 @@ int main(int argc, char **argv){
 			if (argc == 7){
 				drawConeXML((float)atof(argv[2]), (float)atof(argv[3]), atoi(argv[4]), atoi(argv[5]), argv[6]);
 				printf("Cone gravado em %s com %Lf de altura, %Lf de raio, %d camadas e %d fatias.\n", argv[6], (float)atof(argv[2]), (float)atof(argv[3]), atoi(argv[4]), atoi(argv[5]));
+			}
+			else{
+				printf("Erro nos argumentos!\n");
+			}
+		}
+		else if (strcmp(argv[1], "plano") == 0){
+			if (argc == 5){
+				drawPlaneXML(atof(argv[2]), atof(argv[3]),argv[4]);
+				printf("Plano gravado em %s com %Lf de largura e %Lf de altura.\n", argv[4], atof(argv[2]), atof(argv[3]));
 			}
 			else{
 				printf("Erro nos argumentos!\n");
