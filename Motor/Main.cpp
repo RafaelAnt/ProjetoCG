@@ -42,15 +42,6 @@ void changeSize(int w, int h) {
 	glMatrixMode(GL_MODELVIEW);
 }
 
-/* Preencher os vetores com os modelos */
-void prepareModels(vector<const char*> nomes){
-	vector<GLfloat> aux;
-	for (unsigned int i = 0; i < nomes.size(); i++){
-		aux = readVertices(nomes[i]);
-		models.push_back(aux);
-	}
-}
-
 /* Desenhar os modelos carregados */
 void drawModels(){
 	for (unsigned int i = 0; i < models.size(); i++){
@@ -127,41 +118,7 @@ void menu(int op){
 	glutPostRedisplay();
 }
 
-/* 
-	Função que analisa o ficheiro XML e determina os modelos a desenhar
-	Em caso de problemas, irão ser atiradas as respetivas excepções (ficheiro XML inválido, modelo inexistente, etc)
-	A função preenche um vetor com os nomes dos modelos referenciados pelo XML, e irá preparar os vetores que irão
-	guardar os seus vértices.
-*/
-void readScene(char *filename){
-	using namespace tinyxml2;
-	//Carregar o ficheiro xml
-	XMLDocument xmlDoc;
-	XMLError eResult = xmlDoc.LoadFile(filename);
 
-	if (eResult != XML_SUCCESS){
-		printf("Erro!! %s", xmlDoc.ErrorName());
-
-	}
-
-	printf("Loaded %s\n", filename);
-
-	XMLNode * pRoot = xmlDoc.FirstChild();
-	if (pRoot == NULL)
-		throw 21;
-
-	XMLElement * pListElement = pRoot->FirstChildElement("modelo");
-	vector<const char*> nomes;
-	while (pListElement != NULL) {
-		const char * nome;
-		nome = pListElement->Attribute("ficheiro");
-		if (nome != NULL) {
-			nomes.push_back(nome);
-		}
-		pListElement = pListElement->NextSiblingElement("modelo");
-	}
-	prepareModels(nomes);
-}
 
 void createMenu(){
 	glutCreateMenu(menu);
@@ -174,6 +131,11 @@ void createMenu(){
 int main() {
 	srand(time(NULL));
 
+	if (__argc!=2){
+		puts("Erro nos argumentos! Especifique apenas o nome da cena a desenhar.\nCertifique-se tambem que o ficheiro esta na diretoria do executavel!");
+		return -1;
+	}
+
 	try{ readScene(__argv[1]); }
 	catch (int e){
 		if (e == 21){
@@ -184,7 +146,7 @@ int main() {
 		else{
 			puts("Erro na leitura dos triangulos, excepcao não tratada!");
 		}
-		exit(-1);
+		return -1;
 	}
 
 	// init de cenas

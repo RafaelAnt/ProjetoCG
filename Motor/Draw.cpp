@@ -12,6 +12,13 @@ typedef struct point{
 	GLfloat z;
 } Point;
 
+/*
+	Funçao que desenha um vetor de vértices, cada 3 vértices é um triângulo.
+	Atenção!!! A função não irá verificar se o vetor está bem formado, ou seja,
+	se tem exatamente um conjunto de vários 3 pontos. Caso o vetor não esteja bem formado
+	poderá haver acessos a indices do array fora de limites, o que provavelmente irá resultar num crash.
+	Nesta aplicação a verificação é feita no momento da leitura dos vértices dos modelos.
+*/
 void drawVertices(vector<GLfloat> vertices){
 	Point p1, p2, p3;
 	glBegin(GL_TRIANGLES);
@@ -75,4 +82,46 @@ vector<GLfloat> readVertices(const char *filename) {
 		pElement = pElement->NextSiblingElement("triangle");
 	}
 	return vec;
+}
+
+
+/* Preencher os vetores com os modelos */
+static vector<vector<GLfloat>> prepareModels(vector<const char*> nomes){
+	vector<vector<GLfloat>> models;
+	vector<GLfloat> aux;
+	for (unsigned int i = 0; i < nomes.size(); i++){
+		aux = readVertices(nomes[i]);
+		models.push_back(aux);
+	}
+	return models;
+}
+
+vector<vector<GLfloat>> readScene(char *filename){
+	using namespace tinyxml2;
+	//Carregar o ficheiro xml
+	XMLDocument xmlDoc;
+	XMLError eResult = xmlDoc.LoadFile(filename);
+
+	if (eResult != XML_SUCCESS){
+		printf("Erro!! %s", xmlDoc.ErrorName());
+
+	}
+
+	printf("Loaded %s\n", filename);
+
+	XMLNode * pRoot = xmlDoc.FirstChild();
+	if (pRoot == NULL)
+		throw 21;
+
+	XMLElement * pListElement = pRoot->FirstChildElement("modelo");
+	vector<const char*> nomes;
+	while (pListElement != NULL) {
+		const char * nome;
+		nome = pListElement->Attribute("ficheiro");
+		if (nome != NULL) {
+			nomes.push_back(nome);
+		}
+		pListElement = pListElement->NextSiblingElement("modelo");
+	}
+	return prepareModels(nomes);
 }
