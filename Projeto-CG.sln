@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Projeto-CG", "Projeto-CG\Projeto-CG.vcxproj", "{A714AADF-D647-492C-8414-8A20AD565AD3}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Motor", "Motor\Motor.vcxproj", "{79BCF955-81D4-4B77-A764-D53536A06D35}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Modelador", "Modelador\Modelador.vcxproj", "{7571F299-9A2F-447F-B956-21F7AE0F4B02}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Gerador", "Gerador\Gerador.vcxproj", "{7571F299-9A2F-447F-B956-21F7AE0F4B02}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,10 +13,10 @@ Global
 		Release|Win32 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{A714AADF-D647-492C-8414-8A20AD565AD3}.Debug|Win32.ActiveCfg = Debug|Win32
-		{A714AADF-D647-492C-8414-8A20AD565AD3}.Debug|Win32.Build.0 = Debug|Win32
-		{A714AADF-D647-492C-8414-8A20AD565AD3}.Release|Win32.ActiveCfg = Release|Win32
-		{A714AADF-D647-492C-8414-8A20AD565AD3}.Release|Win32.Build.0 = Release|Win32
+		{79BCF955-81D4-4B77-A764-D53536A06D35}.Debug|Win32.ActiveCfg = Debug|Win32
+		{79BCF955-81D4-4B77-A764-D53536A06D35}.Debug|Win32.Build.0 = Debug|Win32
+		{79BCF955-81D4-4B77-A764-D53536A06D35}.Release|Win32.ActiveCfg = Release|Win32
+		{79BCF955-81D4-4B77-A764-D53536A06D35}.Release|Win32.Build.0 = Release|Win32
 		{7571F299-9A2F-447F-B956-21F7AE0F4B02}.Debug|Win32.ActiveCfg = Debug|Win32
 		{7571F299-9A2F-447F-B956-21F7AE0F4B02}.Debug|Win32.Build.0 = Debug|Win32
 		{7571F299-9A2F-447F-B956-21F7AE0F4B02}.Release|Win32.ActiveCfg = Release|Win32

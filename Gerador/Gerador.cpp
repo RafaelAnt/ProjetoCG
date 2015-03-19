@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include "tinyxml2.h"
 #include <sstream>
-#include "Modelador.h"
 
 typedef struct ponto{
 	double x;
