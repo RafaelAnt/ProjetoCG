@@ -66,7 +66,7 @@ static vector<GLfloat> readVertices_aux(tinyxml2::XMLElement *pElement, vector<G
 	A função irá retornar um vetor com todos os pontos, bem definidos e prontos a serem desenhados.
 */
 
-vector<GLfloat> readVertices(const char *filename) {
+static vector<GLfloat> readVertices(const char *filename) {
 	using namespace tinyxml2;
 	vector<GLfloat> vec;
 	tinyxml2::XMLDocument xmlDoc;
@@ -84,7 +84,6 @@ vector<GLfloat> readVertices(const char *filename) {
 	return vec;
 }
 
-
 /* Preencher os vetores com os modelos */
 static vector<vector<GLfloat>> prepareModels(vector<const char*> nomes){
 	vector<vector<GLfloat>> models;
@@ -101,18 +100,14 @@ vector<vector<GLfloat>> readScene(char *filename){
 	//Carregar o ficheiro xml
 	XMLDocument xmlDoc;
 	XMLError eResult = xmlDoc.LoadFile(filename);
-
 	if (eResult != XML_SUCCESS){
 		printf("Erro!! %s", xmlDoc.ErrorName());
 
 	}
-
 	printf("Loaded %s\n", filename);
-
 	XMLNode * pRoot = xmlDoc.FirstChild();
 	if (pRoot == NULL)
 		throw 21;
-
 	XMLElement * pListElement = pRoot->FirstChildElement("modelo");
 	vector<const char*> nomes;
 	while (pListElement != NULL) {

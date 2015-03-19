@@ -8,15 +8,13 @@
 #include "tinyxml2.h"
 #include "Draw.h"
 
-//#pragma comment(lib,"glew32.lib")
-
 using namespace std;
 
 /* Esta variável irá conter todos os modelos a desenhar*/
 static vector<vector<GLfloat>> models;
 
 /* Variáveis da camara, começa a 5 unidades de distância da origem */
-float alfa = 0, beta = 0, raio = 5, step = 0.02;
+static float alfa = 0, beta = 0, raio = 5, step = 0.02;
 
 void changeSize(int w, int h) {
 	// Prevent a divide by zero, when window is too short
@@ -136,7 +134,7 @@ int main() {
 		return -1;
 	}
 
-	try{ readScene(__argv[1]); }
+	try{ models=readScene(__argv[1]); }
 	catch (int e){
 		if (e == 21){
 			puts("Erro na leitura da cena, XML parsing error!");
@@ -163,9 +161,6 @@ int main() {
 	glutReshapeFunc(changeSize);
 	glutSpecialFunc(keyboardSpecial);
 	glutKeyboardFunc(keyboard);
-
-
-	//glewInit();
 
 	// alguns settings para OpenGL
 	glEnable(GL_DEPTH_TEST);
