@@ -5,15 +5,15 @@
 #include <sstream>
 #include "Modelador.h"
 
-typedef struct vertex{
+typedef struct ponto{
 	double x;
 	double y;
 	double z;
-}Vertex;
+}Ponto;
 
 tinyxml2::XMLDocument xmlDoc;
 
-static void writeVertexToXML(tinyxml2::XMLNode * pRoot, Vertex v){
+static void writeVertexToXML(tinyxml2::XMLNode * pRoot, Ponto v){
 	using namespace tinyxml2;
 	char text[1024];
 	XMLElement *elem = xmlDoc.NewElement("vertex");
@@ -31,7 +31,7 @@ static void writeVertexToXML(tinyxml2::XMLNode * pRoot, double x, double y, doub
 	pRoot->InsertEndChild(elem);
 }
 
-static void writeTriangleToXML(tinyxml2::XMLNode * pRoot, Vertex v1, Vertex v2, Vertex v3){
+static void writeTriangleToXML(tinyxml2::XMLNode * pRoot, Ponto v1, Ponto v2, Ponto v3){
 	using namespace tinyxml2;
 	XMLNode *triangle = xmlDoc.NewElement("triangle");
 	writeVertexToXML(triangle, v1);
@@ -129,7 +129,7 @@ void drawParallelpipedXML(float width, float height, float lenght, char* filenam
 
 void drawPyramidXML(float base, float height, char *filename){
 	using namespace tinyxml2;
-	Vertex v1, v2, v3;
+	Ponto v1, v2, v3;
 	XMLNode * pRoot = xmlDoc.NewElement("piramide");
 	xmlDoc.InsertFirstChild(pRoot);
 
@@ -169,44 +169,46 @@ void drawSphereXML(float r, int stacks, int slices, char *filename){
 	XMLNode * pRoot = xmlDoc.NewElement("esfera");
 	xmlDoc.InsertFirstChild(pRoot);
 	int t, p;
-	for (t = 0; t < stacks; t++){ // stacks are ELEVATION so they count theta
+	for (t = 0; t < stacks; t++){ // stacks -> theta (theta é PI porque é na vertical (180º)
 		float theta1 = ((float)(t) / stacks)*M_PI;
 		float theta2 = ((float)(t + 1) / stacks)*M_PI;
 
-		for (p = 0; p < slices; p++){ // slices are ORANGE SLICES so they count azimuth
-			double phi1 = ((float)(p) / slices) * 2 * M_PI; // azimuth goes around 0 .. 2*PI
-			double phi2 = ((float)(p + 1) / slices) * 2 * M_PI;
+		for (p = 0; p < slices; p++){ // slices -> phi
+			double phi1 = ((float)(p) / slices) * 2 * M_PI; // (phi é 2PI porque é na horizontal, tem que ser à volta da esfera
+			double phi2 = ((float)(p + 1) / slices) * 2 * M_PI; // toda, ou seja, 360º = 2PI
 
-			Vertex vertex1;
+			Ponto vertex1;
 			vertex1.x = r*sin(theta1)*cos(phi1);
 			vertex1.y = r*sin(theta1)*sin(phi1);
 			vertex1.z = r*cos(theta1);
 
-			Vertex vertex2;
+			Ponto vertex2;
 			vertex2.x = r*sin(theta1)*cos(phi2);
 			vertex2.y = r*sin(theta1)*sin(phi2);
 			vertex2.z = r*cos(theta1);
 
-			Vertex vertex3;
+			Ponto vertex3;
 			vertex3.x = r*sin(theta2)*cos(phi2);
 			vertex3.y = r*sin(theta2)*sin(phi2);
 			vertex3.z = r*cos(theta2);
 
-			Vertex vertex4;
+			Ponto vertex4;
 			vertex4.x = r*sin(theta2)*cos(phi1);
 			vertex4.y = r*sin(theta2)*sin(phi1);
 			vertex4.z = r*cos(theta2);
 
-			if (t == 0){//polo norte
+			if (t == 0){//camada inicial
 				writeTriangleToXML(pRoot, vertex1, vertex3, vertex4);
 			}
-			else if (t + 1 == stacks){ //polo sul
+			else if (t + 1 == stacks){ //camada final 
 				writeTriangleToXML(pRoot, vertex3, vertex1, vertex2);
 			}
 			else{
 				writeTriangleToXML(pRoot, vertex1, vertex2, vertex4);
 				writeTriangleToXML(pRoot, vertex2, vertex3, vertex4);
 			}
+			//os dois "if" iniciais servem para desenhar o "inicio" e o "fim" da esfera
+			//caso nao estejamos na ultima ou primeira camada, desenharemos os "quads" para formar a esfera (2triangles=1quad)
 		}
 	}
 	xmlDoc.SaveFile(filename);
@@ -221,17 +223,17 @@ void drawCylinderXML(float height, float radius, int stacks, int slices, char *f
 
 	//base cima
 	for (float i = 0; i < 2 * pi; i += 2 * pi / slices) {
-		vertex vertex1;
+		Ponto vertex1;
 		vertex1.x = radius*sin(i);
 		vertex1.y = height;
 		vertex1.z = radius*cos(i);
 
-		vertex vertex2;
+		Ponto vertex2;
 		vertex2.x = 0;
 		vertex2.y = height;
 		vertex2.z = 0;
 
-		vertex vertex3;
+		Ponto vertex3;
 		vertex3.x = radius*sin(i + 2 * pi / slices);
 		vertex3.y = height;
 		vertex3.z = radius*cos(i + 2 * pi / slices);
@@ -242,17 +244,17 @@ void drawCylinderXML(float height, float radius, int stacks, int slices, char *f
 	//base baixo
 	for (float i = 0; i < 2 * pi; i += 2 * pi / slices) {
 
-		vertex vertex1;
+		Ponto vertex1;
 		vertex1.x = radius*sin(i);
 		vertex1.y = 0;
 		vertex1.z = radius*cos(i);
 
-		vertex vertex2;
+		Ponto vertex2;
 		vertex2.x = 0;
 		vertex2.y = 0;
 		vertex2.z = 0;
 
-		vertex vertex3;
+		Ponto vertex3;
 		vertex3.x = radius*sin(i + 2 * pi / slices);
 		vertex3.y = 0;
 		vertex3.z = radius*cos(i + 2 * pi / slices);
@@ -265,22 +267,22 @@ void drawCylinderXML(float height, float radius, int stacks, int slices, char *f
 	for (float l = height / stacks, h1 = 0.0f, h2 = l; h2<height; h1 = h2, h2 = h2 + l) {
 		for (float i = 0; i < 2 * pi; i += 2 * pi / slices) {
 
-			vertex vertex1;
+			Ponto vertex1;
 			vertex1.x = radius*sin(i);
 			vertex1.y = h2;
 			vertex1.z = radius*cos(i);
 
-			vertex vertex2;
+			Ponto vertex2;
 			vertex2.x = radius*sin(i + 2 * pi / slices);
 			vertex2.y = h2;
 			vertex2.z = radius*cos(i + 2 * pi / slices);
 
-			vertex vertex3;
+			Ponto vertex3;
 			vertex3.x = radius*sin(i);
 			vertex3.y = h1;
 			vertex3.z = radius*cos(i);
 
-			vertex vertex4;
+			Ponto vertex4;
 			vertex4.x = radius*sin(i + 2 * pi / slices);
 			vertex4.y = h1;
 			vertex4.z = radius*cos(i + 2 * pi / slices);
@@ -292,22 +294,22 @@ void drawCylinderXML(float height, float radius, int stacks, int slices, char *f
 	}
 	for (float i = 0; i < 2 * pi; i += 2 * pi / slices) {
 
-		vertex vertex1;
+		Ponto vertex1;
 		vertex1.x = radius*sin(i);
 		vertex1.y = height;
 		vertex1.z = radius*cos(i);
 
-		vertex vertex2;
+		Ponto vertex2;
 		vertex2.x = radius*sin(i + 2 * pi / slices);
 		vertex2.y = height;
 		vertex2.z = radius*cos(i + 2 * pi / slices);
 
-		vertex vertex3;
+		Ponto vertex3;
 		vertex3.x = radius*sin(i);
 		vertex3.y = height - height / stacks;
 		vertex3.z = radius*cos(i);
 
-		vertex vertex4;
+		Ponto vertex4;
 		vertex4.x = radius*sin(i + 2 * pi / slices);
 		vertex4.y = height - height / stacks;
 		vertex4.z = radius*cos(i + 2 * pi / slices);
@@ -331,17 +333,17 @@ void drawConeXML(float height, float radius, int stacks, int slices, char *filen
 	//base
 	for (float i = 0; i < 2 * pi; i += 2 * pi / slices) {
 
-		vertex vertex1;
+		Ponto vertex1;
 		vertex1.x = radius*sin(i);
 		vertex1.y = 0;
 		vertex1.z = radius*cos(i);
 
-		vertex vertex2;
+		Ponto vertex2;
 		vertex2.x = 0;
 		vertex2.y = 0;
 		vertex2.z = 0;
 
-		vertex vertex3;
+		Ponto vertex3;
 		vertex3.x = radius*sin(i + 2 * pi / slices);
 		vertex3.y = 0;
 		vertex3.z = radius*cos(i + 2 * pi / slices);
@@ -355,22 +357,22 @@ void drawConeXML(float height, float radius, int stacks, int slices, char *filen
 	for (float l = height / stacks, h1 = 0.0f, h2 = l; h2 < height; h1 = h2, h2 = h2 + l) {
 		for (float i = 0; i < 2 * pi; i += 2 * pi / slices) {
 
-			vertex vertex1;
+			Ponto vertex1;
 			vertex1.x = (rAct - r)*sin(i);
 			vertex1.y = h2;
 			vertex1.z = (rAct - r)*cos(i);
 
-			vertex vertex2;
+			Ponto vertex2;
 			vertex2.x = (rAct - r)*sin(i + 2 * pi / slices);
 			vertex2.y = h2;
 			vertex2.z = (rAct - r)*cos(i + 2 * pi / slices);
 
-			vertex vertex3;
+			Ponto vertex3;
 			vertex3.x = rAct*sin(i);
 			vertex3.y = h1;
 			vertex3.z = rAct*cos(i);
 
-			vertex vertex4;
+			Ponto vertex4;
 			vertex4.x = rAct*sin(i + 2 * pi / slices);
 			vertex4.y = h1;
 			vertex4.z = rAct*cos(i + 2 * pi / slices);
@@ -383,17 +385,17 @@ void drawConeXML(float height, float radius, int stacks, int slices, char *filen
 	}
 	for (float i = 0; i < 2 * pi; i += 2 * pi / slices) {
 
-		vertex vertex1;
+		Ponto vertex1;
 		vertex1.x = 0;
 		vertex1.y = height;
 		vertex1.z = 0;
 
-		vertex vertex2;
+		Ponto vertex2;
 		vertex2.x = r*sin(i);
 		vertex2.y = height - height / stacks;
 		vertex2.z = r*cos(i);
 
-		vertex vertex3;
+		Ponto vertex3;
 		vertex3.x = r*sin(i + 2 * pi / slices);
 
 		vertex3.y = height - height / stacks;
@@ -413,7 +415,7 @@ void drawPlaneXML(float largura, float altura, char *filename){
 	XMLNode * pRoot = xmlDoc.NewElement("cone");
 	xmlDoc.InsertEndChild(pRoot);
 
-	Vertex v1, v2, v3, v4;
+	Ponto v1, v2, v3, v4;
 	
 	v1.x = largura / 2;
 	v1.y = -altura / 2;
