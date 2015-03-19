@@ -101,8 +101,8 @@ vector<vector<GLfloat>> readScene(char *filename){
 	XMLDocument xmlDoc;
 	XMLError eResult = xmlDoc.LoadFile(filename);
 	if (eResult != XML_SUCCESS){
-		printf("Erro!! %s", xmlDoc.ErrorName());
-
+		printf("Erro!! %s \n", xmlDoc.ErrorName());
+		throw 20;
 	}
 	printf("Loaded %s\n", filename);
 	XMLNode * pRoot = xmlDoc.FirstChild();

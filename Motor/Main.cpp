@@ -138,8 +138,14 @@ int main() {
 	catch (int e){
 		if (e == 21){
 			puts("Erro na leitura da cena, XML parsing error!");
-		} if (e == 22){
+		}else if (e == 22){
 			puts("Erro na leitura de um dos modelos!");
+		}
+		else if (e == 20){
+			puts("Erro!! ");
+		}
+		else if (e == 1){
+			puts("Erro! Triângulos malformados!!");
 		}
 		else{
 			puts("Erro na leitura dos triangulos, excepcao não tratada!");
