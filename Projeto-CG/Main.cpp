@@ -12,7 +12,10 @@
 
 using namespace std;
 
+/* Esta variável irá conter todos os modelos a desenhar*/
 static vector<vector<GLfloat>> models;
+
+/* Variáveis da camara, começa a 5 unidades de distância da origem */
 float alfa = 0, beta = 0, raio = 5, step = 0.02;
 
 void changeSize(int w, int h) {
@@ -39,6 +42,7 @@ void changeSize(int w, int h) {
 	glMatrixMode(GL_MODELVIEW);
 }
 
+/* Preencher os vetores com os modelos */
 void prepareModels(vector<const char*> nomes){
 	vector<GLfloat> aux;
 	for (unsigned int i = 0; i < nomes.size(); i++){
@@ -47,6 +51,7 @@ void prepareModels(vector<const char*> nomes){
 	}
 }
 
+/* Desenhar os modelos carregados */
 void drawModels(){
 	for (unsigned int i = 0; i < models.size(); i++){
 		drawVertices(models[i]);
@@ -122,6 +127,12 @@ void menu(int op){
 	glutPostRedisplay();
 }
 
+/* 
+	Função que analisa o ficheiro XML e determina os modelos a desenhar
+	Em caso de problemas, irão ser atiradas as respetivas excepções (ficheiro XML inválido, modelo inexistente, etc)
+	A função preenche um vetor com os nomes dos modelos referenciados pelo XML, e irá preparar os vetores que irão
+	guardar os seus vértices.
+*/
 void readScene(char *filename){
 	using namespace tinyxml2;
 	//Carregar o ficheiro xml
@@ -163,7 +174,7 @@ void createMenu(){
 int main() {
 	srand(time(NULL));
 
-	try{ readScene("cena.xml"); }
+	try{ readScene(__argv[1]); }
 	catch (int e){
 		if (e == 21){
 			puts("Erro na leitura da cena, XML parsing error!");
@@ -197,7 +208,6 @@ int main() {
 	// alguns settings para OpenGL
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
-	glEnable(GL_NORMALIZE);
 	glCullFace(GL_FRONT);
 	glFrontFace(GL_CCW);
 

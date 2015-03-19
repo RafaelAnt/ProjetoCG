@@ -197,10 +197,10 @@ void drawSphereXML(float r, int stacks, int slices, char *filename){
 			vertex4.y = r*sin(theta2)*sin(phi1);
 			vertex4.z = r*cos(theta2);
 
-			if (t == 0){//inicio da camada
+			if (t == 0){//polo norte
 				writeTriangleToXML(pRoot, vertex1, vertex3, vertex4);
 			}
-			else if (t + 1 == stacks){ //fim da camada
+			else if (t + 1 == stacks){ //polo sul
 				writeTriangleToXML(pRoot, vertex3, vertex1, vertex2);
 			}
 			else{
