@@ -220,7 +220,7 @@ void drawCylinderXML(float height, float radius, int stacks, int slices, char *f
 
 	float pi = 3.1415f, h1, h2 = 0;
 
-	//base cima
+	//Ciclo que gera base superior
 	for (float i = 0; i < 2 * pi; i += 2 * pi / slices) {
 		Ponto vertex1;
 		vertex1.x = radius*sin(i);
@@ -233,14 +233,14 @@ void drawCylinderXML(float height, float radius, int stacks, int slices, char *f
 		vertex2.z = 0;
 
 		Ponto vertex3;
-		vertex3.x = radius*sin(i + 2 * pi / slices);
+		vertex3.x = radius*sin(i + 2 * pi / slices);	//(i + 2 * pi / slices) = angulo do ponto da proxima fatia
 		vertex3.y = height;
 		vertex3.z = radius*cos(i + 2 * pi / slices);
 
 		writeTriangleToXML(pRoot, vertex1, vertex2, vertex3);
 	}
 
-	//base baixo
+	//Ciclo que gera base inferior
 	for (float i = 0; i < 2 * pi; i += 2 * pi / slices) {
 
 		Ponto vertex1;
@@ -262,8 +262,11 @@ void drawCylinderXML(float height, float radius, int stacks, int slices, char *f
 	}
 
 	//face curva
+	//ciclo que gera as camadas da face 
+	for (float l = height / stacks, h1 = 0.0f, h2 = l; h2<height; h1 = h2, h2 = h2 + l) { 
+		// l  - altura de cada camada; ciclo termina antes de gerar ultima camada
 
-	for (float l = height / stacks, h1 = 0.0f, h2 = l; h2<height; h1 = h2, h2 = h2 + l) {
+		//ciclo que gera os triangulos de cada camada
 		for (float i = 0; i < 2 * pi; i += 2 * pi / slices) {
 
 			Ponto vertex1;
@@ -291,7 +294,8 @@ void drawCylinderXML(float height, float radius, int stacks, int slices, char *f
 		}
 
 	}
-	for (float i = 0; i < 2 * pi; i += 2 * pi / slices) {
+	//ciclo que gera a ultima camada( solução para problema de arredondamento que por vezes levava a que a ultima camada nao fosse gerada)
+	for (float i = 0; i < 2 * pi; i += 2 * pi / slices) {	
 
 		Ponto vertex1;
 		vertex1.x = radius*sin(i);
@@ -329,7 +333,7 @@ void drawConeXML(float height, float radius, int stacks, int slices, char *filen
 
 	float pi = 3.1415f, h1, h2 = 0;
 
-	//base
+	//Ciclo que gera base inferior
 	for (float i = 0; i < 2 * pi; i += 2 * pi / slices) {
 
 		Ponto vertex1;
@@ -351,9 +355,11 @@ void drawConeXML(float height, float radius, int stacks, int slices, char *filen
 	}
 
 	//face curva
-	float rAct = radius;
-	float r = radius / stacks;
+	float rAct = radius;	//raio da camada actual
+	float r = radius / stacks;	//valor a diminuir ao raio da camada actual em cada camada
+	// ciclo que gera as camadas
 	for (float l = height / stacks, h1 = 0.0f, h2 = l; h2 < height; h1 = h2, h2 = h2 + l) {
+		//ciclo que gera triangulos da camada
 		for (float i = 0; i < 2 * pi; i += 2 * pi / slices) {
 
 			Ponto vertex1;
@@ -382,6 +388,8 @@ void drawConeXML(float height, float radius, int stacks, int slices, char *filen
 		rAct -= r;
 
 	}
+
+	//ciclo que gera a ultima camada do cone
 	for (float i = 0; i < 2 * pi; i += 2 * pi / slices) {
 
 		Ponto vertex1;
