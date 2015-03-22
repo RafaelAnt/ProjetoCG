@@ -1,13 +1,12 @@
 #include <valarray>
 #include <map>
+#include <string>
 #include <vector>
 #include "tinyxml2.h"
 #include "Draw.h"
 #include <GL/GLUT.h>
 
 using namespace std;
-
-
 
 typedef struct point{
 	GLfloat x;
@@ -87,13 +86,12 @@ static vector<GLfloat> readVertices(const char *filename) {
 	return vec;
 }
 
-map<const char*, vector<GLfloat>> prepareModels(char *filename){
+map<string, vector<GLfloat>> prepareModels(char *filename){
 	using namespace tinyxml2;
 	//Vetor que vai armazenar os nomes dos modelos
-	map<const char*, vector<GLfloat>> modelos;
-	Nodo *nodo = new(Nodo);
+	map<string, vector<GLfloat>> modelos;
 	//Carregar o ficheiro xml
-	XMLDocument xmlDoc; XMLNode *modelosGroup; XMLElement *modelo,*aux;
+	XMLDocument xmlDoc; XMLNode *modelosGroup; XMLElement *modelo, *aux;
 	XMLError eResult = xmlDoc.LoadFile(filename);
 	if (eResult != XML_SUCCESS){
 		printf("Erro!! %s \n", xmlDoc.ErrorName());
@@ -110,16 +108,6 @@ map<const char*, vector<GLfloat>> prepareModels(char *filename){
 		throw 19; //ficheiro inválido
 	}
 	while (pRoot != NULL){
-		//obter transformacoes
-		aux = pRoot->FirstChildElement("translacao");
-		while (aux){
-			Translate t; t.x = 0; t.y = 0; t.z = 0;
-			aux->QueryFloatAttribute("X", &t.x);
-			aux->QueryFloatAttribute("Y", &t.y);
-			aux->QueryFloatAttribute("Z", &t.z);
-			printf("X=%Lf,Y=%Lf,Z=%Lf\n", t.x, t.y, t.z);
-			aux = aux->NextSiblingElement("translacao");
-		}
 		//obter o node modelos
 		modelosGroup = pRoot->FirstChildElement("modelos");
 		//percorrer os modelos
@@ -129,9 +117,8 @@ map<const char*, vector<GLfloat>> prepareModels(char *filename){
 				const char * nome;
 				nome = modelo->Attribute("ficheiro");
 				if (nome) {
-					puts(nome);
 					if (modelos.count(nome) == 0){
-						modelos[nome] = readVertices(nome);
+						modelos[string(nome)] = readVertices(nome);
 					}
 				}
 				modelo = modelo->NextSiblingElement("modelo");
@@ -140,6 +127,7 @@ map<const char*, vector<GLfloat>> prepareModels(char *filename){
 		//ir para o próximo grupo
 		pRoot = pRoot->FirstChildElement("grupo");
 	}
-
+	printf("%d\n", modelos.size());
 	return modelos;
 }
+

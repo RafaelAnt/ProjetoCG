@@ -25,10 +25,10 @@ typedef struct scale{
 }Scale ;
 
 typedef struct node{
-	char* modelo;
-	vector<Scale> escalas;
-	vector<Rotation> rotacoes;
-	vector<Translate> translacoes;
+	vector<const char*> modelos;
+	vector<Scale*> escalas;
+	vector<Rotation*> rotacoes;
+	vector<Translate*> translacoes;
 }Nodo;
 
 /*
@@ -44,5 +44,5 @@ void drawVertices(vector<GLfloat> vertices);
 	guardar os seus vértices.
 	Os modelos serão retornados num vetor de vetores de vértices. Cada vetor de vértices é um modelo.
 */
-map<const char*, vector<GLfloat>> prepareModels(char *filename);
+map<string, vector<GLfloat>> prepareModels(char *filename);
 
