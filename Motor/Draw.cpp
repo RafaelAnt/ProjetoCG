@@ -1,10 +1,13 @@
 #include <valarray>
+#include <map>
 #include <vector>
 #include "tinyxml2.h"
 #include "Draw.h"
 #include <GL/GLUT.h>
 
 using namespace std;
+
+
 
 typedef struct point{
 	GLfloat x;
@@ -18,7 +21,7 @@ typedef struct point{
 	se tem exatamente um conjunto de vários 3 pontos. Caso o vetor não esteja bem formado
 	poderá haver acessos a indices do array fora de limites, o que provavelmente irá resultar num crash.
 	Nesta aplicação a verificação é feita no momento da leitura dos vértices dos modelos.
-*/
+	*/
 void drawVertices(vector<GLfloat> vertices){
 	Point p1, p2, p3;
 	glBegin(GL_TRIANGLES);
@@ -38,9 +41,9 @@ void drawVertices(vector<GLfloat> vertices){
 /*
 	Função auxiliar que obtem um triângulo de um elemento XML.
 	Caso este elemento não tenha 3 pontos, é atirada um excepção que sinaliza o evento erróneo.
-	A função aceita um vetor, que ja pode ter elementos, coloca os 3 pontos no fim do vetor, e 
+	A função aceita um vetor, que ja pode ter elementos, coloca os 3 pontos no fim do vetor, e
 	retorna o mesmo.
-*/
+	*/
 static vector<GLfloat> readVertices_aux(tinyxml2::XMLElement *pElement, vector<GLfloat> vertices){
 	int i = 0;
 	float x, y, z;
@@ -64,7 +67,7 @@ static vector<GLfloat> readVertices_aux(tinyxml2::XMLElement *pElement, vector<G
 	Caso se trate de um ficheiro XML inválido, serão atiradas as respetivas excepções.
 	Caso os elementos do ficheiro XML não contenham exatamente 3 pontos cada um, também irá ser atirada uma excepção.
 	A função irá retornar um vetor com todos os pontos, bem definidos e prontos a serem desenhados.
-*/
+	*/
 
 static vector<GLfloat> readVertices(const char *filename) {
 	using namespace tinyxml2;
@@ -78,27 +81,19 @@ static vector<GLfloat> readVertices(const char *filename) {
 	}
 	pElement = pRoot->FirstChildElement("triangle");
 	while (pElement != NULL){
-		vec = readVertices_aux(pElement->FirstChildElement("vertex"),vec);
+		vec = readVertices_aux(pElement->FirstChildElement("vertex"), vec);
 		pElement = pElement->NextSiblingElement("triangle");
 	}
 	return vec;
 }
 
-/* Preencher os vetores com os modelos */
-static vector<vector<GLfloat>> prepareModels(vector<const char*> nomes){
-	vector<vector<GLfloat>> models;
-	vector<GLfloat> aux;
-	for (unsigned int i = 0; i < nomes.size(); i++){
-		aux = readVertices(nomes[i]);
-		models.push_back(aux);
-	}
-	return models;
-}
-
-vector<vector<GLfloat>> readScene(char *filename){
+map<const char*, vector<GLfloat>> prepareModels(char *filename){
 	using namespace tinyxml2;
+	//Vetor que vai armazenar os nomes dos modelos
+	map<const char*, vector<GLfloat>> modelos;
+	Nodo *nodo = new(Nodo);
 	//Carregar o ficheiro xml
-	XMLDocument xmlDoc;
+	XMLDocument xmlDoc; XMLNode *modelosGroup; XMLElement *modelo,*aux;
 	XMLError eResult = xmlDoc.LoadFile(filename);
 	if (eResult != XML_SUCCESS){
 		printf("Erro!! %s \n", xmlDoc.ErrorName());
@@ -108,15 +103,43 @@ vector<vector<GLfloat>> readScene(char *filename){
 	XMLNode * pRoot = xmlDoc.FirstChild();
 	if (pRoot == NULL)
 		throw 21;
-	XMLElement * pListElement = pRoot->FirstChildElement("modelo");
-	vector<const char*> nomes;
-	while (pListElement != NULL) {
-		const char * nome;
-		nome = pListElement->Attribute("ficheiro");
-		if (nome != NULL) {
-			nomes.push_back(nome);
-		}
-		pListElement = pListElement->NextSiblingElement("modelo");
+
+	pRoot = pRoot->FirstChildElement("grupo");
+	if (pRoot == NULL){
+		puts("Erro");
+		throw 19; //ficheiro inválido
 	}
-	return prepareModels(nomes);
+	while (pRoot != NULL){
+		//obter transformacoes
+		aux = pRoot->FirstChildElement("translacao");
+		while (aux){
+			Translate t; t.x = 0; t.y = 0; t.z = 0;
+			aux->QueryFloatAttribute("X", &t.x);
+			aux->QueryFloatAttribute("Y", &t.y);
+			aux->QueryFloatAttribute("Z", &t.z);
+			printf("X=%Lf,Y=%Lf,Z=%Lf\n", t.x, t.y, t.z);
+			aux = aux->NextSiblingElement("translacao");
+		}
+		//obter o node modelos
+		modelosGroup = pRoot->FirstChildElement("modelos");
+		//percorrer os modelos
+		if (modelosGroup){
+			modelo = modelosGroup->FirstChildElement("modelo");
+			while (modelo) {
+				const char * nome;
+				nome = modelo->Attribute("ficheiro");
+				if (nome) {
+					puts(nome);
+					if (modelos.count(nome) == 0){
+						modelos[nome] = readVertices(nome);
+					}
+				}
+				modelo = modelo->NextSiblingElement("modelo");
+			}
+		}
+		//ir para o próximo grupo
+		pRoot = pRoot->FirstChildElement("grupo");
+	}
+
+	return modelos;
 }

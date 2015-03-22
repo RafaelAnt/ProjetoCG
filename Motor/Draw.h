@@ -1,8 +1,35 @@
 #include <vector>
+#include <map>
 #include <valarray>
 #include <GL/GLUT.h>
 
 using namespace std;
+
+typedef struct translate{
+	GLfloat x;
+	GLfloat y;
+	GLfloat z;
+}Translate;
+
+typedef struct rotation{
+	GLfloat angle;
+	GLfloat x;
+	GLfloat y;
+	GLfloat z;
+}Rotation;
+
+typedef struct scale{
+	GLfloat x;
+	GLfloat y;
+	GLfloat z;
+}Scale ;
+
+typedef struct node{
+	char* modelo;
+	vector<Scale> escalas;
+	vector<Rotation> rotacoes;
+	vector<Translate> translacoes;
+}Nodo;
 
 /*
 	Desenha um conjunto de vértices em modo imeadiato. De notar o vetor deve ter um cojunto de triângulos.
@@ -17,5 +44,5 @@ void drawVertices(vector<GLfloat> vertices);
 	guardar os seus vértices.
 	Os modelos serão retornados num vetor de vetores de vértices. Cada vetor de vértices é um modelo.
 */
-vector <vector<GLfloat>> readScene(char *filename);
+map<const char*, vector<GLfloat>> prepareModels(char *filename);
 

@@ -3,6 +3,7 @@
 #include <GL/glut.h>
 #include <time.h>
 #include <vector>
+#include <map>
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include "tinyxml2.h"
@@ -11,7 +12,7 @@
 using namespace std;
 
 /* Esta variável irá conter todos os modelos a desenhar*/
-static vector<vector<GLfloat>> models;
+static map<const char*, vector<GLfloat>> models;
 
 /* Variáveis da camara, começa a 5 unidades de distância da origem */
 static float alfa = 0, beta = 0, raio = 5, step = 0.02;
@@ -40,10 +41,10 @@ void changeSize(int w, int h) {
 	glMatrixMode(GL_MODELVIEW);
 }
 
-/* Desenhar os modelos carregados */
 void drawModels(){
-	for (unsigned int i = 0; i < models.size(); i++){
-		drawVertices(models[i]);
+	map<const char*, vector<GLfloat >>::iterator it = models.begin();
+	for (it; it != models.end();it++){
+		drawVertices(it->second);
 	}
 }
 
@@ -129,16 +130,17 @@ void createMenu(){
 int main() {
 	srand(time(NULL));
 
-	if (__argc!=2){
+	if (__argc != 2){
 		puts("Erro nos argumentos! Especifique apenas o nome da cena a desenhar.\nCertifique-se tambem que o ficheiro esta na diretoria do executavel!");
 		return -1;
 	}
 
-	try{ models=readScene(__argv[1]); }
+	try{ models = prepareModels(__argv[1]); }
 	catch (int e){
 		if (e == 21){
 			puts("Erro na leitura da cena, XML parsing error!");
-		}else if (e == 22){
+		}
+		else if (e == 22){
 			puts("Erro na leitura de um dos modelos!");
 		}
 		else if (e == 20){
