@@ -24,12 +24,6 @@ typedef struct scale{
 	GLfloat z;
 }Scale ;
 
-typedef struct node{
-	vector<const char*> modelos;
-	vector<Scale*> escalas;
-	vector<Rotation*> rotacoes;
-	vector<Translate*> translacoes;
-}Nodo;
 
 /*
 	Desenha um conjunto de vértices em modo imeadiato. De notar o vetor deve ter um cojunto de triângulos.

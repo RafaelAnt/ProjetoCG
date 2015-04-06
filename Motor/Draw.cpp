@@ -107,8 +107,10 @@ map<string, vector<GLfloat>> prepareModels(char *filename){
 		puts("Erro");
 		throw 19; //ficheiro inválido
 	}
+	//percorrer irmaos
 	while (pRoot){
 		temp = pRoot;
+		//percorrer filhos
 		while (pRoot){
 			//obter o node modelos
 			modelosGroup = pRoot->FirstChildElement("modelos");
