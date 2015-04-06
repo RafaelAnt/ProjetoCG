@@ -98,7 +98,7 @@ map<string, vector<GLfloat>> prepareModels(char *filename){
 		throw 20;
 	}
 	printf("Loaded %s\n", filename);
-	XMLNode * pRoot = xmlDoc.FirstChild();
+	XMLNode * pRoot = xmlDoc.FirstChild(), *temp;
 	if (pRoot == NULL)
 		throw 21;
 
@@ -107,25 +107,30 @@ map<string, vector<GLfloat>> prepareModels(char *filename){
 		puts("Erro");
 		throw 19; //ficheiro inválido
 	}
-	while (pRoot != NULL){
-		//obter o node modelos
-		modelosGroup = pRoot->FirstChildElement("modelos");
-		//percorrer os modelos
-		if (modelosGroup){
-			modelo = modelosGroup->FirstChildElement("modelo");
-			while (modelo) {
-				const char * nome;
-				nome = modelo->Attribute("ficheiro");
-				if (nome) {
-					if (modelos.count(nome) == 0){
-						modelos[string(nome)] = readVertices(nome);
+	while (pRoot){
+		temp = pRoot;
+		while (pRoot){
+			//obter o node modelos
+			modelosGroup = pRoot->FirstChildElement("modelos");
+			//percorrer os modelos
+			if (modelosGroup){
+				modelo = modelosGroup->FirstChildElement("modelo");
+				while (modelo) {
+					const char * nome;
+					nome = modelo->Attribute("ficheiro");
+					if (nome) {
+						if (modelos.count(nome) == 0){
+							modelos[string(nome)] = readVertices(nome);
+						}
 					}
+					modelo = modelo->NextSiblingElement("modelo");
 				}
-				modelo = modelo->NextSiblingElement("modelo");
 			}
+			//ir para o filho
+			pRoot = pRoot->FirstChildElement("grupo");
 		}
-		//ir para o próximo grupo
-		pRoot = pRoot->FirstChildElement("grupo");
+		//ir para o irmao
+		pRoot = temp->NextSiblingElement("grupo");
 	}
 	printf("%d\n", modelos.size());
 	return modelos;

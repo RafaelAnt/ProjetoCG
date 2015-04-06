@@ -18,27 +18,15 @@ static char* sceneName;
 /* Variáveis da camara, começa a 5 unidades de distância da origem */
 static float alfa = 0, beta = 0, raio = 5, step = 0.02;
 
-void makeTransforms(char *filename){
+static void drawNode(tinyxml2::XMLNode *pRoot){
+	if (pRoot == NULL)
+		return;
 	using namespace tinyxml2;
 	vector<const char*> modelos;
-	//Carregar o ficheiro xml
-	XMLDocument xmlDoc; XMLNode *modelosGroup; XMLElement *modelo, *aux;
-	XMLError eResult = xmlDoc.LoadFile(filename);
-	if (eResult != XML_SUCCESS){
-		printf("Erro!! %s \n", xmlDoc.ErrorName());
-		throw 20;
-	}
-	XMLNode * pRoot = xmlDoc.FirstChild();
-	if (pRoot == NULL)
-		throw 21;
-
-	pRoot = pRoot->FirstChildElement("grupo");
-	if (pRoot == NULL){
-		puts("Erro");
-		throw 19; //ficheiro inválido
-	}
-
-	while (pRoot != NULL){
+	XMLNode *modelosGroup; XMLElement *modelo, *aux;
+	//obter nodos
+	aux = pRoot->FirstChildElement();
+	while (aux){
 		//obter o node modelos
 		modelosGroup = pRoot->FirstChildElement("modelos");
 		//percorrer os modelos
@@ -48,50 +36,74 @@ void makeTransforms(char *filename){
 				const char * nome;
 				nome = modelo->Attribute("ficheiro");
 				if (nome) {
+					puts(nome);
 					modelos.push_back(nome);
 				}
 				modelo = modelo->NextSiblingElement("modelo");
 			}
 		}
 
-		//obter transformacoes
-		aux = pRoot->FirstChildElement();
-		while (aux){	
-			//obter translacao
-			if (strcmp(aux->Name(), "translacao") == 0){
-				Translate t; t.x = 0; t.y = 0; t.z = 0;
-				aux->QueryFloatAttribute("X", &t.x);
-				aux->QueryFloatAttribute("Y", &t.y);
-				aux->QueryFloatAttribute("Z", &t.z);
-				glTranslatef(t.x, t.y, t.z);
-			}
-
-			//obter escalas
-			else if (strcmp(aux->Name(), "escala") == 0){
-				Scale s; s.x = 0; s.y = 0; s.z = 0;
-				aux->QueryFloatAttribute("X", &s.x);
-				aux->QueryFloatAttribute("Y", &s.y);
-				aux->QueryFloatAttribute("Z", &s.z);
-				glScalef(s.x, s.y, s.z);
-			}
-			//obter rotacoes
-			else if (strcmp(aux->Name(), "rotacao") == 0){
-				Rotation r; r.angle = 0; r.x = 0; r.y = 0; r.z = 0;
-				aux->QueryFloatAttribute("angulo", &r.angle);
-				aux->QueryFloatAttribute("X", &r.x);
-				aux->QueryFloatAttribute("Y", &r.y);
-				aux->QueryFloatAttribute("Z", &r.z);
-				glRotatef(r.angle, r.x, r.y, r.z);
-			}
-			aux = aux->NextSiblingElement();
+		//obter translacao
+		if (strcmp(aux->Name(), "translacao") == 0){
+			Translate t; t.x = 0; t.y = 0; t.z = 0;
+			aux->QueryFloatAttribute("X", &t.x);
+			aux->QueryFloatAttribute("Y", &t.y);
+			aux->QueryFloatAttribute("Z", &t.z);
+			glTranslatef(t.x, t.y, t.z);
 		}
 
-		for (int i = 0; i < modelos.size(); i++){
-			drawVertices(models.find(string(modelos[i]))->second);
+		//obter escalas
+		else if (strcmp(aux->Name(), "escala") == 0){
+			Scale s; s.x = 0; s.y = 0; s.z = 0;
+			aux->QueryFloatAttribute("X", &s.x);
+			aux->QueryFloatAttribute("Y", &s.y);
+			aux->QueryFloatAttribute("Z", &s.z);
+			glScalef(s.x, s.y, s.z);
 		}
-		modelos.clear();
+		//obter rotacoes
+		else if (strcmp(aux->Name(), "rotacao") == 0){
+			Rotation r; r.angle = 0; r.x = 0; r.y = 0; r.z = 0;
+			aux->QueryFloatAttribute("angulo", &r.angle);
+			aux->QueryFloatAttribute("X", &r.x);
+			aux->QueryFloatAttribute("Y", &r.y);
+			aux->QueryFloatAttribute("Z", &r.z);
+			glRotatef(r.angle, r.x, r.y, r.z);
+		}
+		aux = aux->NextSiblingElement();
+	}
+	for (int i = 0; i < modelos.size(); i++){
+		drawVertices(models.find(string(modelos[i]))->second);
+	}
+	modelos.clear();
+	
+	drawNode(pRoot->FirstChildElement("grupo"));
+}
 
-		pRoot = pRoot->FirstChildElement("grupo");
+void makeTransforms(char *filename){
+	//Carregar o ficheiro xml
+	using namespace tinyxml2;
+	XMLDocument xmlDoc; XMLNode *modelosGroup; XMLElement *modelo, *aux;
+	XMLError eResult = xmlDoc.LoadFile(filename);
+	if (eResult != XML_SUCCESS){
+		printf("Erro!! %s \n", xmlDoc.ErrorName());
+		throw 20;
+	}
+	XMLNode * pRoot = xmlDoc.FirstChild(), *temp;
+	if (pRoot == NULL)
+		throw 21;
+
+	pRoot = pRoot->FirstChildElement("grupo");
+	if (pRoot == NULL){
+		puts("Erro");
+		throw 19; //ficheiro inválido
+	}
+
+	while (pRoot){
+		puts("cenas");
+		glPushMatrix();
+		drawNode(pRoot);
+		glPopMatrix();
+		pRoot = pRoot->NextSiblingElement("grupo");
 	}
 }
 
