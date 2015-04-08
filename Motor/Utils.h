@@ -25,6 +25,12 @@ typedef struct scale{
 }Scale ;
 
 /*
+	Desenha uma cena (filename), aplicando as transformações necessárias, utilizando o map models
+	para desenhar os modelos com eficiencia.
+*/
+void drawScene(char *filename, map<string, vector<GLfloat>> models);
+
+/*
 	Desenha um conjunto de vértices em modo imeadiato. De notar o vetor deve ter um cojunto de triângulos.
 	3 pontos de cada vez.
 */

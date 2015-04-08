@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 #include "tinyxml2.h"
-#include "Draw.h"
+#include "Utils.h"
 #include <GL/GLUT.h>
 
 using namespace std;
@@ -13,6 +13,112 @@ typedef struct point{
 	GLfloat y;
 	GLfloat z;
 } Point;
+
+//proot é o grupo a desenhar
+static void drawNode(tinyxml2::XMLNode *pRoot, map<string, vector<GLfloat>> models){
+	//se null, fazer pop (chegamos ao fim da hierarquia)
+	if (pRoot == NULL){
+		glPopMatrix();
+		return;
+	}
+	//push matrix, transformações apenas efetuadas aos modelos deste grupo e aos filhos
+	glPushMatrix();
+	using namespace tinyxml2;
+	//nome modelos
+	vector<const char*> modelos;
+	//variaveis de controlo de transforms duplicadas
+	bool trans=false, esc=false, rot=false;
+	XMLNode *modelosGroup; XMLElement *modelo, *aux;
+	//obter nodos
+	aux = pRoot->FirstChildElement();
+
+	//obter o node modelos
+	modelosGroup = pRoot->FirstChildElement("modelos");
+	//percorrer os modelos
+	if (modelosGroup){
+		modelo = modelosGroup->FirstChildElement("modelo");
+		while (modelo) {
+			const char * nome;
+			nome = modelo->Attribute("ficheiro");
+			if (nome) {
+				modelos.push_back(nome);
+			}
+			modelo = modelo->NextSiblingElement("modelo");
+		}
+		if (modelosGroup->NextSiblingElement() != NULL)
+			throw 98; //REPEATED MODELS
+	}
+
+	while (aux){
+		//obter translacao
+		if (strcmp(aux->Name(), "translação") == 0){
+			//mais que uma translacao = exception
+			if (trans)
+				throw 99; //REPEATED TRANSFORM
+			Translate t; t.x = 0; t.y = 0; t.z = 0;
+			aux->QueryFloatAttribute("X", &t.x);
+			aux->QueryFloatAttribute("Y", &t.y);
+			aux->QueryFloatAttribute("Z", &t.z);
+			glTranslatef(t.x, t.y, t.z);
+			trans = true;
+		}
+
+		//obter escalas
+		else if (strcmp(aux->Name(), "escala") == 0){
+			//mais que uma escala = exception
+			if (esc)
+				throw 99;
+			Scale s; s.x = 1; s.y = 1; s.z = 1;
+			aux->QueryFloatAttribute("X", &s.x);
+			aux->QueryFloatAttribute("Y", &s.y);
+			aux->QueryFloatAttribute("Z", &s.z);
+			glScalef(s.x, s.y, s.z);
+			esc = true;
+		}
+		//obter rotacoes
+		else if (strcmp(aux->Name(), "rotação") == 0){
+			if (rot)
+				throw 99;
+			Rotation r; r.angle = 0; r.x = 0; r.y = 0; r.z = 0;
+			aux->QueryFloatAttribute("angulo", &r.angle);
+			aux->QueryFloatAttribute("eixoX", &r.x);
+			aux->QueryFloatAttribute("eixoY", &r.y);
+			aux->QueryFloatAttribute("eixoZ", &r.z);
+			glRotatef(r.angle, r.x, r.y, r.z);
+			rot = true;
+		}
+		aux = aux->NextSiblingElement();
+	}
+	for (int i = 0; i < modelos.size(); i++){
+		drawVertices(models.find(string(modelos[i]))->second);
+	}
+	modelos.clear();
+	
+	drawNode(pRoot->FirstChildElement("grupo"),models);
+	drawNode(pRoot->NextSiblingElement("grupo"),models);
+}
+
+void drawScene(char *filename, map<string, vector<GLfloat>> models){
+	//Carregar o ficheiro xml
+	using namespace tinyxml2;
+	XMLDocument xmlDoc; XMLNode *modelosGroup; XMLElement *modelo, *aux;
+	XMLError eResult = xmlDoc.LoadFile(filename);
+	if (eResult != XML_SUCCESS){
+		printf("Erro!! %s \n", xmlDoc.ErrorName());
+		throw 20;
+	}
+	XMLNode * pRoot = xmlDoc.FirstChild(), *temp;
+	if (pRoot == NULL)
+		throw 21;
+
+	pRoot = pRoot->FirstChildElement("grupo");
+	if (pRoot == NULL){
+		puts("Erro");
+		throw 19; //ficheiro inválido
+	}
+
+	drawNode(pRoot,models);
+}
 
 /*
 	Funçao que desenha um vetor de vértices, cada 3 vértices é um triângulo.
@@ -86,12 +192,13 @@ static vector<GLfloat> readVertices(const char *filename) {
 	return vec;
 }
 
+//passar map por referencia
 static void auxPrepare(map<string, vector<GLfloat>> *modelos, tinyxml2::XMLNode *pRoot){
 	using namespace tinyxml2;
 	if (pRoot == NULL)
 		return;
 	XMLDocument xmlDoc; XMLNode *modelosGroup; XMLElement *modelo, *aux;
-	//obter o node modelos
+	//obter o grupo modelos
 	modelosGroup = pRoot->FirstChildElement("modelos");
 	//percorrer os modelos
 	if (modelosGroup){
@@ -101,6 +208,7 @@ static void auxPrepare(map<string, vector<GLfloat>> *modelos, tinyxml2::XMLNode 
 			nome = modelo->Attribute("ficheiro");
 			if (nome) {
 				if (modelos->count(nome) == 0){
+					//guardar modelos no map
 					(*modelos)[string(nome)] = readVertices(nome);
 				}
 			}
@@ -113,25 +221,31 @@ static void auxPrepare(map<string, vector<GLfloat>> *modelos, tinyxml2::XMLNode 
 
 map<string, vector<GLfloat>> prepareModels(char *filename){
 	using namespace tinyxml2;
-	//Vetor que vai armazenar os nomes dos modelos
+	//Map que vai armazenar os modelos
 	map<string, vector<GLfloat>> modelos;
 	//Carregar o ficheiro xml
 	XMLDocument xmlDoc; XMLNode *modelosGroup; XMLElement *modelo, *aux;
 	XMLError eResult = xmlDoc.LoadFile(filename);
+	//test erros
 	if (eResult != XML_SUCCESS){
 		printf("Erro!! %s \n", xmlDoc.ErrorName());
 		throw 20;
 	}
+	//confirm load
 	printf("Loaded %s\n", filename);
+	//obter node inicial
 	XMLNode * pRoot = xmlDoc.FirstChild(), *temp;
+	//erro de empty xml
 	if (pRoot == NULL)
 		throw 21;
 
 	pRoot = pRoot->FirstChildElement("grupo");
+	//ficheiro sem grupos
 	if (pRoot == NULL){
 		puts("Erro");
 		throw 19; //ficheiro inválido
 	}
+	//obter os modelos
 	auxPrepare(&modelos, pRoot);
 	return modelos;
 }
