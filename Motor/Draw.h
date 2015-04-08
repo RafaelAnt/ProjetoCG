@@ -24,7 +24,6 @@ typedef struct scale{
 	GLfloat z;
 }Scale ;
 
-
 /*
 	Desenha um conjunto de vértices em modo imeadiato. De notar o vetor deve ter um cojunto de triângulos.
 	3 pontos de cada vez.
