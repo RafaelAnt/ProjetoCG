@@ -86,6 +86,31 @@ static vector<GLfloat> readVertices(const char *filename) {
 	return vec;
 }
 
+static void auxPrepare(map<string, vector<GLfloat>> *modelos, tinyxml2::XMLNode *pRoot){
+	using namespace tinyxml2;
+	if (pRoot == NULL)
+		return;
+	XMLDocument xmlDoc; XMLNode *modelosGroup; XMLElement *modelo, *aux;
+	//obter o node modelos
+	modelosGroup = pRoot->FirstChildElement("modelos");
+	//percorrer os modelos
+	if (modelosGroup){
+		modelo = modelosGroup->FirstChildElement("modelo");
+		while (modelo) {
+			const char * nome;
+			nome = modelo->Attribute("ficheiro");
+			if (nome) {
+				if (modelos->count(nome) == 0){
+					(*modelos)[string(nome)] = readVertices(nome);
+				}
+			}
+			modelo = modelo->NextSiblingElement("modelo");
+		}
+	}
+	auxPrepare(&(*modelos), pRoot->FirstChildElement("grupo"));
+	auxPrepare(&(*modelos), pRoot->NextSiblingElement("grupo"));
+}
+
 map<string, vector<GLfloat>> prepareModels(char *filename){
 	using namespace tinyxml2;
 	//Vetor que vai armazenar os nomes dos modelos
@@ -107,34 +132,7 @@ map<string, vector<GLfloat>> prepareModels(char *filename){
 		puts("Erro");
 		throw 19; //ficheiro inválido
 	}
-	//percorrer irmaos
-	while (pRoot){
-		temp = pRoot;
-		//percorrer filhos
-		while (pRoot){
-			//obter o node modelos
-			modelosGroup = pRoot->FirstChildElement("modelos");
-			//percorrer os modelos
-			if (modelosGroup){
-				modelo = modelosGroup->FirstChildElement("modelo");
-				while (modelo) {
-					const char * nome;
-					nome = modelo->Attribute("ficheiro");
-					if (nome) {
-						if (modelos.count(nome) == 0){
-							modelos[string(nome)] = readVertices(nome);
-						}
-					}
-					modelo = modelo->NextSiblingElement("modelo");
-				}
-			}
-			//ir para o filho
-			pRoot = pRoot->FirstChildElement("grupo");
-		}
-		//ir para o irmao
-		pRoot = temp->NextSiblingElement("grupo");
-	}
-	printf("%d\n", modelos.size());
+	auxPrepare(&modelos, pRoot);
 	return modelos;
 }
 

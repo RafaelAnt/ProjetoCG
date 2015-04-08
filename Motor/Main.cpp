@@ -19,8 +19,11 @@ static char* sceneName;
 static float alfa = 0, beta = 0, raio = 5, step = 0.02;
 
 static void drawNode(tinyxml2::XMLNode *pRoot){
-	if (pRoot == NULL)
+	if (pRoot == NULL){
+		glPopMatrix();
 		return;
+	}
+	glPushMatrix();
 	using namespace tinyxml2;
 	vector<const char*> modelos;
 	XMLNode *modelosGroup; XMLElement *modelo, *aux;
@@ -77,6 +80,7 @@ static void drawNode(tinyxml2::XMLNode *pRoot){
 	modelos.clear();
 	
 	drawNode(pRoot->FirstChildElement("grupo"));
+	drawNode(pRoot->NextSiblingElement("grupo"));
 }
 
 void makeTransforms(char *filename){
@@ -98,13 +102,7 @@ void makeTransforms(char *filename){
 		throw 19; //ficheiro inválido
 	}
 
-	while (pRoot){
-		puts("cenas");
-		glPushMatrix();
-		drawNode(pRoot);
-		glPopMatrix();
-		pRoot = pRoot->NextSiblingElement("grupo");
-	}
+	drawNode(pRoot);
 }
 
 void changeSize(int w, int h) {
