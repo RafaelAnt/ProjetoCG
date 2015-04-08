@@ -73,7 +73,9 @@ void renderScene(void) {
 			exit(-1);
 		}
 	}
-
+	GLint depth;
+	glGetIntegerv(GL_MODELVIEW_STACK_DEPTH, &depth);
+	printf("stack depth %d\n", depth);
 	// fim do frame
 	glutSwapBuffers();
 }
@@ -171,7 +173,7 @@ int main() {
 
 	printf("%d\n", models.find("esfera.3d")->second.size());
 
-	// init de cenas
+	//inits opengl
 	glutInit(&__argc, __argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowPosition(100, 100);

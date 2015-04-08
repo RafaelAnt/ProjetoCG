@@ -21,7 +21,8 @@ static void drawNode(tinyxml2::XMLNode *pRoot, map<string, vector<GLfloat>> mode
 		glPopMatrix();
 		return;
 	}
-	//push matrix, transformações apenas efetuadas aos modelos deste grupo e aos filhos
+	//push matrix, transformações apenas efetuadas 
+	//aos modelos deste grupo e aos filhos
 	glPushMatrix();
 	using namespace tinyxml2;
 	//nome modelos
@@ -41,14 +42,17 @@ static void drawNode(tinyxml2::XMLNode *pRoot, map<string, vector<GLfloat>> mode
 			const char * nome;
 			nome = modelo->Attribute("ficheiro");
 			if (nome) {
+				//guardar modelo
 				modelos.push_back(nome);
 			}
 			modelo = modelo->NextSiblingElement("modelo");
 		}
+		//nodos a seguir a modelo = ERR!!
 		if (modelosGroup->NextSiblingElement() != NULL)
 			throw 98; //REPEATED MODELS
 	}
 
+	//enquanto nao se esgotarem os elementos no grupo
 	while (aux){
 		//obter translacao
 		if (strcmp(aux->Name(), "translação") == 0){
@@ -77,6 +81,7 @@ static void drawNode(tinyxml2::XMLNode *pRoot, map<string, vector<GLfloat>> mode
 		}
 		//obter rotacoes
 		else if (strcmp(aux->Name(), "rotação") == 0){
+			//mais que uma rotacao = exception
 			if (rot)
 				throw 99;
 			Rotation r; r.angle = 0; r.x = 0; r.y = 0; r.z = 0;
@@ -87,14 +92,18 @@ static void drawNode(tinyxml2::XMLNode *pRoot, map<string, vector<GLfloat>> mode
 			glRotatef(r.angle, r.x, r.y, r.z);
 			rot = true;
 		}
+		//avaliar proximo elemento
 		aux = aux->NextSiblingElement();
 	}
 	for (int i = 0; i < modelos.size(); i++){
+		//desenhar modelos
 		drawVertices(models.find(string(modelos[i]))->second);
 	}
 	modelos.clear();
 	
+	//desenhar os filhos
 	drawNode(pRoot->FirstChildElement("grupo"),models);
+	//depois desenhar os irmaos
 	drawNode(pRoot->NextSiblingElement("grupo"),models);
 }
 
