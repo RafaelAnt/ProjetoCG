@@ -16,7 +16,7 @@ static map<string, vector<GLfloat>> models;
 static char* sceneName;
 
 /* Variáveis da camara, começa a 5 unidades de distância da origem */
-static float alfa = 0, beta = 0, raio = 150, step = 0.02;
+static float alfa = 0, beta = 0, raio = 10, step = 0.02;
 
 
 void changeSize(int w, int h) {
@@ -106,10 +106,10 @@ void keyboard(unsigned char key, int x, int y){
 	float step = 0.05;
 	switch (key){
 	case '+':
-		raio -= 0.05;
+		raio -= 0.5;
 		break;
 	case '-':
-		raio += 0.05;
+		raio += 0.5;
 		break;
 	}
 	glutPostRedisplay();
