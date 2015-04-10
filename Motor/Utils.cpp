@@ -57,7 +57,7 @@ static void drawNode(tinyxml2::XMLNode *pRoot, map<string, vector<GLfloat>> mode
 	//enquanto nao se esgotarem os elementos no grupo
 	while (aux){
 		//obter translacao
-		if (strcmp(aux->Name(), "translação") == 0){
+		if (strcmp(aux->Name(), "translacao") == 0){
 			//mais que uma translacao = exception
 			if (trans)
 				throw 99; //REPEATED TRANSFORM
@@ -82,7 +82,7 @@ static void drawNode(tinyxml2::XMLNode *pRoot, map<string, vector<GLfloat>> mode
 			esc = true;
 		}
 		//obter rotacoes
-		else if (strcmp(aux->Name(), "rotação") == 0){
+		else if (strcmp(aux->Name(), "rotacao") == 0){
 			//mais que uma rotacao = exception
 			if (rot)
 				throw 99;
