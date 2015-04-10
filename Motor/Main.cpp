@@ -16,7 +16,7 @@ static map<string, vector<GLfloat>> models;
 static char* sceneName;
 
 /* Variáveis da camara, começa a 5 unidades de distância da origem */
-static float alfa = 0, beta = 0, raio = 5, step = 0.02;
+static float alfa = 0, beta = 0, raio = 150, step = 0.02;
 
 
 void changeSize(int w, int h) {
@@ -97,6 +97,7 @@ void keyboardSpecial(int key, int x, int y){
 	case GLUT_KEY_RIGHT:
 		alfa += step;
 		break;
+
 	}
 	glutPostRedisplay();
 }

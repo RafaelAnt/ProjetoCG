@@ -47,9 +47,11 @@ static void drawNode(tinyxml2::XMLNode *pRoot, map<string, vector<GLfloat>> mode
 			}
 			modelo = modelo->NextSiblingElement("modelo");
 		}
+		XMLElement *test = modelosGroup->NextSiblingElement();
 		//nodos a seguir a modelo = ERR!!
-		if (modelosGroup->NextSiblingElement() != NULL)
-			throw 98; //REPEATED MODELS
+		if (modelosGroup->NextSiblingElement("modelos") != NULL){
+				throw 98; //REPEATED MODELS
+		}
 	}
 
 	//enquanto nao se esgotarem os elementos no grupo
