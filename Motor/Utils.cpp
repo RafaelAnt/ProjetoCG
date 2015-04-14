@@ -5,6 +5,8 @@
 #include <vector>
 #include "tinyxml2.h"
 #include "Utils.h"
+#define _USE_MATH_DEFINES
+#include <math.h>
 #include <GL/GLUT.h>
 
 using namespace std;
@@ -61,7 +63,7 @@ static void drawNode(tinyxml2::XMLNode *pRoot, map<string, int> models){
 	//enquanto nao se esgotarem os elementos no grupo
 	while (aux){
 		//obter translacao
-		if (strcmp(aux->Name(), "translacao") == 0){
+		if (strcmp(aux->Name(), "translação") == 0){
 			//mais que uma translacao = exception
 			if (trans)
 				throw 99; //REPEATED TRANSFORM
@@ -86,16 +88,20 @@ static void drawNode(tinyxml2::XMLNode *pRoot, map<string, int> models){
 			esc = true;
 		}
 		//obter rotacoes
-		else if (strcmp(aux->Name(), "rotacao") == 0){
+		else if (strcmp(aux->Name(), "rotação") == 0){
 			//mais que uma rotacao = exception
 			if (rot)
 				throw 99;
-			Rotation r; r.angle = 0; r.x = 0; r.y = 0; r.z = 0;
+			Rotation r; r.angle = -1; r.time =-1; r.x = 0; r.y = 0; r.z = 0;
 			aux->QueryFloatAttribute("angulo", &r.angle);
+			aux->QueryFloatAttribute("tempo", &r.time);
 			aux->QueryFloatAttribute("eixoX", &r.x);
 			aux->QueryFloatAttribute("eixoY", &r.y);
 			aux->QueryFloatAttribute("eixoZ", &r.z);
-			glRotatef(r.angle, r.x, r.y, r.z);
+			if (r.angle > 0)
+				glRotatef(r.angle, r.x, r.y, r.z);
+			else if (r.time > 0)
+				glRotatef((360)*(glutGet(GLUT_ELAPSED_TIME) / (r.time*1000)), r.x, r.y, r.z);
 			rot = true;
 		}
 		//avaliar proximo elemento

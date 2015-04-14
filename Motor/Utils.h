@@ -13,6 +13,7 @@ typedef struct translate{
 
 typedef struct rotation{
 	GLfloat angle;
+	GLfloat time;
 	GLfloat x;
 	GLfloat y;
 	GLfloat z;

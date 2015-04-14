@@ -158,7 +158,7 @@ int main() {
 
 	// registo de funcs
 	glutDisplayFunc(renderScene);
-	//glutIdleFunc(renderScene);
+	glutIdleFunc(renderScene);
 	glutMouseFunc(NULL);
 	glutReshapeFunc(changeSize);
 	glutSpecialFunc(keyboardSpecial);
