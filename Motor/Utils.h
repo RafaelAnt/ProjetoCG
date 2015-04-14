@@ -28,13 +28,13 @@ typedef struct scale{
 	Desenha uma cena (filename), aplicando as transformações necessárias, utilizando o map models
 	para desenhar os modelos com eficiencia.
 */
-void drawScene(char *filename, map<string, vector<GLfloat>> models);
+void drawScene(char *filename, map<string, int> models);
 
 /*
 	Desenha um conjunto de vértices em modo imeadiato. De notar o vetor deve ter um cojunto de triângulos.
 	3 pontos de cada vez.
 */
-void drawVertices(vector<GLfloat> vertices);
+void drawVertices(int vboIndex);
 
 /*
 	Função que analisa o ficheiro XML e determina os modelos a desenhar
@@ -43,5 +43,5 @@ void drawVertices(vector<GLfloat> vertices);
 	guardar os seus vértices.
 	Os modelos serão retornados num vetor de vetores de vértices. Cada vetor de vértices é um modelo.
 */
-map<string, vector<GLfloat>> prepareModels(char *filename);
+map<string, int> prepareModels(char *filename);
 

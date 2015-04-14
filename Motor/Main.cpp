@@ -1,3 +1,4 @@
+#include <GL\glew.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <GL/glut.h>
@@ -11,8 +12,10 @@
 
 using namespace std;
 
+#pragma comment(lib, "glew32.lib")
+
 /* Esta variável irá conter todos os modelos a desenhar*/
-static map<string, vector<GLfloat>> models;
+static map<string, int> models;
 static char* sceneName;
 
 /* Variáveis da camara, começa a 5 unidades de distância da origem */
@@ -41,13 +44,6 @@ void changeSize(int w, int h) {
 
 	// return to the model view matrix mode
 	glMatrixMode(GL_MODELVIEW);
-}
-
-void drawModels(){
-	map<string, vector<GLfloat >>::iterator it = models.begin();
-	for (it; it != models.end(); it++){
-		drawVertices(it->second);
-	}
 }
 
 void renderScene(void) {
@@ -152,6 +148,29 @@ int main() {
 
 	sceneName = __argv[1];
 
+	//inits opengl
+	glutInit(&__argc, __argv);
+	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
+	glutInitWindowPosition(100, 100);
+	glutInitWindowSize(400, 400);
+	glutCreateWindow("Projeto-CG");
+	glewInit();
+
+	// registo de funcs
+	glutDisplayFunc(renderScene);
+	//glutIdleFunc(renderScene);
+	glutMouseFunc(NULL);
+	glutReshapeFunc(changeSize);
+	glutSpecialFunc(keyboardSpecial);
+	glutKeyboardFunc(keyboard);
+
+	// alguns settings para OpenGL
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_FRONT);
+	glFrontFace(GL_CCW);
+	createMenu();
+
 	try{ models = prepareModels(sceneName); }
 	catch (int e){
 		if (e == 21){
@@ -171,31 +190,6 @@ int main() {
 		}
 		return -1;
 	}
-
-	printf("%d\n", models.find("esfera.3d")->second.size());
-
-	//inits opengl
-	glutInit(&__argc, __argv);
-	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
-	glutInitWindowPosition(100, 100);
-	glutInitWindowSize(400, 400);
-	glutCreateWindow("Projeto-CG");
-
-	// registo de funcs
-	glutDisplayFunc(renderScene);
-	//glutIdleFunc(renderScene);
-	glutMouseFunc(NULL);
-	glutReshapeFunc(changeSize);
-	glutSpecialFunc(keyboardSpecial);
-	glutKeyboardFunc(keyboard);
-
-	// alguns settings para OpenGL
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_FRONT);
-	glFrontFace(GL_CCW);
-
-	createMenu();
 
 	// entrar no loop do glut
 	glutMainLoop();

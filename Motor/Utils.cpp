@@ -1,3 +1,4 @@
+#include <GL/glew.h>
 #include <valarray>
 #include <map>
 #include <string>
@@ -8,6 +9,9 @@
 
 using namespace std;
 
+GLuint *vbo;
+vector<int> sizes;
+
 typedef struct point{
 	GLfloat x;
 	GLfloat y;
@@ -15,7 +19,7 @@ typedef struct point{
 } Point;
 
 //proot é o grupo a desenhar
-static void drawNode(tinyxml2::XMLNode *pRoot, map<string, vector<GLfloat>> models){
+static void drawNode(tinyxml2::XMLNode *pRoot, map<string, int> models){
 	//se null, fazer pop (chegamos ao fim da hierarquia)
 	if (pRoot == NULL){
 		glPopMatrix();
@@ -99,7 +103,7 @@ static void drawNode(tinyxml2::XMLNode *pRoot, map<string, vector<GLfloat>> mode
 	}
 	for (int i = 0; i < modelos.size(); i++){
 		//desenhar modelos
-		drawVertices(models.find(string(modelos[i]))->second);
+		drawVertices(models[modelos[i]]);
 	}
 	modelos.clear();
 	
@@ -109,7 +113,7 @@ static void drawNode(tinyxml2::XMLNode *pRoot, map<string, vector<GLfloat>> mode
 	drawNode(pRoot->NextSiblingElement("grupo"),models);
 }
 
-void drawScene(char *filename, map<string, vector<GLfloat>> models){
+void drawScene(char *filename, map<string, int> models){
 	//Carregar o ficheiro xml
 	using namespace tinyxml2;
 	XMLDocument xmlDoc; XMLNode *modelosGroup; XMLElement *modelo, *aux;
@@ -138,20 +142,12 @@ void drawScene(char *filename, map<string, vector<GLfloat>> models){
 	poderá haver acessos a indices do array fora de limites, o que provavelmente irá resultar num crash.
 	Nesta aplicação a verificação é feita no momento da leitura dos vértices dos modelos.
 	*/
-void drawVertices(vector<GLfloat> vertices){
-	Point p1, p2, p3;
-	glBegin(GL_TRIANGLES);
-	for (unsigned int i = 0, j = 0; i < vertices.size(); i += 3, j++){
-		p1.x = vertices[i]; p1.y = vertices[i + 1]; p1.z = vertices[i + 2];
-		glVertex3f(p1.x, p1.y, p1.z);
-		i += 3;
-		p2.x = vertices[i]; p2.y = vertices[i + 1]; p2.z = vertices[i + 2];
-		glVertex3f(p2.x, p2.y, p2.z);
-		i += 3;
-		p3.x = vertices[i]; p3.y = vertices[i + 1]; p3.z = vertices[i + 2];
-		glVertex3f(p3.x, p3.y, p3.z);
-	}
-	glEnd();
+void drawVertices(int vboIndex){
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[vboIndex]);
+	glVertexPointer(3, GL_FLOAT, 0, NULL);
+	glDrawArrays(GL_TRIANGLES, 0, sizes[vboIndex]/3);
+	glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 /*
@@ -230,7 +226,7 @@ static void auxPrepare(map<string, vector<GLfloat>> *modelos, tinyxml2::XMLNode 
 	auxPrepare(&(*modelos), pRoot->NextSiblingElement("grupo"));
 }
 
-map<string, vector<GLfloat>> prepareModels(char *filename){
+map<string, int> prepareModels(char *filename){
 	using namespace tinyxml2;
 	//Map que vai armazenar os modelos
 	map<string, vector<GLfloat>> modelos;
@@ -258,6 +254,19 @@ map<string, vector<GLfloat>> prepareModels(char *filename){
 	}
 	//obter os modelos
 	auxPrepare(&modelos, pRoot);
-	return modelos;
+
+	vbo = new GLuint[modelos.size()];
+	glGenBuffers(modelos.size(),vbo);
+	map<string, int> vboIndex;
+	typedef map<string, vector<GLfloat>>::iterator it_type;
+	int index = 0;
+	for (it_type iterator = modelos.begin(); iterator != modelos.end(); iterator++) {
+		vector<GLfloat> vec = iterator->second;
+		vboIndex[iterator->first] = index;
+		sizes.push_back(vec.size());
+		glBindBuffer(GL_ARRAY_BUFFER, vbo[index++]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*vec.size(), &vec[0], GL_STATIC_DRAW);
+	}
+	return vboIndex;
 }
 
