@@ -8,18 +8,22 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <GL/GLUT.h>
+#include "Stopwatch.h"
 
 #pragma comment(lib, "glew32.lib")
 
 using namespace std;
 
+Stopwatch<> crono;
 tinyxml2::XMLDocument xmlDoc;
 bool loaded = false;
 GLuint *vbo;
 vector<int> sizes;
 
 //de casteljau's algorithm!!
-Point bezierCurve(vector<Point> pontos, GLfloat t){
+Point bezierCurve(vector<Point> pontos, GLfloat tempo){
+	GLfloat useless,t=modf(tempo, &useless);
+	printf("%f\n", t);
 	vector<Point> q(pontos);
 	int k,i;
 	for (k = 1; k < pontos.size(); k++){
@@ -106,7 +110,7 @@ static void drawNode(tinyxml2::XMLNode *pRoot, map<string, int> models){
 					ponto = ponto->NextSiblingElement();
 					printf("%f %f %f\n", t.x,t.y,t.z);
 				}
-				Point objetivo = bezierCurve(pontos, glutGet(GLUT_ELAPSED_TIME) / (tempo * 1000));
+				Point objetivo = bezierCurve(pontos, glutGet(GLUT_ELAPSED_TIME) / (tempo*1000));
 				glTranslatef(objetivo.x, objetivo.y, objetivo.z);
 			}
 			trans = true;

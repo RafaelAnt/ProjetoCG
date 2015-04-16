@@ -9,7 +9,8 @@
 #include <math.h>
 #include "tinyxml2.h"
 #include "Utils.h"
-
+#include <windows.system.h>
+ 
 using namespace std;
 
 #pragma comment(lib, "glew32.lib")
