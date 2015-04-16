@@ -23,11 +23,9 @@ vector<int> sizes;
 //de casteljau's algorithm!!
 Point bezierCurve(vector<Point> pontos, GLfloat tempo){
 	GLfloat useless,t=modf(tempo, &useless);
-	printf("%f\n", t);
 	vector<Point> q(pontos);
 	int k,i;
 	for (k = 1; k < pontos.size(); k++){
-		printf("%d\n", k);
 		for (i = 0; i < pontos.size() - k; i++){
 			q[i].x = (1 - t)*q[i].x + t*q[i + 1].x;
 			q[i].y = (1 - t)*q[i].y + t*q[i + 1].y;
@@ -108,7 +106,6 @@ static void drawNode(tinyxml2::XMLNode *pRoot, map<string, int> models){
 					ponto->QueryFloatAttribute("Z", &t.z);
 					pontos.push_back(t);
 					ponto = ponto->NextSiblingElement();
-					printf("%f %f %f\n", t.x,t.y,t.z);
 				}
 				Point objetivo = bezierCurve(pontos, glutGet(GLUT_ELAPSED_TIME) / (tempo*1000));
 				glTranslatef(objetivo.x, objetivo.y, objetivo.z);
