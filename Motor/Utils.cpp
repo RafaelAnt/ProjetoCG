@@ -11,14 +11,10 @@
 
 using namespace std;
 
+tinyxml2::XMLDocument xmlDoc;
+bool loaded = false;
 GLuint *vbo;
 vector<int> sizes;
-
-typedef struct point{
-	GLfloat x;
-	GLfloat y;
-	GLfloat z;
-} Point;
 
 //proot é o grupo a desenhar
 static void drawNode(tinyxml2::XMLNode *pRoot, map<string, int> models){
@@ -67,11 +63,26 @@ static void drawNode(tinyxml2::XMLNode *pRoot, map<string, int> models){
 			//mais que uma translacao = exception
 			if (trans)
 				throw 99; //REPEATED TRANSFORM
-			Translate t; t.x = 0; t.y = 0; t.z = 0;
-			aux->QueryFloatAttribute("X", &t.x);
-			aux->QueryFloatAttribute("Y", &t.y);
-			aux->QueryFloatAttribute("Z", &t.z);
-			glTranslatef(t.x, t.y, t.z);
+			XMLElement *ponto=aux->FirstChildElement("ponto");
+			if (ponto == NULL){
+				Translate t; t.x = 0; t.y = 0; t.z = 0;
+				aux->QueryFloatAttribute("X", &t.x);
+				aux->QueryFloatAttribute("Y", &t.y);
+				aux->QueryFloatAttribute("Z", &t.z);
+				glTranslatef(t.x, t.y, t.z);
+			}
+			else{
+				//falta verificaçao de erros
+				vector<Point> pontos;
+				while (ponto != NULL){
+					Point t; t.x = 0; t.y = 0; t.z = 0;
+					ponto->QueryFloatAttribute("X", &t.x);
+					ponto->QueryFloatAttribute("Y", &t.y);
+					ponto->QueryFloatAttribute("Z", &t.z);
+					ponto = ponto->NextSiblingElement();
+					printf("%f %f %f \n", t.x, t.y, t.z);
+				}
+			}
 			trans = true;
 		}
 
@@ -122,22 +133,27 @@ static void drawNode(tinyxml2::XMLNode *pRoot, map<string, int> models){
 void drawScene(char *filename, map<string, int> models){
 	//Carregar o ficheiro xml
 	using namespace tinyxml2;
-	XMLDocument xmlDoc; XMLNode *modelosGroup; XMLElement *modelo, *aux;
-	XMLError eResult = xmlDoc.LoadFile(filename);
-	if (eResult != XML_SUCCESS){
-		printf("Erro!! %s \n", xmlDoc.ErrorName());
-		throw 20;
-	}
-	XMLNode * pRoot = xmlDoc.FirstChild(), *temp;
-	if (pRoot == NULL)
-		throw 21;
+	XMLNode *modelosGroup, *pRoot, *temp;; XMLElement *modelo, *aux;
+	if (!loaded){
+		XMLError eResult = xmlDoc.LoadFile(filename);
+		if (eResult != XML_SUCCESS){
+			printf("Erro!! %s \n", xmlDoc.ErrorName());
+			throw 20;
+		}
+		pRoot = xmlDoc.FirstChild();
+		if (pRoot == NULL)
+			throw 21;
 
-	pRoot = pRoot->FirstChildElement("grupo");
-	if (pRoot == NULL){
-		puts("Erro");
-		throw 19; //ficheiro inválido
+		pRoot = pRoot->FirstChildElement("grupo");
+		if (pRoot == NULL){
+			puts("Erro");
+			throw 19; //ficheiro inválido
+		}
+		loaded = true;
 	}
-
+	else{
+		pRoot = xmlDoc.FirstChild();
+	}
 	drawNode(pRoot,models);
 }
 

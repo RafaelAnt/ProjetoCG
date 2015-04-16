@@ -5,6 +5,12 @@
 
 using namespace std;
 
+typedef struct point{
+	GLfloat x;
+	GLfloat y;
+	GLfloat z;
+}Point;
+
 typedef struct translate{
 	GLfloat x;
 	GLfloat y;
