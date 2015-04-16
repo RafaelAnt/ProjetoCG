@@ -8,13 +8,11 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <GL/GLUT.h>
-#include "Stopwatch.h"
 
 #pragma comment(lib, "glew32.lib")
 
 using namespace std;
 
-Stopwatch<> crono;
 tinyxml2::XMLDocument xmlDoc;
 bool loaded = false;
 GLuint *vbo;
