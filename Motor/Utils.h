@@ -1,3 +1,7 @@
+#ifndef UTILS_H
+
+#define UTILS_H
+
 #include <vector>
 #include <map>
 #include <valarray>
@@ -31,6 +35,11 @@ typedef struct scale{
 	GLfloat z;
 }Scale ;
 
+#define CG_REPEATED_TRANSFORM 99
+#define CG_CURVE_INVALID_TIME 98
+#define CG_ROTATION_INVALID_TIME 97
+#define CG_REPEATED_MODELS 96
+
 /*
 	Desenha uma cena (filename), aplicando as transformações necessárias, utilizando o map models
 	para desenhar os modelos com eficiencia.
@@ -52,3 +61,4 @@ void drawVertices(int vboIndex);
 */
 map<string, int> prepareModels(char *filename);
 
+#endif

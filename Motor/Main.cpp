@@ -60,18 +60,15 @@ void renderScene(void) {
 	
 	try{ drawScene(sceneName,models); }
 	catch (int e){
-		if (e == 99){
+		if (e == CG_REPEATED_MODELS){
 			puts("Transformações duplicadas! Corriga a cena!");
 			exit(-1);
 		}
-		if (e == 98){
+		if (e == CG_REPEATED_MODELS){
 			puts("Grupo modelos repetido ou não presente no fim! Corriga a cena!");
 			exit(-1);
 		}
 	}
-	GLint depth;
-	glGetIntegerv(GL_MODELVIEW_STACK_DEPTH, &depth);
-	printf("stack depth %d\n", depth);
 	// fim do frame
 	glutSwapBuffers();
 }

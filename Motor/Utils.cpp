@@ -9,12 +9,29 @@
 #include <math.h>
 #include <GL/GLUT.h>
 
+#pragma comment(lib, "glew32.lib")
+
 using namespace std;
 
 tinyxml2::XMLDocument xmlDoc;
 bool loaded = false;
 GLuint *vbo;
 vector<int> sizes;
+
+//de casteljau's algorithm!!
+Point bezierCurve(vector<Point> pontos, GLfloat t){
+	vector<Point> q(pontos);
+	int k,i;
+	for (k = 1; k < pontos.size(); k++){
+		printf("%d\n", k);
+		for (i = 0; i < pontos.size() - k; i++){
+			q[i].x = (1 - t)*q[i].x + t*q[i + 1].x;
+			q[i].y = (1 - t)*q[i].y + t*q[i + 1].y;
+			q[i].z = (1 - t)*q[i].z + t*q[i + 1].z;
+		}
+	}
+	return q[0];
+}
 
 //proot é o grupo a desenhar
 static void drawNode(tinyxml2::XMLNode *pRoot, map<string, int> models){
@@ -52,7 +69,7 @@ static void drawNode(tinyxml2::XMLNode *pRoot, map<string, int> models){
 		XMLElement *test = modelosGroup->NextSiblingElement();
 		//nodos a seguir a modelo = ERR!!
 		if (modelosGroup->NextSiblingElement("modelos") != NULL){
-				throw 98; //REPEATED MODELS
+				throw CG_REPEATED_MODELS; //REPEATED MODELS
 		}
 	}
 
@@ -62,7 +79,7 @@ static void drawNode(tinyxml2::XMLNode *pRoot, map<string, int> models){
 		if (strcmp(aux->Name(), "translação") == 0){
 			//mais que uma translacao = exception
 			if (trans)
-				throw 99; //REPEATED TRANSFORM
+				throw CG_REPEATED_TRANSFORM; //REPEATED TRANSFORM
 			XMLElement *ponto=aux->FirstChildElement("ponto");
 			if (ponto == NULL){
 				Translate t; t.x = 0; t.y = 0; t.z = 0;
@@ -72,6 +89,12 @@ static void drawNode(tinyxml2::XMLNode *pRoot, map<string, int> models){
 				glTranslatef(t.x, t.y, t.z);
 			}
 			else{
+				GLfloat tempo = -1;
+				aux->QueryFloatAttribute("tempo", &tempo);
+				if (tempo == -1){
+					//tempo inválido ou não especificado!
+					throw CG_CURVE_INVALID_TIME;
+				}
 				//falta verificaçao de erros
 				vector<Point> pontos;
 				while (ponto != NULL){
@@ -79,9 +102,12 @@ static void drawNode(tinyxml2::XMLNode *pRoot, map<string, int> models){
 					ponto->QueryFloatAttribute("X", &t.x);
 					ponto->QueryFloatAttribute("Y", &t.y);
 					ponto->QueryFloatAttribute("Z", &t.z);
+					pontos.push_back(t);
 					ponto = ponto->NextSiblingElement();
-					printf("%f %f %f \n", t.x, t.y, t.z);
+					printf("%f %f %f\n", t.x,t.y,t.z);
 				}
+				Point objetivo = bezierCurve(pontos, glutGet(GLUT_ELAPSED_TIME) / (tempo * 1000));
+				glTranslatef(objetivo.x, objetivo.y, objetivo.z);
 			}
 			trans = true;
 		}
@@ -90,7 +116,7 @@ static void drawNode(tinyxml2::XMLNode *pRoot, map<string, int> models){
 		else if (strcmp(aux->Name(), "escala") == 0){
 			//mais que uma escala = exception
 			if (esc)
-				throw 99;
+				throw CG_REPEATED_TRANSFORM;
 			Scale s; s.x = 1; s.y = 1; s.z = 1;
 			aux->QueryFloatAttribute("X", &s.x);
 			aux->QueryFloatAttribute("Y", &s.y);
@@ -102,7 +128,7 @@ static void drawNode(tinyxml2::XMLNode *pRoot, map<string, int> models){
 		else if (strcmp(aux->Name(), "rotação") == 0){
 			//mais que uma rotacao = exception
 			if (rot)
-				throw 99;
+				throw CG_REPEATED_TRANSFORM;
 			Rotation r; r.angle = -1; r.time =-1; r.x = 0; r.y = 0; r.z = 0;
 			aux->QueryFloatAttribute("angulo", &r.angle);
 			aux->QueryFloatAttribute("tempo", &r.time);
@@ -118,7 +144,7 @@ static void drawNode(tinyxml2::XMLNode *pRoot, map<string, int> models){
 		//avaliar proximo elemento
 		aux = aux->NextSiblingElement();
 	}
-	for (int i = 0; i < modelos.size(); i++){
+	for (unsigned int i = 0; i < modelos.size(); i++){
 		//desenhar modelos
 		drawVertices(models[modelos[i]]);
 	}
@@ -133,7 +159,7 @@ static void drawNode(tinyxml2::XMLNode *pRoot, map<string, int> models){
 void drawScene(char *filename, map<string, int> models){
 	//Carregar o ficheiro xml
 	using namespace tinyxml2;
-	XMLNode *modelosGroup, *pRoot, *temp;; XMLElement *modelo, *aux;
+	XMLNode *pRoot;
 	if (!loaded){
 		XMLError eResult = xmlDoc.LoadFile(filename);
 		if (eResult != XML_SUCCESS){
@@ -226,7 +252,7 @@ static void auxPrepare(map<string, vector<GLfloat>> *modelos, tinyxml2::XMLNode 
 	using namespace tinyxml2;
 	if (pRoot == NULL)
 		return;
-	XMLDocument xmlDoc; XMLNode *modelosGroup; XMLElement *modelo, *aux;
+	XMLDocument xmlDoc; XMLNode *modelosGroup; XMLElement *modelo;
 	//obter o grupo modelos
 	modelosGroup = pRoot->FirstChildElement("modelos");
 	//percorrer os modelos
@@ -253,7 +279,7 @@ map<string, int> prepareModels(char *filename){
 	//Map que vai armazenar os modelos
 	map<string, vector<GLfloat>> modelos;
 	//Carregar o ficheiro xml
-	XMLDocument xmlDoc; XMLNode *modelosGroup; XMLElement *modelo, *aux;
+	XMLDocument xmlDoc;
 	XMLError eResult = xmlDoc.LoadFile(filename);
 	//test erros
 	if (eResult != XML_SUCCESS){
@@ -263,7 +289,7 @@ map<string, int> prepareModels(char *filename){
 	//confirm load
 	printf("Loaded %s\n", filename);
 	//obter node inicial
-	XMLNode * pRoot = xmlDoc.FirstChild(), *temp;
+	XMLNode * pRoot = xmlDoc.FirstChild();
 	//erro de empty xml
 	if (pRoot == NULL)
 		throw 21;
