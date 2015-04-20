@@ -3,16 +3,12 @@
 #include <stdio.h>
 #include "tinyxml2.h"
 #include <sstream>
-
-typedef struct ponto{
-	double x;
-	double y;
-	double z;
-}Ponto;
+#include <vector>
+#include "Bezier.h"
 
 tinyxml2::XMLDocument xmlDoc;
 
-static void writeVertexToXML(tinyxml2::XMLNode * pRoot, Ponto v){
+static void writeVertexToXML(tinyxml2::XMLNode * pRoot, Point v){
 	using namespace tinyxml2;
 	char text[1024];
 	XMLElement *elem = xmlDoc.NewElement("vertex");
@@ -30,7 +26,7 @@ static void writeVertexToXML(tinyxml2::XMLNode * pRoot, double x, double y, doub
 	pRoot->InsertEndChild(elem);
 }
 
-static void writeTriangleToXML(tinyxml2::XMLNode * pRoot, Ponto v1, Ponto v2, Ponto v3){
+static void writeTriangleToXML(tinyxml2::XMLNode * pRoot, Point v1, Point v2, Point v3){
 	using namespace tinyxml2;
 	XMLNode *triangle = xmlDoc.NewElement("triangle");
 	writeVertexToXML(triangle, v1);
@@ -128,7 +124,7 @@ void drawParallelpipedXML(float width, float height, float lenght, char* filenam
 
 void drawPyramidXML(float base, float height, char *filename){
 	using namespace tinyxml2;
-	Ponto v1, v2, v3;
+	Point v1, v2, v3;
 	XMLNode * pRoot = xmlDoc.NewElement("piramide");
 	xmlDoc.InsertFirstChild(pRoot);
 
@@ -176,22 +172,22 @@ void drawSphereXML(float r, int stacks, int slices, char *filename){
 			double phi1 = ((float)(p) / slices) * 2 * M_PI; // (phi é 2PI porque é na horizontal, tem que ser à volta da esfera
 			double phi2 = ((float)(p + 1) / slices) * 2 * M_PI; // toda, ou seja, 360º = 2PI
 
-			Ponto vertex1;
+			Point vertex1;
 			vertex1.x = r*sin(theta1)*cos(phi1);
 			vertex1.y = r*sin(theta1)*sin(phi1);
 			vertex1.z = r*cos(theta1);
 
-			Ponto vertex2;
+			Point vertex2;
 			vertex2.x = r*sin(theta1)*cos(phi2);
 			vertex2.y = r*sin(theta1)*sin(phi2);
 			vertex2.z = r*cos(theta1);
 
-			Ponto vertex3;
+			Point vertex3;
 			vertex3.x = r*sin(theta2)*cos(phi2);
 			vertex3.y = r*sin(theta2)*sin(phi2);
 			vertex3.z = r*cos(theta2);
 
-			Ponto vertex4;
+			Point vertex4;
 			vertex4.x = r*sin(theta2)*cos(phi1);
 			vertex4.y = r*sin(theta2)*sin(phi1);
 			vertex4.z = r*cos(theta2);
@@ -222,17 +218,17 @@ void drawCylinderXML(float height, float radius, int stacks, int slices, char *f
 
 	//Ciclo que gera base superior
 	for (float i = 0; i < 2 * pi; i += 2 * pi / slices) {
-		Ponto vertex1;
+		Point vertex1;
 		vertex1.x = radius*sin(i);
 		vertex1.y = height;
 		vertex1.z = radius*cos(i);
 
-		Ponto vertex2;
+		Point vertex2;
 		vertex2.x = 0;
 		vertex2.y = height;
 		vertex2.z = 0;
 
-		Ponto vertex3;
+		Point vertex3;
 		vertex3.x = radius*sin(i + 2 * pi / slices);	//(i + 2 * pi / slices) = angulo do ponto da proxima fatia
 		vertex3.y = height;
 		vertex3.z = radius*cos(i + 2 * pi / slices);
@@ -243,17 +239,17 @@ void drawCylinderXML(float height, float radius, int stacks, int slices, char *f
 	//Ciclo que gera base inferior
 	for (float i = 0; i < 2 * pi; i += 2 * pi / slices) {
 
-		Ponto vertex1;
+		Point vertex1;
 		vertex1.x = radius*sin(i);
 		vertex1.y = 0;
 		vertex1.z = radius*cos(i);
 
-		Ponto vertex2;
+		Point vertex2;
 		vertex2.x = 0;
 		vertex2.y = 0;
 		vertex2.z = 0;
 
-		Ponto vertex3;
+		Point vertex3;
 		vertex3.x = radius*sin(i + 2 * pi / slices);
 		vertex3.y = 0;
 		vertex3.z = radius*cos(i + 2 * pi / slices);
@@ -263,28 +259,28 @@ void drawCylinderXML(float height, float radius, int stacks, int slices, char *f
 
 	//face curva
 	//ciclo que gera as camadas da face 
-	for (float l = height / stacks, h1 = 0.0f, h2 = l; h2<height; h1 = h2, h2 = h2 + l) { 
+	for (float l = height / stacks, h1 = 0.0f, h2 = l; h2 < height; h1 = h2, h2 = h2 + l) {
 		// l  - altura de cada camada; ciclo termina antes de gerar ultima camada
 
 		//ciclo que gera os triangulos de cada camada
 		for (float i = 0; i < 2 * pi; i += 2 * pi / slices) {
 
-			Ponto vertex1;
+			Point vertex1;
 			vertex1.x = radius*sin(i);
 			vertex1.y = h2;
 			vertex1.z = radius*cos(i);
 
-			Ponto vertex2;
+			Point vertex2;
 			vertex2.x = radius*sin(i + 2 * pi / slices);
 			vertex2.y = h2;
 			vertex2.z = radius*cos(i + 2 * pi / slices);
 
-			Ponto vertex3;
+			Point vertex3;
 			vertex3.x = radius*sin(i);
 			vertex3.y = h1;
 			vertex3.z = radius*cos(i);
 
-			Ponto vertex4;
+			Point vertex4;
 			vertex4.x = radius*sin(i + 2 * pi / slices);
 			vertex4.y = h1;
 			vertex4.z = radius*cos(i + 2 * pi / slices);
@@ -295,24 +291,24 @@ void drawCylinderXML(float height, float radius, int stacks, int slices, char *f
 
 	}
 	//ciclo que gera a ultima camada( solução para problema de arredondamento que por vezes levava a que a ultima camada nao fosse gerada)
-	for (float i = 0; i < 2 * pi; i += 2 * pi / slices) {	
+	for (float i = 0; i < 2 * pi; i += 2 * pi / slices) {
 
-		Ponto vertex1;
+		Point vertex1;
 		vertex1.x = radius*sin(i);
 		vertex1.y = height;
 		vertex1.z = radius*cos(i);
 
-		Ponto vertex2;
+		Point vertex2;
 		vertex2.x = radius*sin(i + 2 * pi / slices);
 		vertex2.y = height;
 		vertex2.z = radius*cos(i + 2 * pi / slices);
 
-		Ponto vertex3;
+		Point vertex3;
 		vertex3.x = radius*sin(i);
 		vertex3.y = height - height / stacks;
 		vertex3.z = radius*cos(i);
 
-		Ponto vertex4;
+		Point vertex4;
 		vertex4.x = radius*sin(i + 2 * pi / slices);
 		vertex4.y = height - height / stacks;
 		vertex4.z = radius*cos(i + 2 * pi / slices);
@@ -336,17 +332,17 @@ void drawConeXML(float height, float radius, int stacks, int slices, char *filen
 	//Ciclo que gera base inferior
 	for (float i = 0; i < 2 * pi; i += 2 * pi / slices) {
 
-		Ponto vertex1;
+		Point vertex1;
 		vertex1.x = radius*sin(i);
 		vertex1.y = 0;
 		vertex1.z = radius*cos(i);
 
-		Ponto vertex2;
+		Point vertex2;
 		vertex2.x = 0;
 		vertex2.y = 0;
 		vertex2.z = 0;
 
-		Ponto vertex3;
+		Point vertex3;
 		vertex3.x = radius*sin(i + 2 * pi / slices);
 		vertex3.y = 0;
 		vertex3.z = radius*cos(i + 2 * pi / slices);
@@ -362,22 +358,22 @@ void drawConeXML(float height, float radius, int stacks, int slices, char *filen
 		//ciclo que gera triangulos da camada
 		for (float i = 0; i < 2 * pi; i += 2 * pi / slices) {
 
-			Ponto vertex1;
+			Point vertex1;
 			vertex1.x = (rAct - r)*sin(i);
 			vertex1.y = h2;
 			vertex1.z = (rAct - r)*cos(i);
 
-			Ponto vertex2;
+			Point vertex2;
 			vertex2.x = (rAct - r)*sin(i + 2 * pi / slices);
 			vertex2.y = h2;
 			vertex2.z = (rAct - r)*cos(i + 2 * pi / slices);
 
-			Ponto vertex3;
+			Point vertex3;
 			vertex3.x = rAct*sin(i);
 			vertex3.y = h1;
 			vertex3.z = rAct*cos(i);
 
-			Ponto vertex4;
+			Point vertex4;
 			vertex4.x = rAct*sin(i + 2 * pi / slices);
 			vertex4.y = h1;
 			vertex4.z = rAct*cos(i + 2 * pi / slices);
@@ -392,17 +388,17 @@ void drawConeXML(float height, float radius, int stacks, int slices, char *filen
 	//ciclo que gera a ultima camada do cone
 	for (float i = 0; i < 2 * pi; i += 2 * pi / slices) {
 
-		Ponto vertex1;
+		Point vertex1;
 		vertex1.x = 0;
 		vertex1.y = height;
 		vertex1.z = 0;
 
-		Ponto vertex2;
+		Point vertex2;
 		vertex2.x = r*sin(i);
 		vertex2.y = height - height / stacks;
 		vertex2.z = r*cos(i);
 
-		Ponto vertex3;
+		Point vertex3;
 		vertex3.x = r*sin(i + 2 * pi / slices);
 
 		vertex3.y = height - height / stacks;
@@ -422,8 +418,8 @@ void drawPlaneXML(float largura, float altura, char *filename){
 	XMLNode * pRoot = xmlDoc.NewElement("cone");
 	xmlDoc.InsertEndChild(pRoot);
 
-	Ponto v1, v2, v3, v4;
-	
+	Point v1, v2, v3, v4;
+
 	v1.x = largura / 2;
 	v1.y = -altura / 2;
 	v1.z = 0;
@@ -440,12 +436,53 @@ void drawPlaneXML(float largura, float altura, char *filename){
 	v4.y = altura / 2;
 	v4.z = 0;
 
-	
+
 	writeTriangleToXML(pRoot, v2, v3, v1);
 	writeTriangleToXML(pRoot, v3, v4, v1);
 
 	xmlDoc.SaveFile(filename);
 
+}
+using namespace std;
+
+void drawBezierPatchesXML(vector<Point> vertices, vector<vector<unsigned int>> indices, int resu, int resv, char *filename){
+	//obter os vertices
+	for (int p = 0; p < indices.size(); p++) {
+		Point pontos_control[NM + 1][NM + 1];
+		makeControlPoints(p, pontos_control, vertices, indices);
+		for (int ru = 0; ru <= resu - 1; ru++) {
+			float u = 1.0 * ru / (resu - 1);
+			for (int rv = 0; rv <= resv - 1; rv++) {
+				float v = 1.0 * rv / (resv - 1);
+				vertices[p*resu*resv + ru*resv + rv] = getBezierPoint(pontos_control, u, v);
+			}
+		}
+	}
+	//obter indices triangulos
+	vector<unsigned int> indices_tri;
+	int n = 0;
+	for (int p = 0; p < indices.size(); p++) {
+		for (int ru = 0; ru < resu - 1; ru++)
+		for (int rv = 0; rv < resv - 1; rv++) {
+			// 1 square ABCD = 2 triangles ABC + CDA
+			// ABC
+			indices_tri.push_back(p*resu*resv + ru   *resv + rv);
+			indices_tri.push_back(p*resu*resv + ru   *resv + (rv + 1));
+			indices_tri.push_back(p*resu*resv + (ru + 1)*resv + (rv + 1));
+			// CDA
+			indices_tri.push_back(p*resu*resv + (ru + 1)*resv + (rv + 1));
+			indices_tri.push_back(p*resu*resv + (ru + 1)*resv + rv);
+			indices_tri.push_back(p*resu*resv + ru   *resv + rv);
+		}
+	}
+	//guardar no xml
+	using namespace tinyxml2;
+	XMLNode * pRoot = xmlDoc.NewElement("bezier surface");
+	xmlDoc.InsertEndChild(pRoot);
+
+	for (int i = 0; i < indices_tri.size(); i+=3){
+		writeTriangleToXML(pRoot, vertices[indices_tri[i]], vertices[indices_tri[i + 1]], vertices[indices_tri[i + 2]]);
+	}
 }
 
 int main(int argc, char **argv){
@@ -464,7 +501,7 @@ int main(int argc, char **argv){
 		else if (strcmp(argv[1], "piramide") == 0){
 			if (argc == 5){
 				drawPyramidXML((float)atof(argv[2]), (float)atof(argv[3]), argv[4]);
-				printf("Piramide gravada em %s com %Lf de base e %Lf de altura\n",argv[4], (float)atof(argv[2]), (float)atof(argv[3]));
+				printf("Piramide gravada em %s com %Lf de base e %Lf de altura\n", argv[4], (float)atof(argv[2]), (float)atof(argv[3]));
 			}
 			else{
 				printf("Erro nos argumentos!\n");
@@ -500,11 +537,16 @@ int main(int argc, char **argv){
 		}
 		else if (strcmp(argv[1], "plano") == 0){
 			if (argc == 5){
-				drawPlaneXML(atof(argv[2]), atof(argv[3]),argv[4]);
+				drawPlaneXML(atof(argv[2]), atof(argv[3]), argv[4]);
 				printf("Plano gravado em %s com %Lf de largura e %Lf de altura.\n", argv[4], atof(argv[2]), atof(argv[3]));
 			}
 			else{
 				printf("Erro nos argumentos!\n");
+			}
+		}
+		else if (strcmp(argv[1], "bezier") == 0){
+			if (argc == 4){
+				/*cenas do to/naso/rafa*/
 			}
 		}
 		else{
