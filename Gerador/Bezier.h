@@ -7,9 +7,9 @@ using namespace std;
 #define NM 3
 
 typedef struct ponto{
-	double x;
-	double y;
-	double z;
+	float x;
+	float y;
+	float z;
 }Point;
 
 Point getBezierPoint(Point pontos_control[][NM+1], float u, float v);

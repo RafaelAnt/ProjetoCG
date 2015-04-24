@@ -4,6 +4,7 @@
 #include "tinyxml2.h"
 #include <sstream>
 #include <vector>
+#include <fstream>
 #include "Bezier.h"
 
 tinyxml2::XMLDocument xmlDoc;
@@ -12,16 +13,16 @@ static void writeVertexToXML(tinyxml2::XMLNode * pRoot, Point v){
 	using namespace tinyxml2;
 	char text[1024];
 	XMLElement *elem = xmlDoc.NewElement("vertex");
-	sprintf_s(text, "X=%g Y=%g Z=%g", v.x, v.y, v.z);
+	sprintf_s(text, "X=%f Y=%f Z=%f", v.x, v.y, v.z);
 	elem->SetText(text);
 	pRoot->InsertEndChild(elem);
 }
 
-static void writeVertexToXML(tinyxml2::XMLNode * pRoot, double x, double y, double z){
+static void writeVertexToXML(tinyxml2::XMLNode * pRoot, float x, float y, float z){
 	using namespace tinyxml2;
 	char text[1024];
 	XMLElement *elem = xmlDoc.NewElement("vertex");
-	sprintf_s(text, "X=%g Y=%g Z=%g", x, y, z);
+	sprintf_s(text, "X=%f Y=%f Z=%f", x, y, z);
 	elem->SetText(text);
 	pRoot->InsertEndChild(elem);
 }
@@ -446,42 +447,99 @@ void drawPlaneXML(float largura, float altura, char *filename){
 using namespace std;
 
 void drawBezierPatchesXML(vector<Point> vertices, vector<vector<unsigned int>> indices, int resu, int resv, char *filename){
-	//obter os vertices
+	Point *vertices_res = new Point[indices.size()*resu*resv];
+	Point pontos_control[NM + 1][NM + 1];
+	float res[3];
 	for (int p = 0; p < indices.size(); p++) {
-		Point pontos_control[NM + 1][NM + 1];
 		makeControlPoints(p, pontos_control, vertices, indices);
 		for (int ru = 0; ru <= resu - 1; ru++) {
 			float u = 1.0 * ru / (resu - 1);
 			for (int rv = 0; rv <= resv - 1; rv++) {
 				float v = 1.0 * rv / (resv - 1);
-				vertices[p*resu*resv + ru*resv + rv] = getBezierPoint(pontos_control, u, v);
+				vertices_res[p*resu*resv + ru*resv + rv]=getBezierPoint(pontos_control, u, v);
 			}
 		}
 	}
+
 	//obter indices triangulos
 	vector<unsigned int> indices_tri;
 	int n = 0;
 	for (int p = 0; p < indices.size(); p++) {
-		for (int ru = 0; ru < resu - 1; ru++)
-		for (int rv = 0; rv < resv - 1; rv++) {
-			// 1 square ABCD = 2 triangles ABC + CDA
-			// ABC
-			indices_tri.push_back(p*resu*resv + ru   *resv + rv);
-			indices_tri.push_back(p*resu*resv + ru   *resv + (rv + 1));
-			indices_tri.push_back(p*resu*resv + (ru + 1)*resv + (rv + 1));
-			// CDA
-			indices_tri.push_back(p*resu*resv + (ru + 1)*resv + (rv + 1));
-			indices_tri.push_back(p*resu*resv + (ru + 1)*resv + rv);
-			indices_tri.push_back(p*resu*resv + ru   *resv + rv);
+		for (int ru = 0; ru < resu - 1; ru++){
+			for (int rv = 0; rv < resv - 1; rv++) {
+				// 1 square ABCD = 2 triangles ABC + CDA
+				// ABC
+				indices_tri.push_back(p*resu*resv + ru   *resv + rv);
+				indices_tri.push_back(p*resu*resv + ru   *resv + (rv + 1));
+				indices_tri.push_back(p*resu*resv + (ru + 1)*resv + (rv + 1));
+				// CDA
+				indices_tri.push_back(p*resu*resv + (ru + 1)*resv + (rv + 1));
+				indices_tri.push_back(p*resu*resv + (ru + 1)*resv + rv);
+				indices_tri.push_back(p*resu*resv + ru   *resv + rv);
+			}
 		}
 	}
 	//guardar no xml
 	using namespace tinyxml2;
-	XMLNode * pRoot = xmlDoc.NewElement("bezier surface");
+	XMLNode * pRoot = xmlDoc.NewElement("beziersurface");
 	xmlDoc.InsertEndChild(pRoot);
 
-	for (int i = 0; i < indices_tri.size(); i+=3){
-		writeTriangleToXML(pRoot, vertices[indices_tri[i]], vertices[indices_tri[i + 1]], vertices[indices_tri[i + 2]]);
+	for (int i = 0; i < indices_tri.size(); i += 3){
+		writeTriangleToXML(pRoot, vertices_res[indices_tri[i]], vertices_res[indices_tri[i + 1]], vertices_res[indices_tri[i + 2]]);
+	}
+	xmlDoc.SaveFile(filename);
+}
+
+void readBezierFile(string filename, vector<vector<unsigned int>> &indices, vector<Point> &vertices){
+	int i = 0, j;
+	string line;
+	string token;
+	float nindices, npontos, auxa, auxb, auxc;
+	unsigned int a;
+	float aux[3];
+	ifstream file(filename);
+	if (file.is_open()){
+		//saber numero de indices
+		if (i == 0) {
+			file >> nindices;
+			i++;
+		}
+		//buscar os indices e guardar no vetor de vetores
+		for (i = 1; i <= nindices + 1; i++) {
+			vector<unsigned int> v;
+			getline(file, line);
+			//cout << line;
+			//printf("\n");
+			stringstream ss(line);
+			while (getline(ss, token, ',')) {
+				//indices começam a 1 em vez de 0
+				v.push_back(atoi(token.c_str()) + 1);
+			}
+			if (i != 1) indices.push_back(v);
+		}
+		//saber numero de pontos
+		file >> npontos;
+		i = 1;
+		//buscar os pontos e guardar no vetor de pontos
+		while (!file.eof()){
+			ponto f;
+			getline(file, line);
+			stringstream ss(line);
+			//cout << line;
+			//printf("\n");
+			j = 0;
+			while (getline(ss, token, ',')) {
+				aux[j] = atof(token.c_str());
+				j++;
+			}
+			//printf("%f %f %f \n",aux[0],aux[1],aux[2]);
+			f.x = aux[0];
+			f.y = aux[1];
+			f.z = aux[2];
+			if (i != 1) vertices.push_back(f);
+			i++;
+		}
+		file.close();
 	}
 }
 
@@ -546,7 +604,10 @@ int main(int argc, char **argv){
 		}
 		else if (strcmp(argv[1], "bezier") == 0){
 			if (argc == 4){
-				/*cenas do to/naso/rafa*/
+				vector<vector<unsigned int>> indices;
+				vector<Point> vertices;
+				readBezierFile(argv[2], indices, vertices);
+				drawBezierPatchesXML(vertices, indices, 10, 10, argv[3]);
 			}
 		}
 		else{
