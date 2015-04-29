@@ -183,11 +183,7 @@ void drawScene(char *filename, map<string, int> models){
 }
 
 /*
-	Funçao que desenha um vetor de vértices, cada 3 vértices é um triângulo.
-	Atenção!!! A função não irá verificar se o vetor está bem formado, ou seja,
-	se tem exatamente um conjunto de vários 3 pontos. Caso o vetor não esteja bem formado
-	poderá haver acessos a indices do array fora de limites, o que provavelmente irá resultar num crash.
-	Nesta aplicação a verificação é feita no momento da leitura dos vértices dos modelos.
+	Funçao que desenha o array de vértices armazenados num dado buffer (vboIndex)
 	*/
 void drawVertices(int vboIndex){
 	glEnableClientState(GL_VERTEX_ARRAY);
