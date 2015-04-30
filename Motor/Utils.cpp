@@ -18,20 +18,55 @@ tinyxml2::XMLDocument xmlDoc;
 bool loaded = false;
 GLuint *vbo;
 vector<int> sizes;
+// catmull-rom matrix
+float m[4][4] = { { -0.5f, 1.5f, -1.5f, 0.5f },
+{ 1.0f, -2.5f, 2.0f, -0.5f },
+{ -0.5f, 0.0f, 0.5f, 0.0f },
+{ 0.0f, 1.0f, 0.0f, 0.0f } };
 
-//de casteljau's algorithm!!
-Point bezierCurve(vector<Point> pontos, GLfloat tempo){
-	GLfloat useless, t = modf(tempo, &useless);
-	vector<Point> q(pontos);
-	int k, i;
-	for (k = 1; k < pontos.size(); k++){
-		for (i = 0; i < pontos.size() - k; i++){
-			q[i].x = (1 - t)*q[i].x + t*q[i + 1].x;
-			q[i].y = (1 - t)*q[i].y + t*q[i + 1].y;
-			q[i].z = (1 - t)*q[i].z + t*q[i + 1].z;
-		}
-	}
-	return q[0];
+
+Point getCatmullRomPoint(float t, int *indices, vector<Point> p) {
+	
+	Point p1=p[0], p2=p[1], p3=p[2], p4=p[3];
+
+	Point res = { 0, 0, 0 };
+
+	//rafa mete à tua maneira a usar a matrix M
+	res.x = 0.5 * ((-p1.x + 3 * p2.x - 3 * p3.x + p4.x)*t*t*t
+		+ (2 * p1.x - 5 * p2.x + 4 * p3.x - p4.x)*t*t
+		+ (-p1.x + p3.x)*t
+		+ 2 * p2.x);
+
+	res.y = 0.5 * ((-p1.y + 3 * p2.y - 3 * p3.y + p4.y)*t*t*t
+		+ (2 * p1.y - 5 * p2.y + 4 * p3.y - p4.y)*t*t
+		+ (-p1.y + p3.y)*t
+		+ 2 * p2.y);
+
+
+	res.z = 0.5 * ((-p1.z + 3 * p2.z - 3 * p3.z + p4.z)*t*t*t
+		+ (2 * p1.z - 5 * p2.z + 4 * p3.z - p4.z)*t*t
+		+ (-p1.z + p3.z)*t
+		+ 2 * p2.z);
+
+	return res;
+}
+
+
+// given  global t, returns the point in the curve
+Point getGlobalCatmullRomPoint(float gt, vector<Point> p) {
+
+	int POINT_COUNT = p.size();
+
+	float t = gt * POINT_COUNT; // this is the real global t
+	int index = floor(t);  // which segment
+	t = t - index; // where within  the segment
+
+	// indices store the points
+	int indices[4];
+	indices[0] = (index + POINT_COUNT - 1) % POINT_COUNT;	indices[1] = (indices[0] + 1) % POINT_COUNT;
+	indices[2] = (indices[1] + 1) % POINT_COUNT; indices[3] = (indices[2] + 1) % POINT_COUNT;
+
+	return getCatmullRomPoint(t, indices, p);
 }
 
 //proot é o grupo a desenhar
@@ -107,7 +142,7 @@ static void drawNode(tinyxml2::XMLNode *pRoot, map<string, int> models){
 					ponto = ponto->NextSiblingElement();
 				}
 				//colocar o tempo decorrido na timescale desejada
-				Point objetivo = bezierCurve(pontos, glutGet(GLUT_ELAPSED_TIME) / (tempo * 1000));
+				Point objetivo = getGlobalCatmullRomPoint(glutGet(GLUT_ELAPSED_TIME) / (tempo * 1000), pontos);
 				glTranslatef(objetivo.x, objetivo.y, objetivo.z);
 			}
 			trans = true;
