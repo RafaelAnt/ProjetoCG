@@ -15,15 +15,8 @@ float m[4][4] = { { -0.5f, 1.5f, -1.5f, 0.5f },
 { -0.5f, 0.0f, 0.5f, 0.0f },
 { 0.0f, 1.0f, 0.0f, 0.0f } };
 
-float EPSILON = 0.0001;
-
 //Prototipos
 Point getCatmullRomPoint(float t, int *indices, vector<Point> p);
-
-bool igual(float a, float b){
-	float diff = a - b;
-	return (diff < EPSILON) && (-diff < EPSILON);
-}
 
 /* Metodo que dado um vector com 3 posições, mormaliza-o.
 */
@@ -218,6 +211,7 @@ void catmullRomCurveMovement(GLfloat gt, vector<Point> p){
 	der = getDerivada(gt, p);
 
 	r = prodVectorial(b, der);
+	printf("DER %f %f %f\n", der.x, der.y, der.z);
 	printf("%f %f %f\n", r.x, r.y, r.z);
 	up = prodVectorial(r, der);
 	printf("%f %f %f\n", up.x, up.y, up.z);
@@ -233,10 +227,6 @@ void catmullRomCurveMovement(GLfloat gt, vector<Point> p){
 
 	renderCatmullRomCurve(p);
 	glMultMatrixf(matriz);
-
-	GLUquadric* cyl = gluNewQuadric();
-	GLUquadric* cy2 = gluNewQuadric();
-	GLUquadric* cy3 = gluNewQuadric();
 
 	glPushMatrix();
 	double len = 1.0;
