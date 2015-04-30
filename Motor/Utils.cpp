@@ -52,16 +52,16 @@ Point getCatmullRomPoint(float t, int *indices, vector<Point> p) {
 }
 
 
-// given  global t, returns the point in the curve
+//dado um t global calcular o ponto na curva
 Point getGlobalCatmullRomPoint(float gt, vector<Point> p) {
 
 	int POINT_COUNT = p.size();
 
-	float t = gt * POINT_COUNT; // this is the real global t
-	int index = floor(t);  // which segment
-	t = t - index; // where within  the segment
+	float t = gt * POINT_COUNT; //obter t global verdadeiro
+	int index = floor(t);  //segmento
+	t = t - index; //posição no segmento
 
-	// indices store the points
+	//obter os indices dos nossos pontos de controlo
 	int indices[4];
 	indices[0] = (index + POINT_COUNT - 1) % POINT_COUNT;	indices[1] = (indices[0] + 1) % POINT_COUNT;
 	indices[2] = (indices[1] + 1) % POINT_COUNT; indices[3] = (indices[2] + 1) % POINT_COUNT;
