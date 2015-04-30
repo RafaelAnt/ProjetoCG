@@ -7,9 +7,6 @@
 
 using namespace std;
 
-
-void catmullcatmullRomCurveMovement(float gt, vector<Point> p);
-
-
+void catmullRomCurveMovement(float gt, vector<Point> p);
 
 #endif

@@ -20,8 +20,6 @@ float m[4][4] = { { -0.5f, 1.5f, -1.5f, 0.5f },
 Point getCatmullRomPoint(float t, int *indices, vector<Point> p);
 
 
-
-
 /* Metodo que dado um vector com 3 posições, mormaliza-o.
 */
 void normalizeVector(float vec[]){
@@ -189,9 +187,32 @@ Point getDerivada(float gt, vector<Point> p){
 	return getDerivadaAux(t, indices, p);
 }
 
-void catmullcatmullRomCurveMovement(float gt, vector<Point> p){
+void renderCatmullRomCurve(vector<Point> p) {
 
-	float* pos, der[3], r[3], up[3];
+	// desenhar a curva usando segmentos de reta - GL_LINE_LOOP
+
+	float res[3];
+
+	glBegin(GL_LINE_LOOP);
+	for (float f = 0; f < 1; f += 0.01){
+		Point res = getGlobalCatmullRomPoint(f, p);
+		glVertex3f(res.x, res.y, res.z);
+	}
+	glEnd();
+
+	/*for (float f = 0; f < 1; f += 0.01){
+	glBegin(GL_LINES);
+	getGlobalCatmullRomPoint(f, res);
+	glVertex3f(res[0], res[1], res[2]);
+	getDerivada(f, vec);
+	glVertex3f(res[0] + vec[0], res[1] + vec[1], res[2] + vec[2]);
+	glEnd();
+	}*/
+}
+
+void catmullRomCurveMovement(float gt, vector<Point> p){
+
+	GLfloat pos[3], der[3], r[3], up[3];
 
 	Point aux;
 
@@ -205,7 +226,7 @@ void catmullcatmullRomCurveMovement(float gt, vector<Point> p){
 	der[1] = aux.y;
 	der[2] = aux.z;
 
-	float b[3] = { 0, 0, 1 };
+	float b[3] = { 0, 1, 0 };
 
 	prodVectorial(der, b, r);
 
@@ -221,6 +242,7 @@ void catmullcatmullRomCurveMovement(float gt, vector<Point> p){
 		r[0], r[1], r[2], 0,
 		pos[0], pos[1], pos[2], 1.0f };
 
+	renderCatmullRomCurve(p);
 	glMultMatrixf(matriz);
 
 }

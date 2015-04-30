@@ -20,15 +20,6 @@ bool loaded = false;
 GLuint *vbo;
 vector<int> sizes;
 
-
-
-
-
-
-
-
-
-
 //proot é o grupo a desenhar
 static void drawNode(tinyxml2::XMLNode *pRoot, map<string, int> models){
 	//se null, fazer pop (chegamos ao fim da hierarquia)
