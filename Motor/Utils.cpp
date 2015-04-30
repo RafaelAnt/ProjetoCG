@@ -14,15 +14,16 @@
 using namespace std;
 
 tinyxml2::XMLDocument xmlDoc;
+
 bool loaded = false;
 GLuint *vbo;
 vector<int> sizes;
 
 //de casteljau's algorithm!!
 Point bezierCurve(vector<Point> pontos, GLfloat tempo){
-	GLfloat useless,t=modf(tempo, &useless);
+	GLfloat useless, t = modf(tempo, &useless);
 	vector<Point> q(pontos);
-	int k,i;
+	int k, i;
 	for (k = 1; k < pontos.size(); k++){
 		for (i = 0; i < pontos.size() - k; i++){
 			q[i].x = (1 - t)*q[i].x + t*q[i + 1].x;
@@ -47,7 +48,7 @@ static void drawNode(tinyxml2::XMLNode *pRoot, map<string, int> models){
 	//nome modelos
 	vector<const char*> modelos;
 	//variaveis de controlo de transforms duplicadas
-	bool trans=false, esc=false, rot=false;
+	bool trans = false, esc = false, rot = false;
 	XMLNode *modelosGroup; XMLElement *modelo, *aux;
 	//obter nodos
 	aux = pRoot->FirstChildElement();
@@ -69,7 +70,7 @@ static void drawNode(tinyxml2::XMLNode *pRoot, map<string, int> models){
 		XMLElement *test = modelosGroup->NextSiblingElement();
 		//nodos a seguir a modelo = ERR!!
 		if (modelosGroup->NextSiblingElement("modelos") != NULL){
-				throw CG_REPEATED_MODELS; //REPEATED MODELS
+			throw CG_REPEATED_MODELS; //REPEATED MODELS
 		}
 	}
 
@@ -80,7 +81,7 @@ static void drawNode(tinyxml2::XMLNode *pRoot, map<string, int> models){
 			//mais que uma translacao = exception
 			if (trans)
 				throw CG_REPEATED_TRANSFORM; //REPEATED TRANSFORM
-			XMLElement *ponto=aux->FirstChildElement("ponto");
+			XMLElement *ponto = aux->FirstChildElement("ponto");
 			if (ponto == NULL){
 				Translate t; t.x = 0; t.y = 0; t.z = 0;
 				aux->QueryFloatAttribute("X", &t.x);
@@ -105,7 +106,8 @@ static void drawNode(tinyxml2::XMLNode *pRoot, map<string, int> models){
 					pontos.push_back(t);
 					ponto = ponto->NextSiblingElement();
 				}
-				Point objetivo = bezierCurve(pontos, glutGet(GLUT_ELAPSED_TIME) / (tempo*1000));
+				//colocar o tempo decorrido na timescale desejada
+				Point objetivo = bezierCurve(pontos, glutGet(GLUT_ELAPSED_TIME) / (tempo * 1000));
 				glTranslatef(objetivo.x, objetivo.y, objetivo.z);
 			}
 			trans = true;
@@ -128,7 +130,7 @@ static void drawNode(tinyxml2::XMLNode *pRoot, map<string, int> models){
 			//mais que uma rotacao = exception
 			if (rot)
 				throw CG_REPEATED_TRANSFORM;
-			Rotation r; r.angle = -1; r.time =-1; r.x = 0; r.y = 0; r.z = 0;
+			Rotation r; r.angle = -1; r.time = -1; r.x = 0; r.y = 0; r.z = 0;
 			aux->QueryFloatAttribute("angulo", &r.angle);
 			aux->QueryFloatAttribute("tempo", &r.time);
 			aux->QueryFloatAttribute("eixoX", &r.x);
@@ -137,7 +139,7 @@ static void drawNode(tinyxml2::XMLNode *pRoot, map<string, int> models){
 			if (r.angle > 0)
 				glRotatef(r.angle, r.x, r.y, r.z);
 			else if (r.time > 0)
-				glRotatef((360)*(glutGet(GLUT_ELAPSED_TIME) / (r.time*1000)), r.x, r.y, r.z);
+				glRotatef((360)*(glutGet(GLUT_ELAPSED_TIME) / (r.time * 1000)), r.x, r.y, r.z);
 			rot = true;
 		}
 		//avaliar proximo elemento
@@ -148,38 +150,25 @@ static void drawNode(tinyxml2::XMLNode *pRoot, map<string, int> models){
 		drawVertices(models[modelos[i]]);
 	}
 	modelos.clear();
-	
+
 	//desenhar os filhos
-	drawNode(pRoot->FirstChildElement("grupo"),models);
+	drawNode(pRoot->FirstChildElement("grupo"), models);
 	//depois desenhar os irmaos
-	drawNode(pRoot->NextSiblingElement("grupo"),models);
+	drawNode(pRoot->NextSiblingElement("grupo"), models);
 }
 
 void drawScene(char *filename, map<string, int> models){
 	//Carregar o ficheiro xml
 	using namespace tinyxml2;
 	XMLNode *pRoot;
+	//se a cena ainda não foi carregada, atirar exception
 	if (!loaded){
-		XMLError eResult = xmlDoc.LoadFile(filename);
-		if (eResult != XML_SUCCESS){
-			printf("Erro!! %s \n", xmlDoc.ErrorName());
-			throw 20;
-		}
-		pRoot = xmlDoc.FirstChild();
-		if (pRoot == NULL)
-			throw 21;
-
-		pRoot = pRoot->FirstChildElement("grupo");
-		if (pRoot == NULL){
-			puts("Erro");
-			throw 19; //ficheiro inválido
-		}
-		loaded = true;
+		throw CG_DRAW_WITHOUT_LOAD;
 	}
 	else{
-		pRoot = xmlDoc.FirstChild();
+		pRoot = xmlDoc.FirstChild()->FirstChildElement("grupo");
 	}
-	drawNode(pRoot,models);
+	drawNode(pRoot, models);
 }
 
 /*
@@ -189,7 +178,7 @@ void drawVertices(int vboIndex){
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[vboIndex]);
 	glVertexPointer(3, GL_FLOAT, 0, NULL);
-	glDrawArrays(GL_TRIANGLES, 0, sizes[vboIndex]/3);
+	glDrawArrays(GL_TRIANGLES, 0, sizes[vboIndex] / 3);
 	glDisableClientState(GL_VERTEX_ARRAY);
 }
 
@@ -232,7 +221,7 @@ static vector<GLfloat> readVertices(const char *filename) {
 	XMLNode * pRoot = xmlDoc.FirstChild();
 	XMLElement *pElement;
 	if (pRoot == nullptr){
-		throw 22;
+		throw CG_INVALID_MODELS;
 	}
 	pElement = pRoot->FirstChildElement("triangle");
 	while (pElement != NULL){
@@ -269,17 +258,21 @@ static void auxPrepare(map<string, vector<GLfloat>> *modelos, tinyxml2::XMLNode 
 	auxPrepare(&(*modelos), pRoot->NextSiblingElement("grupo"));
 }
 
+/*
+	Função que lê uma cena XML e armazena todos os modelos a desenhar nos respetivos buffers, e devolve um map com o nome
+	do modelo e do respetivo identificador do buffer
+	*/
 map<string, int> prepareModels(char *filename){
 	using namespace tinyxml2;
 	//Map que vai armazenar os modelos
 	map<string, vector<GLfloat>> modelos;
 	//Carregar o ficheiro xml
-	XMLDocument xmlDoc;
 	XMLError eResult = xmlDoc.LoadFile(filename);
+	loaded = true;
 	//test erros
 	if (eResult != XML_SUCCESS){
 		printf("Erro!! %s \n", xmlDoc.ErrorName());
-		throw 20;
+		throw CG_XML_PARSE_ERROR;
 	}
 	//confirm load
 	printf("Loaded %s\n", filename);
@@ -287,19 +280,18 @@ map<string, int> prepareModels(char *filename){
 	XMLNode * pRoot = xmlDoc.FirstChild();
 	//erro de empty xml
 	if (pRoot == NULL)
-		throw 21;
+		throw CG_NO_XML_NODES;
 
 	pRoot = pRoot->FirstChildElement("grupo");
 	//ficheiro sem grupos
 	if (pRoot == NULL){
-		puts("Erro");
-		throw 19; //ficheiro inválido
+		throw CG_NO_XML_NODES; //ficheiro inválido
 	}
 	//obter os modelos
 	auxPrepare(&modelos, pRoot);
 
 	vbo = new GLuint[modelos.size()];
-	glGenBuffers(modelos.size(),vbo);
+	glGenBuffers(modelos.size(), vbo);
 	map<string, int> vboIndex;
 	typedef map<string, vector<GLfloat>>::iterator it_type;
 	int index = 0;

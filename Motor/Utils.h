@@ -39,6 +39,10 @@ typedef struct scale{
 #define CG_CURVE_INVALID_TIME 98
 #define CG_ROTATION_INVALID_TIME 97
 #define CG_REPEATED_MODELS 96
+#define CG_INVALID_MODELS 95
+#define CG_NO_XML_NODES 94
+#define CG_DRAW_WITHOUT_LOAD 93
+#define CG_XML_PARSE_ERROR 20
 
 /*
 	Desenha uma cena (filename), aplicando as transformações necessárias, utilizando o map models

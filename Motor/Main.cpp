@@ -136,18 +136,18 @@ void createMenu(){
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
 
-int main() {
+int main(int argc, char **argv) {
 	srand(time(NULL));
 
-	if (__argc != 2){
+	if (argc != 2){
 		puts("Erro nos argumentos! Especifique apenas o nome da cena a desenhar.\nCertifique-se tambem que o ficheiro esta na diretoria do executavel!");
 		return -1;
 	}
 
-	sceneName = __argv[1];
+	sceneName = argv[1];
 
 	//inits opengl
-	glutInit(&__argc, __argv);
+	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowPosition(100, 100);
 	glutInitWindowSize(400, 400);
@@ -174,7 +174,7 @@ int main() {
 		if (e == 21){
 			puts("Erro na leitura da cena, XML parsing error!");
 		}
-		else if (e == 22){
+		else if (e == CG_INVALID_MODELS){
 			puts("Erro na leitura de um dos modelos!");
 		}
 		else if (e == 20){
