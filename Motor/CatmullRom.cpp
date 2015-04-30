@@ -22,24 +22,26 @@ Point getCatmullRomPoint(float t, int *indices, vector<Point> p);
 
 /* Metodo que dado um vector com 3 posições, mormaliza-o.
 */
-void normalizeVector(float vec[]){
-	float aux = vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2];
-	float aux2 = sqrt(aux);
-	vec[0] = vec[0] / aux2;
-	vec[1] = vec[1] / aux2;
-	vec[2] = vec[2] / aux2;
+Point normalizeVector(Point vec){
+	GLfloat length = (float)sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
+	vec.x = vec.x / length;
+	vec.y = vec.y / length;
+	vec.z = vec.z / length;
+	return vec;
 }
 
 /*Função que calcula o produto vectorial de dois arrays de 3 elementos
 */
-void prodVectorial(float * a, float * b, float * res){
-	res[0] = (a[1] * b[2]) - (a[2] * b[1]);
-	res[1] = -((a[0] * b[2]) - (a[2] * b[0]));
-	res[2] = (a[0] * b[1]) - (a[1] * b[0]);
+Point prodVectorial(Point a, Point b){
+	Point res;
+	res.x = (a.y * b.z) - (a.z * b.y);
+	res.y = -((a.x * b.z) - (a.z * b.x));
+	res.z = (a.x * b.y) - (a.y * b.x);
+	return res;
 }
 
 //dado um t global calcular o ponto na curva
-Point getGlobalCatmullRomPoint(float gt, vector<Point> p) {
+Point getGlobalCatmullRomPoint(GLfloat gt, vector<Point> p) {
 
 	int POINT_COUNT = p.size();
 
@@ -109,7 +111,6 @@ Point getCatmullRomPoint(float t, int *indices, vector<Point> p) {
 		if (i == 1)res.y = sumAux;
 		if (i == 2)res.z = sumAux;
 	}
-
 	return res;
 }
 
@@ -210,37 +211,26 @@ void renderCatmullRomCurve(vector<Point> p) {
 	}*/
 }
 
-void catmullRomCurveMovement(float gt, vector<Point> p){
+void catmullRomCurveMovement(GLfloat gt, vector<Point> p){
 
-	GLfloat pos[3], der[3], r[3], up[3];
+	Point pos, der, r, up, b = { 0, 1, 0 };
 
-	Point aux;
+	pos=getGlobalCatmullRomPoint(gt, p);
 
-	aux=getGlobalCatmullRomPoint(gt, p);
-	pos[0] = aux.x;
-	pos[1] = aux.y;
-	pos[2] = aux.z;
+	der=getDerivada(gt, p);
 
-	aux=getDerivada(gt, p);
-	der[0] = aux.x;
-	der[1] = aux.y;
-	der[2] = aux.z;
+	r=prodVectorial(der, b);
 
-	float b[3] = { 0, 1, 0 };
+	up=prodVectorial(r, der);
 
-	prodVectorial(der, b, r);
+	der=normalizeVector(der);
+	up=normalizeVector(up);
+	r=normalizeVector(r);
 
-	prodVectorial(r, der, up);
-
-
-	normalizeVector(der);
-	normalizeVector(up);
-	normalizeVector(r);
-
-	float matriz[16] = { der[0], der[1], der[2], 0,
-		up[0], up[1], up[2], 0,
-		r[0], r[1], r[2], 0,
-		pos[0], pos[1], pos[2], 1.0f };
+	GLfloat matriz[16] = { der.x, der.y, der.z, 0,
+		up.x, up.y, up.z, 0,
+		r.x, r.y, r.z, 0,
+		pos.x, pos.y, pos.z, 1.0f };
 
 	renderCatmullRomCurve(p);
 	glMultMatrixf(matriz);
