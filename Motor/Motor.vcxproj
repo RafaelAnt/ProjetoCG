@@ -42,8 +42,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Libraries\headers;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Libraries\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\toolkits\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\toolkits\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -83,11 +83,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CatmullRom.cpp" />
     <ClCompile Include="Utils.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="tinyxml2.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CatmullRom.h" />
     <ClInclude Include="Utils.h" />
     <ClInclude Include="tinyxml2.h" />
   </ItemGroup>

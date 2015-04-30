@@ -5,6 +5,7 @@
 #include <vector>
 #include "tinyxml2.h"
 #include "Utils.h"
+#include "CatmullRom.h"
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <GL/GLUT.h>
@@ -18,39 +19,15 @@ tinyxml2::XMLDocument xmlDoc;
 bool loaded = false;
 GLuint *vbo;
 vector<int> sizes;
-// catmull-rom matrix
-float m[4][4] = { { -0.5f, 1.5f, -1.5f, 0.5f },
-{ 1.0f, -2.5f, 2.0f, -0.5f },
-{ -0.5f, 0.0f, 0.5f, 0.0f },
-{ 0.0f, 1.0f, 0.0f, 0.0f } };
 
 
-void getCatmullRomPoint(float t, int *indices, vector<Point> p) {
-	
-	Point p1=p[0], p2=p[1], p3=p[2], p4=p[3];
-
-	Point res = { 0, 0, 0 };
-
-	/*METER AQUI A ANDAR A RODA A RODA COMO AS RATAZANAS*/
-}
 
 
-//dado um t global calcular o ponto na curva
-void catmullRomCurveMovement(float gt, vector<Point> p) {
 
-	int POINT_COUNT = p.size();
 
-	float t = gt * POINT_COUNT; //obter t global verdadeiro
-	int index = floor(t);  //segmento
-	t = t - index; //posição no segmento
 
-	//obter os indices dos nossos pontos de controlo
-	int indices[4];
-	indices[0] = (index + POINT_COUNT - 1) % POINT_COUNT;	indices[1] = (indices[0] + 1) % POINT_COUNT;
-	indices[2] = (indices[1] + 1) % POINT_COUNT; indices[3] = (indices[2] + 1) % POINT_COUNT;
 
-	getCatmullRomPoint(t, indices, p);
-}
+
 
 //proot é o grupo a desenhar
 static void drawNode(tinyxml2::XMLNode *pRoot, map<string, int> models){
