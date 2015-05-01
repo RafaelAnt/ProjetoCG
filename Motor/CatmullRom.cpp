@@ -253,7 +253,7 @@ void catmullRomCurveMovement(GLfloat gt, vector<Point> p){
 
 #define POINT_COUNT 5
 // Points that make up the loop for catmull-rom interpolation
-float p[POINT_COUNT][3] = { { -1, -1, 0.5 }, { -1, 1, 0 }, { 1, 1.5, 0 }, { 2, 0, -1.5 }, { 1, -1, 0 } };
+float p[POINT_COUNT][3] = { { -1, -1, 0 }, { -1, 1, 0 }, { 1, 1, 0 }, { 0, 0, 0 }, { 1, -1, 0 } };
 
 
 
@@ -270,6 +270,8 @@ void normalizeVector(float vec[]);
 
 
 void catmullRomCurveMovement(float gt, vector<Point> pontos){
+
+	//printf("GT: %f\n", gt);
 
 	/*POINT_COUNT = pontos.size();
 
@@ -295,6 +297,12 @@ void catmullRomCurveMovement(float gt, vector<Point> pontos){
 	normalizeVector(up);
 	normalizeVector(r);
 
+	float matrizTeaPot[16] = { der[0], der[1], der[2], 0,
+		up[0], up[1], up[2], 0,
+		r[0], r[1], r[2], 0,
+		pos[0], pos[1], pos[2], 1.0f };
+
+
 	//desenhar eixo vertical
 	glBegin(GL_LINES);
 		glColor3f(1, 0, 0);
@@ -303,15 +311,25 @@ void catmullRomCurveMovement(float gt, vector<Point> pontos){
 		glColor3f(1, 1, 1);
 	glEnd();
 
-	float matrizTeaPot[16] = { der[0], der[1], der[2], 0,
-		up[0], up[1], up[2], 0,
-		r[0], r[1], r[2], 0,
-		pos[0], pos[1], pos[2], 1.0f };
+	//desenhar eixo vertical
+	glBegin(GL_LINES);
+		glColor3f(0, 1, 0);
+		glVertex3f(pos[0], pos[1], pos[2]);
+		glVertex3f(pos[0] + der[0], pos[1] + der[1], pos[2] + der[2]);
+		glColor3f(1, 1, 1);
+	glEnd();
 
+
+	//desenhar eixo vertical
+	glBegin(GL_LINES);
+		glColor3f(0, 0, 1);
+		glVertex3f(pos[0], pos[1], pos[2]);
+		glVertex3f(pos[0] + r[0], pos[1] + r[1], pos[2] + r[2]);
+		glColor3f(1, 1, 1);
+	glEnd();
 
 	glMultMatrixf(matrizTeaPot);
-
-
+	//glutWireTeapot(0.1);
 }
 
 
@@ -322,21 +340,25 @@ void renderCatmullRomCurve() {
 	float res[3];
 	float vec[3];
 
+	glColor3f(1, 1, 1);
 	glBegin(GL_LINE_LOOP);
-	for (float f = 0; f < 1; f += 0.01){
-		getGlobalCatmullRomPoint(f, res);
-		glVertex3f(res[0], res[1], res[2]);
-	}
+		for (float f = 0; f < 1; f += 0.01){
+			getGlobalCatmullRomPoint(f, res);
+			glVertex3f(res[0], res[1], res[2]);
+		}
 	glEnd();
 
+	/*glColor3f(0.25, 0.25, 0.25);
 	for (float f = 0; f < 1; f += 0.01){
 		glBegin(GL_LINES);
-		getGlobalCatmullRomPoint(f, res);
-		glVertex3f(res[0], res[1], res[2]);
-		getDerivada(f, vec);
-		glVertex3f(res[0] + vec[0], res[1] + vec[1], res[2] + vec[2]);
+		
+			getGlobalCatmullRomPoint(f, res);
+			glVertex3f(res[0], res[1], res[2]);
+			getDerivada(f, vec);
+			glVertex3f(res[0] + vec[0], res[1] + vec[1], res[2] + vec[2]);
 		glEnd();
 	}
+	glColor3f(1, 1, 1);*/
 }
 
 

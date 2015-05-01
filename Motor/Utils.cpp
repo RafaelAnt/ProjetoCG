@@ -94,6 +94,7 @@ static void drawNode(tinyxml2::XMLNode *pRoot, map<string, int> models){
 				}
 				//colocar o tempo decorrido na timescale desejada
 				catmullRomCurveMovement(glutGet(GLUT_ELAPSED_TIME) / (tempo * 1000), pontos);
+				//glPopMatrix();
 			}
 			trans = true;
 		}
