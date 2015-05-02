@@ -107,7 +107,7 @@ Point getCatmullRomPoint(float t, int *indices, vector<Point> p) {
 
 void catmullRomCurveMovement(GLfloat gt, vector<Point> p){
 
-	Point pos, der, r, up, b = { 0, 1, 0 };
+	Point pos, b = { 0, 1, 0 };
 
 	pos = getGlobalCatmullRomPoint(gt, p);
 
