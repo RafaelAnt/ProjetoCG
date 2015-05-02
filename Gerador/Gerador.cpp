@@ -456,7 +456,7 @@ void drawBezierPatchesXML(vector<Point> vertices, vector<vector<unsigned int>> i
 			float u = 1.0 * ru / (resu - 1);
 			for (int rv = 0; rv <= resv - 1; rv++) {
 				float v = 1.0 * rv / (resv - 1);
-				vertices_res[p*resu*resv + ru*resv + rv]=getBezierPoint(pontos_control, u, v);
+				vertices_res[p*resu*resv + ru*resv + rv] = getBezierPoint(pontos_control, u, v);
 			}
 		}
 	}
@@ -467,15 +467,15 @@ void drawBezierPatchesXML(vector<Point> vertices, vector<vector<unsigned int>> i
 	for (int p = 0; p < indices.size(); p++) {
 		for (int ru = 0; ru < resu - 1; ru++){
 			for (int rv = 0; rv < resv - 1; rv++) {
-				// 1 square ABCD = 2 triangles ABC + CDA
-				// ABC
-				indices_tri.push_back(p*resu*resv + ru   *resv + rv);
+				// 1 square ABCD = 2 triangles CBA + ADC (CCW!!)
+				// CBA
+				indices_tri.push_back(p*resu*resv + (ru + 1)*resv + (rv + 1));
 				indices_tri.push_back(p*resu*resv + ru   *resv + (rv + 1));
-				indices_tri.push_back(p*resu*resv + (ru + 1)*resv + (rv + 1));
-				// CDA
-				indices_tri.push_back(p*resu*resv + (ru + 1)*resv + (rv + 1));
-				indices_tri.push_back(p*resu*resv + (ru + 1)*resv + rv);
 				indices_tri.push_back(p*resu*resv + ru   *resv + rv);
+				// ADC
+				indices_tri.push_back(p*resu*resv + ru   *resv + rv);
+				indices_tri.push_back(p*resu*resv + (ru + 1)*resv + rv);
+				indices_tri.push_back(p*resu*resv + (ru + 1)*resv + (rv + 1)); 
 			}
 		}
 	}
