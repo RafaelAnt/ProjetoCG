@@ -1,5 +1,5 @@
 #define _USE_MATH_DEFINES
-#include <math.h>
+#include <cmath>
 #include <stdio.h>
 #include "tinyxml2.h"
 #include <sstream>
@@ -166,32 +166,32 @@ void drawSphereXML(float r, int stacks, int slices, char *filename){
 	xmlDoc.InsertFirstChild(pRoot);
 	int t, p;
 	for (t = 0; t < stacks; t++){ // stacks -> theta (theta é PI porque é na vertical (180º)
-		float theta1 = ((float)(t) / stacks)*M_PI;
-		float theta2 = ((float)(t + 1) / stacks)*M_PI;
+		float theta1 = ((float)(t) / stacks)*(float)M_PI;
+		float theta2 = ((float)(t + 1) / stacks)*(float)M_PI;
 
 		for (p = 0; p < slices; p++){ // slices -> phi
-			double phi1 = ((float)(p) / slices) * 2 * M_PI; // (phi é 2PI porque é na horizontal, tem que ser à volta da esfera
-			double phi2 = ((float)(p + 1) / slices) * 2 * M_PI; // toda, ou seja, 360º = 2PI
+			float phi1 = ((float)(p) / slices) * 2 * (float)M_PI; // (phi é 2PI porque é na horizontal, tem que ser à volta da esfera
+			float phi2 = ((float)(p + 1) / slices) * 2 * (float)M_PI; // toda, ou seja, 360º = 2PI
 
 			Point vertex1;
-			vertex1.x = r*sin(theta1)*cos(phi1);
-			vertex1.y = r*sin(theta1)*sin(phi1);
-			vertex1.z = r*cos(theta1);
+			vertex1.x = (float)r*sin(theta1)*cos(phi1);
+			vertex1.y = (float)r*sin(theta1)*sin(phi1);
+			vertex1.z = (float)r*cos(theta1);
 
 			Point vertex2;
-			vertex2.x = r*sin(theta1)*cos(phi2);
-			vertex2.y = r*sin(theta1)*sin(phi2);
-			vertex2.z = r*cos(theta1);
+			vertex2.x = (float)r*sin(theta1)*cos(phi2);
+			vertex2.y = (float)r*sin(theta1)*sin(phi2);
+			vertex2.z = (float)r*cos(theta1);
 
 			Point vertex3;
-			vertex3.x = r*sin(theta2)*cos(phi2);
-			vertex3.y = r*sin(theta2)*sin(phi2);
-			vertex3.z = r*cos(theta2);
+			vertex3.x = (float)r*sin(theta2)*cos(phi2);
+			vertex3.y = (float)r*sin(theta2)*sin(phi2);
+			vertex3.z = (float)r*cos(theta2);
 
 			Point vertex4;
-			vertex4.x = r*sin(theta2)*cos(phi1);
-			vertex4.y = r*sin(theta2)*sin(phi1);
-			vertex4.z = r*cos(theta2);
+			vertex4.x = (float)r*sin(theta2)*cos(phi1);
+			vertex4.y = (float)r*sin(theta2)*sin(phi1);
+			vertex4.z = (float)r*cos(theta2);
 
 			if (t == 0){//camada inicial
 				writeTriangleToXML(pRoot, vertex1, vertex3, vertex4);
@@ -215,7 +215,7 @@ void drawCylinderXML(float height, float radius, int stacks, int slices, char *f
 	XMLNode * pRoot = xmlDoc.NewElement("cilindro");
 	xmlDoc.InsertFirstChild(pRoot);
 
-	float pi = 3.1415f, h1, h2 = 0;
+	float pi = 3.1415f;
 
 	//Ciclo que gera base superior
 	for (float i = 0; i < 2 * pi; i += 2 * pi / slices) {
@@ -328,7 +328,7 @@ void drawConeXML(float height, float radius, int stacks, int slices, char *filen
 	XMLNode * pRoot = xmlDoc.NewElement("cone");
 	xmlDoc.InsertFirstChild(pRoot);
 
-	float pi = 3.1415f, h1, h2 = 0;
+	float pi = 3.1415f;
 
 	//Ciclo que gera base inferior
 	for (float i = 0; i < 2 * pi; i += 2 * pi / slices) {
@@ -445,22 +445,21 @@ void drawPlaneXML(float largura, float altura, char *filename){
 
 }
 
-void drawBezierPatchesXML(vector<Point> vertices, vector<vector<unsigned int>> indices, int resu, int resv, char *filename){
+void drawBezierPatchesXML(vector<Point> vertices, vector<vector<unsigned int>> indices, unsigned int resu, unsigned int resv, char *filename){
 	vector<Patch> vertices_res;
 	Point pontos_control[NM + 1][NM + 1];
-	float res[3];
-	for (int p = 0; p < indices.size(); p++) {
+	for (unsigned int p = 0; p < indices.size(); p++) {
 		makeControlPoints(p, pontos_control, vertices, indices);
 		//matriz com os pontos ao longo de u e v
 		Patch patch(resu);
-		for (int ru = 0; ru <= resu - 1; ru++) {
+		for (unsigned int ru = 0; ru <= resu - 1; ru++) {
 			//colocar u entre 0 e 1
-			float u = 1.0 * ru / (resu - 1);
+			float u = ru / (float)(resu - 1);
 			//alocar espaço
 			patch[ru].resize(resv);
-			for (int rv = 0; rv <= resv - 1; rv++) {
+			for (unsigned int rv = 0; rv <= resv - 1; rv++) {
 				//colocar v entre 0 e 1
-				float v = 1.0 * rv / (resv - 1);
+				float v = rv / (float)(resv - 1);
 				patch[ru][rv] = getBezierPoint(pontos_control, u, v);
 			}
 		}
@@ -472,9 +471,9 @@ void drawBezierPatchesXML(vector<Point> vertices, vector<vector<unsigned int>> i
 	XMLNode * pRoot = xmlDoc.NewElement("beziersurface");
 	xmlDoc.InsertEndChild(pRoot);
 	Point a, b, c, d;
-	for (int p = 0; p < indices.size(); p++) {
-		for (int ru = 0; ru < resu - 1; ru++){
-			for (int rv = 0; rv < resv - 1; rv++) {
+	for (unsigned int p = 0; p < indices.size(); p++) {
+		for (unsigned int ru = 0; ru < resu - 1; ru++){
+			for (unsigned int rv = 0; rv < resv - 1; rv++) {
 				// 1 square ABCD = 2 triangles CBA + ADC
 				a = vertices_res[p][ru][rv];
 				b = vertices_res[p][ru][rv + 1];
@@ -494,8 +493,7 @@ void readBezierFile(string filename, vector<vector<unsigned int>> &indices, vect
 	int i = 0, j;
 	string line;
 	string token;
-	float nindices, npontos, auxa, auxb, auxc;
-	unsigned int a;
+	float nindices, npontos;
 	float aux[3];
 	ifstream file(filename);
 	if (file.is_open()){
@@ -508,8 +506,6 @@ void readBezierFile(string filename, vector<vector<unsigned int>> &indices, vect
 		for (i = 1; i <= nindices + 1; i++) {
 			vector<unsigned int> v;
 			getline(file, line);
-			//cout << line;
-			//printf("\n");
 			stringstream ss(line);
 			while (getline(ss, token, ',')) {
 				//indices começam a 1 em vez de 0
@@ -525,14 +521,11 @@ void readBezierFile(string filename, vector<vector<unsigned int>> &indices, vect
 			ponto f;
 			getline(file, line);
 			stringstream ss(line);
-			//cout << line;
-			//printf("\n");
 			j = 0;
 			while (getline(ss, token, ',')) {
-				aux[j] = atof(token.c_str());
+				aux[j] = (float)atof(token.c_str());
 				j++;
 			}
-			//printf("%f %f %f \n",aux[0],aux[1],aux[2]);
 			f.x = aux[0];
 			f.y = aux[1];
 			f.z = aux[2];
@@ -544,8 +537,6 @@ void readBezierFile(string filename, vector<vector<unsigned int>> &indices, vect
 }
 
 int main(int argc, char **argv){
-	int stacks, slices;
-	float radius;
 	if (argc > 1){
 		if (strcmp(argv[1], "esfera") == 0){
 			if (argc == 6){
@@ -577,7 +568,7 @@ int main(int argc, char **argv){
 		}
 		else if (strcmp(argv[1], "paralelepipedo") == 0){
 			if (argc == 6){
-				drawParallelpipedXML(atof(argv[2]), atof(argv[3]), atof(argv[4]), argv[5]);
+				drawParallelpipedXML((float)atof(argv[2]), (float)atof(argv[3]), (float)atof(argv[4]), argv[5]);
 				printf("Paralelepipedo gravado em %s com %Lf de largura, %Lf de altura e %Lf de comprimento.\n", argv[5], atof(argv[2]), atof(argv[3]), atof(argv[4]));
 			}
 			else{
@@ -595,7 +586,7 @@ int main(int argc, char **argv){
 		}
 		else if (strcmp(argv[1], "plano") == 0){
 			if (argc == 5){
-				drawPlaneXML(atof(argv[2]), atof(argv[3]), argv[4]);
+				drawPlaneXML((float)atof(argv[2]), (float)atof(argv[3]), argv[4]);
 				printf("Plano gravado em %s com %Lf de largura e %Lf de altura.\n", argv[4], atof(argv[2]), atof(argv[3]));
 			}
 			else{
@@ -607,7 +598,11 @@ int main(int argc, char **argv){
 				vector<vector<unsigned int>> indices;
 				vector<Point> vertices;
 				readBezierFile(argv[2], indices, vertices);
-				drawBezierPatchesXML(vertices, indices, 10, 10, argv[3]);
+				int resu = atoi(argv[3]);
+				int resv = atoi(argv[4]);
+				if (resu < 0 || resv < 0)
+					puts("Resoluções inválidas! Número inteiros positivos apenas!");
+				drawBezierPatchesXML(vertices, indices,resu, resv, argv[5]);
 			}
 		}
 		else{
