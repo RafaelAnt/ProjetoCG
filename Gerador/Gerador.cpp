@@ -594,7 +594,7 @@ int main(int argc, char **argv){
 			}
 		}
 		else if (strcmp(argv[1], "bezier") == 0){
-			if (argc == 4){
+			if (argc == 6){
 				vector<vector<unsigned int>> indices;
 				vector<Point> vertices;
 				readBezierFile(argv[2], indices, vertices);
@@ -603,6 +603,10 @@ int main(int argc, char **argv){
 				if (resu < 0 || resv < 0)
 					puts("Resoluções inválidas! Número inteiros positivos apenas!");
 				drawBezierPatchesXML(vertices, indices,resu, resv, argv[5]);
+				printf("Modelo gravado em %s", argv[5]);
+			}
+			else{
+				puts("Erro nos argumentos!");
 			}
 		}
 		else{
