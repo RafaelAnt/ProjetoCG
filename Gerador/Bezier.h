@@ -12,6 +12,8 @@ typedef struct ponto{
 	float z;
 }Point;
 
+typedef vector<vector<Point>> Patch;
+
 Point getBezierPoint(Point pontos_control[][NM+1], float u, float v);
 void makeControlPoints(int patch, Point pontos_control[][NM+1], vector<Point> vertices, vector<vector<unsigned int>> indices);
 

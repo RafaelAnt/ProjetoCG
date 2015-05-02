@@ -444,48 +444,48 @@ void drawPlaneXML(float largura, float altura, char *filename){
 	xmlDoc.SaveFile(filename);
 
 }
-using namespace std;
 
 void drawBezierPatchesXML(vector<Point> vertices, vector<vector<unsigned int>> indices, int resu, int resv, char *filename){
-	Point *vertices_res = new Point[indices.size()*resu*resv];
+	vector<Patch> vertices_res;
 	Point pontos_control[NM + 1][NM + 1];
 	float res[3];
 	for (int p = 0; p < indices.size(); p++) {
 		makeControlPoints(p, pontos_control, vertices, indices);
+		//matriz com os pontos ao longo de u e v
+		Patch patch(resu);
 		for (int ru = 0; ru <= resu - 1; ru++) {
+			//colocar u entre 0 e 1
 			float u = 1.0 * ru / (resu - 1);
+			//alocar espaço
+			patch[ru].resize(resv);
 			for (int rv = 0; rv <= resv - 1; rv++) {
+				//colocar v entre 0 e 1
 				float v = 1.0 * rv / (resv - 1);
-				vertices_res[p*resu*resv + ru*resv + rv] = getBezierPoint(pontos_control, u, v);
+				patch[ru][rv] = getBezierPoint(pontos_control, u, v);
 			}
 		}
+		vertices_res.push_back(patch);
 	}
 
-	//obter indices triangulos
-	vector<unsigned int> indices_tri;
-	int n = 0;
-	for (int p = 0; p < indices.size(); p++) {
-		for (int ru = 0; ru < resu - 1; ru++){
-			for (int rv = 0; rv < resv - 1; rv++) {
-				// 1 square ABCD = 2 triangles CBA + ADC (CCW!!)
-				// CBA
-				indices_tri.push_back(p*resu*resv + (ru + 1)*resv + (rv + 1));
-				indices_tri.push_back(p*resu*resv + ru   *resv + (rv + 1));
-				indices_tri.push_back(p*resu*resv + ru   *resv + rv);
-				// ADC
-				indices_tri.push_back(p*resu*resv + ru   *resv + rv);
-				indices_tri.push_back(p*resu*resv + (ru + 1)*resv + rv);
-				indices_tri.push_back(p*resu*resv + (ru + 1)*resv + (rv + 1)); 
-			}
-		}
-	}
 	//guardar no xml
 	using namespace tinyxml2;
 	XMLNode * pRoot = xmlDoc.NewElement("beziersurface");
 	xmlDoc.InsertEndChild(pRoot);
-
-	for (int i = 0; i < indices_tri.size(); i += 3){
-		writeTriangleToXML(pRoot, vertices_res[indices_tri[i]], vertices_res[indices_tri[i + 1]], vertices_res[indices_tri[i + 2]]);
+	Point a, b, c, d;
+	for (int p = 0; p < indices.size(); p++) {
+		for (int ru = 0; ru < resu - 1; ru++){
+			for (int rv = 0; rv < resv - 1; rv++) {
+				// 1 square ABCD = 2 triangles CBA + ADC
+				a = vertices_res[p][ru][rv];
+				b = vertices_res[p][ru][rv + 1];
+				c = vertices_res[p][ru + 1][rv + 1];
+				d = vertices_res[p][ru+1][rv];
+				// CBA
+				writeTriangleToXML(pRoot, c, b, a);
+				// ADC
+				writeTriangleToXML(pRoot, a, d, c);
+			}
+		}
 	}
 	xmlDoc.SaveFile(filename);
 }
