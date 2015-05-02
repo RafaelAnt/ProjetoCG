@@ -37,31 +37,31 @@ Point getBezierPoint(Point pontos[][NM + 1], float u, float v) {
 	float V[4] = { v*v*v, v*v, v, 1 };
 
 	float M[4][4] = {
-			{ -1, 3 ,-3, 1 },
-			{ 3, -6, 3, 0 },
-			{ -3, 3, 0, 0 },
-			{ 1, 0, 0, 0 }
+		{ -1, 3, -3, 1 },
+		{ 3, -6, 3, 0 },
+		{ -3, 3, 0, 0 },
+		{ 1, 0, 0, 0 }
 	};
 
 	float Px[4][4] = {
-			{ pontos[0][0].x, pontos[0][1].x, pontos[0][2].x, pontos[0][3].x },
-			{ pontos[1][0].x, pontos[1][1].x, pontos[1][2].x, pontos[1][3].x },
-			{ pontos[2][0].x, pontos[2][1].x, pontos[2][2].x, pontos[2][3].x },
-			{ pontos[3][0].x, pontos[3][1].x, pontos[3][2].x, pontos[3][3].x }
+		{ pontos[0][0].x, pontos[0][1].x, pontos[0][2].x, pontos[0][3].x },
+		{ pontos[1][0].x, pontos[1][1].x, pontos[1][2].x, pontos[1][3].x },
+		{ pontos[2][0].x, pontos[2][1].x, pontos[2][2].x, pontos[2][3].x },
+		{ pontos[3][0].x, pontos[3][1].x, pontos[3][2].x, pontos[3][3].x }
 	};
 
 	float Py[4][4] = {
-			{ pontos[0][0].y, pontos[0][1].y, pontos[0][2].y, pontos[0][3].y },
-			{ pontos[1][0].y, pontos[1][1].y, pontos[1][2].y, pontos[1][3].y },
-			{ pontos[2][0].y, pontos[2][1].y, pontos[2][2].y, pontos[2][3].y },
-			{ pontos[3][0].y, pontos[3][1].y, pontos[3][2].y, pontos[3][3].y }
+		{ pontos[0][0].y, pontos[0][1].y, pontos[0][2].y, pontos[0][3].y },
+		{ pontos[1][0].y, pontos[1][1].y, pontos[1][2].y, pontos[1][3].y },
+		{ pontos[2][0].y, pontos[2][1].y, pontos[2][2].y, pontos[2][3].y },
+		{ pontos[3][0].y, pontos[3][1].y, pontos[3][2].y, pontos[3][3].y }
 	};
 
 	float Pz[4][4] = {
-			{ pontos[0][0].z, pontos[0][1].z, pontos[0][2].z, pontos[0][3].z },
-			{ pontos[1][0].z, pontos[1][1].z, pontos[1][2].z, pontos[1][3].z },
-			{ pontos[2][0].z, pontos[2][1].z, pontos[2][2].z, pontos[2][3].z },
-			{ pontos[3][0].z, pontos[3][1].z, pontos[3][2].z, pontos[3][3].z }
+		{ pontos[0][0].z, pontos[0][1].z, pontos[0][2].z, pontos[0][3].z },
+		{ pontos[1][0].z, pontos[1][1].z, pontos[1][2].z, pontos[1][3].z },
+		{ pontos[2][0].z, pontos[2][1].z, pontos[2][2].z, pontos[2][3].z },
+		{ pontos[3][0].z, pontos[3][1].z, pontos[3][2].z, pontos[3][3].z }
 	};
 
 	float aux[4];
