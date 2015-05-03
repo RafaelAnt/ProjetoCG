@@ -124,8 +124,12 @@ static void drawNode(tinyxml2::XMLNode *pRoot, map<string, int> models){
 			aux->QueryFloatAttribute("eixoZ", &r.z);
 			if (r.angle > 0)
 				glRotatef(r.angle, r.x, r.y, r.z);
-			else if (r.time > 0)
-				glRotatef((360)*(glutGet(GLUT_ELAPSED_TIME) / (r.time * 1000)), r.x, r.y, r.z);
+			else if (r.time > 0){
+				//calcular velocidade angular em graus/milisegundo
+				GLfloat velAngular = 360.0 / (r.time * 1000);
+				//angulo a percorrer = velAngular * t
+				glRotatef(velAngular * glutGet(GLUT_ELAPSED_TIME), r.x, r.y, r.z);
+			}
 			rot = true;
 		}
 		//avaliar proximo elemento
