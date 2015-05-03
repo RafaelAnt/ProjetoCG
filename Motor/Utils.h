@@ -51,18 +51,18 @@ typedef struct scale{
 void drawScene(char *filename, map<string, int> models);
 
 /*
-	Desenha um conjunto de vértices em modo imeadiato. De notar o vetor deve ter um cojunto de triângulos.
-	3 pontos de cada vez.
+	Desenha os vértices armazenados no buffer correspondente.
 */
 void drawVertices(int vboIndex);
 
 /*
 	Função que analisa o ficheiro XML e determina os modelos a desenhar
 	Em caso de problemas, irão ser atiradas as respetivas excepções (ficheiro XML inválido, modelo inexistente, etc)
-	A função preenche um vetor com os nomes dos modelos referenciados pelo XML, e irá preparar os vetores que irão
-	guardar os seus vértices.
-	Os modelos serão retornados num vetor de vetores de vértices. Cada vetor de vértices é um modelo.
+	A função guarda todos os modelos em memória inicializando os VBOs.
+	A função retorna um map que associa o modelo ao respetivo indice do buffer em que ficou armazenado.
 */
 map<string, int> prepareModels(char *filename);
+
+void exceptionHandler(int e);
 
 #endif

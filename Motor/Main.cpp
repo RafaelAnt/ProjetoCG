@@ -61,14 +61,8 @@ void renderScene(void) {
 	
 	try{ drawScene(sceneName,models); }
 	catch (int e){
-		if (e == CG_REPEATED_MODELS){
-			puts("Transformações duplicadas! Corriga a cena!");
-			exit(-1);
-		}
-		if (e == CG_REPEATED_MODELS){
-			puts("Grupo modelos repetido ou não presente no fim! Corriga a cena!");
-			exit(-1);
-		}
+		exceptionHandler(e);
+		exit(-1);
 	}
 	// fim do frame
 	glutSwapBuffers();
@@ -126,8 +120,6 @@ void menu(int op){
 	glutPostRedisplay();
 }
 
-
-
 void createMenu(){
 	glutCreateMenu(menu);
 	glutAddMenuEntry("Linha", 1);
@@ -171,21 +163,7 @@ int main(int argc, char **argv) {
 
 	try{ models = prepareModels(sceneName); }
 	catch (int e){
-		if (e == 21){
-			puts("Erro na leitura da cena, XML parsing error!");
-		}
-		else if (e == CG_INVALID_MODELS){
-			puts("Erro na leitura de um dos modelos!");
-		}
-		else if (e == 20){
-			puts("Erro!! ");
-		}
-		else if (e == 1){
-			puts("Erro! Triângulos malformados!!");
-		}
-		else{
-			puts("Erro na leitura dos triangulos, excepcao não tratada!");
-		}
+		exceptionHandler(e);
 		return -1;
 	}
 

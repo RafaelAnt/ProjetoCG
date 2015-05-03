@@ -20,6 +20,40 @@ bool loaded = false;
 GLuint *vbo;
 vector<int> sizes;
 
+void exceptionHandler(int e){
+	if (e == CG_CURVE_INVALID_TIME){
+		puts("Tempo de movimento da curva inválido! Inteiros positivos apenas!");
+	}
+	else if (e == CG_INVALID_MODELS){
+		puts("Erro na leitura de um dos modelos!");
+	}
+	else if (e == CG_DRAW_WITHOUT_LOAD){
+		puts("Erro!! A aplicação tentou desenhar modelos sem os carregar!!");
+		puts("ISTO N E SUPOSTO ACONTECER.");
+	}
+	else if (e == CG_INVALID_MODELS){
+		puts("Erro!! Os modelos estão inválidos!!");
+	}
+	else if (e == CG_NO_XML_NODES){
+		puts("A CENA NÃO POSSUI NODOS XML!!");
+	}
+	else if (e == CG_REPEATED_MODELS){
+		puts("Erro!! Apenas pode existir um zona de modelos por grupo!!");
+	}
+	else if (e == CG_REPEATED_TRANSFORM){
+		puts("Erro!! Apenas pode existir uma transformação de cada tipo por grupo!!");
+	}
+	else if (e == CG_ROTATION_INVALID_TIME){
+		puts("Tempo de rotação inválido! Inteiros positivos apenas!");
+	}
+	else if (e == CG_XML_PARSE_ERROR){
+		puts("Erro de parsing do XML!");
+	}
+	else{
+		puts("UNHANDLED EXCEPTION! ABORT");
+	}
+}
+
 //proot é o grupo a desenhar
 static void drawNode(tinyxml2::XMLNode *pRoot, map<string, int> models){
 	//se null, fazer pop (chegamos ao fim da hierarquia)
