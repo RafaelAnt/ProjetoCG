@@ -250,8 +250,6 @@ static void auxPrepare(map<string, vector<GLfloat>> *modelos, tinyxml2::XMLNode 
 	*/
 map<string, int> prepareModels(char *filename){
 	using namespace tinyxml2;
-	//Map que vai armazenar os modelos
-	map<string, vector<GLfloat>> modelos;
 	//Carregar o ficheiro xml
 	XMLError eResult = xmlDoc.LoadFile(filename);
 	loaded = true;
@@ -273,20 +271,36 @@ map<string, int> prepareModels(char *filename){
 	if (pRoot == NULL){
 		throw CG_NO_XML_NODES; //ficheiro inválido
 	}
-	//obter os modelos
+	//Map que vai armazenar os modelos
+	map<string, vector<GLfloat>> modelos;
+	//obter os modelos, auxPrepare analisa a cena XML
+	//e preenche o map com todos os modelos (sem repetições!)
 	auxPrepare(&modelos, pRoot);
 
+	//inicializar buffers
 	vbo = new GLuint[modelos.size()];
 	glGenBuffers(modelos.size(), vbo);
+	//map que irá associar nome de modelo ao número do buffer
 	map<string, int> vboIndex;
+	//tipo do iterador
 	typedef map<string, vector<GLfloat>>::iterator it_type;
+	//inicializar indice
 	int index = 0;
+	//para todos os modelos obtidos criar um buffer
 	for (it_type iterator = modelos.begin(); iterator != modelos.end(); iterator++) {
+		//vértices do modelo
 		vector<GLfloat> vec = iterator->second;
+		//associar nome do modelo ao número do vbo
 		vboIndex[iterator->first] = index;
+		//atualizar vetor de tamanhos, para que na altura do 
+		//desenho se saiba o numero de triangulos a desenhar
 		sizes.push_back(vec.size());
-		glBindBuffer(GL_ARRAY_BUFFER, vbo[index++]);
+		//fazer bind do buffer
+		glBindBuffer(GL_ARRAY_BUFFER, vbo[index]);
+		//guardar vértices do modelo no buffer
 		glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*vec.size(), &vec[0], GL_STATIC_DRAW);
+		//atualizar indice do buffer para a proxima iteração
+		index++;
 	}
 	return vboIndex;
 }
