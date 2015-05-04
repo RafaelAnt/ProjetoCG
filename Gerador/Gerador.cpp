@@ -478,7 +478,7 @@ void drawBezierPatchesXML(vector<Point> vertices, vector<vector<unsigned int>> i
 	for (unsigned int p = 0; p < indices.size(); p++) {
 		for (unsigned int ru = 0; ru < resu - 1; ru++){
 			for (unsigned int rv = 0; rv < resv - 1; rv++) {
-				// 1 square ABCD = 2 triangles CBA + ADC
+				// 1 quadrado ABCD = 2 triangles CBA + ADC
 				a = vertices_res[p][ru][rv];
 				b = vertices_res[p][ru][rv + 1];
 				c = vertices_res[p][ru + 1][rv + 1];
