@@ -15,11 +15,13 @@ using namespace std;
 
 #pragma comment(lib, "glew32.lib")
 
-/* Esta variável irá conter todos os modelos a desenhar*/
+//modelos e indices do vbo
 static map<string, int> models;
-static char* sceneName;
 
-/* Variáveis da camara, começa a 5 unidades de distância da origem */
+//nome da cena que está a ser utilizada
+static char *sceneName;
+
+//controlo da camara
 static float alfa = 0, beta = 0, raio = 10, step = 0.02;
 
 

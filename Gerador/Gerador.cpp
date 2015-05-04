@@ -449,18 +449,22 @@ bool drawBezierPatchesXML(vector<Point> vertices, vector<vector<unsigned int>> i
 	vector<Patch> vertices_res;
 	Point pontos_control[NM + 1][NM + 1];
 	for (unsigned int p = 0; p < indices.size(); p++) {
+		//obter pontos de controlo para este patch
 		makeControlPoints(p, pontos_control, vertices, indices);
-		//matriz com os pontos ao longo de u e v
+		/*matriz com os pontos ao longo de u e v
+		esta matriz é uma grelha com todos os pontos
+		da superficie de bezier com resu colunas e resvv linhas*/
 		Patch patch(resu);
+		//superficies de bezier contem curvas de bezier ao longo de
+		//u e v, teremos que as percorrer e obter todos os pontos resultantes
 		for (unsigned int ru = 0; ru <= resu - 1; ru++) {
 			//colocar u entre 0 e 1
 			float u = ru / (float)(resu - 1);
-			//alocar espaço
-			patch[ru].resize(resv);
 			for (unsigned int rv = 0; rv <= resv - 1; rv++) {
 				//colocar v entre 0 e 1
 				float v = rv / (float)(resv - 1);
-				patch[ru][rv] = getBezierPoint(pontos_control, u, v);
+				//adicionar ponto no fim desta linha, posição (ru,rv)
+				patch[ru].push_back(getBezierPoint(pontos_control, u, v));
 			}
 		}
 		vertices_res.push_back(patch);
