@@ -69,8 +69,6 @@ Point getBezierPoint(Point pontos[][NM + 1], float u, float v) {
 
 	//definir o ponto x
 	MMult1x4By4x4(U, M, aux);
-	printf(" U %f %f %f %f%f\n", U[0], U[1], U[2], U[3]);
-	printf(" aux %f %f %f %f\n", aux[0], aux[1], aux[2], aux[3]);
 	MMult1x4By4x4(aux, Px, aux2);
 	MMult1x4By4x4(aux2, M, aux);
 	res.x = MMult1x4By4x1(aux, V);

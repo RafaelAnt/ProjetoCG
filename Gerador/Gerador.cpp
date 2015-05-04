@@ -445,7 +445,7 @@ void drawPlaneXML(float largura, float altura, char *filename){
 
 }
 
-void drawBezierPatchesXML(vector<Point> vertices, vector<vector<unsigned int>> indices, unsigned int resu, unsigned int resv, char *filename){
+bool drawBezierPatchesXML(vector<Point> vertices, vector<vector<unsigned int>> indices, unsigned int resu, unsigned int resv, char *filename){
 	vector<Patch> vertices_res;
 	Point pontos_control[NM + 1][NM + 1];
 	for (unsigned int p = 0; p < indices.size(); p++) {
@@ -489,7 +489,7 @@ void drawBezierPatchesXML(vector<Point> vertices, vector<vector<unsigned int>> i
 	xmlDoc.SaveFile(filename);
 }
 
-void readBezierFile(string filename, vector<vector<unsigned int>> &indices, vector<Point> &vertices){
+bool readBezierFile(string filename, vector<vector<unsigned int>> &indices, vector<Point> &vertices){
 	int i = 0, j;
 	string line;
 	string token;
@@ -533,6 +533,11 @@ void readBezierFile(string filename, vector<vector<unsigned int>> &indices, vect
 			i++;
 		}
 		file.close();
+		return true;
+	}
+	else{
+		puts("Ficheiro não existe!");
+		return false;
 	}
 }
 
@@ -602,8 +607,8 @@ int main(int argc, char **argv){
 				int resv = atoi(argv[4]);
 				if (resu < 0 || resv < 0)
 					puts("Resoluções inválidas! Número inteiros positivos apenas!");
-				drawBezierPatchesXML(vertices, indices,resu, resv, argv[5]);
-				printf("Modelo gravado em %s", argv[5]);
+				if (drawBezierPatchesXML(vertices, indices,resu, resv, argv[5]))
+					printf("Modelo gravado em %s", argv[5]);
 			}
 			else{
 				puts("Erro nos argumentos!");
