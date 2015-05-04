@@ -445,7 +445,7 @@ void drawPlaneXML(float largura, float altura, char *filename){
 
 }
 
-bool drawBezierPatchesXML(vector<Point> vertices, vector<vector<unsigned int>> indices, unsigned int resu, unsigned int resv, char *filename){
+void drawBezierPatchesXML(vector<Point> vertices, vector<vector<unsigned int>> indices, unsigned int resu, unsigned int resv, char *filename){
 	vector<Patch> vertices_res;
 	Point pontos_control[NM + 1][NM + 1];
 	for (unsigned int p = 0; p < indices.size(); p++) {
@@ -482,7 +482,7 @@ bool drawBezierPatchesXML(vector<Point> vertices, vector<vector<unsigned int>> i
 				a = vertices_res[p][ru][rv];
 				b = vertices_res[p][ru][rv + 1];
 				c = vertices_res[p][ru + 1][rv + 1];
-				d = vertices_res[p][ru+1][rv];
+				d = vertices_res[p][ru + 1][rv];
 				// CBA
 				writeTriangleToXML(pRoot, c, b, a);
 				// ADC
@@ -606,13 +606,16 @@ int main(int argc, char **argv){
 			if (argc == 6){
 				vector<vector<unsigned int>> indices;
 				vector<Point> vertices;
-				readBezierFile(argv[2], indices, vertices);
-				int resu = atoi(argv[3]);
-				int resv = atoi(argv[4]);
-				if (resu < 0 || resv < 0)
-					puts("Resoluções inválidas! Número inteiros positivos apenas!");
-				if (drawBezierPatchesXML(vertices, indices,resu, resv, argv[5]))
+				if (readBezierFile(argv[2], indices, vertices)){
+					int resu = atoi(argv[3]);
+					int resv = atoi(argv[4]);
+					if (resu < 0 || resv < 0)
+						puts("Resoluções inválidas! Número inteiros positivos apenas!");
+					drawBezierPatchesXML(vertices, indices, resu, resv, argv[5]);
 					printf("Modelo gravado em %s", argv[5]);
+				}
+				else
+					puts("Ficheiro não existe!");
 			}
 			else{
 				puts("Erro nos argumentos!");
