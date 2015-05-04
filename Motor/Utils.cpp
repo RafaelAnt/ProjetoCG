@@ -31,9 +31,6 @@ void exceptionHandler(int e){
 		puts("Erro!! A aplicação tentou desenhar modelos sem os carregar!!");
 		puts("ISTO N E SUPOSTO ACONTECER.");
 	}
-	else if (e == CG_INVALID_MODELS){
-		puts("Erro!! Os modelos estão inválidos!!");
-	}
 	else if (e == CG_NO_XML_NODES){
 		puts("A CENA NÃO POSSUI NODOS XML!!");
 	}
