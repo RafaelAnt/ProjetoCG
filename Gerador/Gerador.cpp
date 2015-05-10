@@ -27,6 +27,42 @@ static void writeVertexToXML(tinyxml2::XMLNode * pRoot, float x, float y, float 
 	pRoot->InsertEndChild(elem);
 }
 
+static void writeNormalToXML(tinyxml2::XMLNode * pRoot, Point v){
+	using namespace tinyxml2;
+	char text[1024];
+	XMLElement *elem = xmlDoc.NewElement("normal");
+	sprintf_s(text, "X=%f Y=%f Z=%f", v.x, v.y, v.z);
+	elem->SetText(text);
+	pRoot->InsertEndChild(elem);
+}
+
+static void writeNormalToXML(tinyxml2::XMLNode * pRoot, float x, float y, float z){
+	using namespace tinyxml2;
+	char text[1024];
+	XMLElement *elem = xmlDoc.NewElement("normal");
+	sprintf_s(text, "X=%f Y=%f Z=%f", x, y, z);
+	elem->SetText(text);
+	pRoot->InsertEndChild(elem);
+}
+
+static void writeTexCoordToXML(tinyxml2::XMLNode * pRoot, Point v){
+	using namespace tinyxml2;
+	char text[1024];
+	XMLElement *elem = xmlDoc.NewElement("normal");
+	sprintf_s(text, "U=%f V=%f", v.x, v.y, v.z);
+	elem->SetText(text);
+	pRoot->InsertEndChild(elem);
+}
+
+static void writeNormalToXML(tinyxml2::XMLNode * pRoot, float u, float v){
+	using namespace tinyxml2;
+	char text[1024];
+	XMLElement *elem = xmlDoc.NewElement("normal");
+	sprintf_s(text, "U=%f V=%f", u, v);
+	elem->SetText(text);
+	pRoot->InsertEndChild(elem);
+}
+
 static void writeTriangleToXML(tinyxml2::XMLNode * pRoot, Point v1, Point v2, Point v3){
 	using namespace tinyxml2;
 	XMLNode *triangle = xmlDoc.NewElement("triangle");
