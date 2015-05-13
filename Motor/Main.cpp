@@ -61,7 +61,7 @@ void renderScene(void) {
 		0, 0, 0,
 		0.0f, 1.0f, 0.0f);
 	
-	try{ drawScene(sceneName,models); }
+	try{ drawScene(sceneName); }
 	catch (int e){
 		exceptionHandler(e);
 		exit(-1);
@@ -163,7 +163,7 @@ int main(int argc, char **argv) {
 	glFrontFace(GL_CCW);
 	createMenu();
 
-	try{ models = prepareModels(sceneName); }
+	try{ prepareModels(sceneName); }
 	catch (int e){
 		exceptionHandler(e);
 		return -1;

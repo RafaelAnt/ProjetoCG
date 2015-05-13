@@ -51,19 +51,19 @@ void exceptionHandler(int e){
 	}
 }
 
-//proot é o grupo a desenhar
-static void drawNode(tinyxml2::XMLNode *pRoot, map<string, int> models){
+//proot é o grupo a desenhar, retorna o indice do proximo vbo a desenhar
+static int drawNode(tinyxml2::XMLNode *pRoot, int n){
 	//se null, fazer pop (chegamos ao fim da hierarquia)
 	if (pRoot == NULL){
 		glPopMatrix();
-		return;
+		return n;
 	}
 	//push matrix, transformações apenas efetuadas 
 	//aos modelos deste grupo e aos filhos
 	glPushMatrix();
 	using namespace tinyxml2;
-	//nome modelos
-	vector<const char*> modelos;
+	//modelos a desenhar no fim
+	vector<int> modelos;
 	//variaveis de controlo de transforms duplicadas
 	bool trans = false, esc = false, rot = false;
 	XMLNode *modelosGroup; XMLElement *modelo, *aux;
@@ -79,8 +79,9 @@ static void drawNode(tinyxml2::XMLNode *pRoot, map<string, int> models){
 			const char * nome;
 			nome = modelo->Attribute("ficheiro");
 			if (nome) {
+				printf("%s %d\n", nome, n);
 				//guardar modelo
-				modelos.push_back(nome);
+				modelos.push_back(n++);
 			}
 			modelo = modelo->NextSiblingElement("modelo");
 		}
@@ -168,17 +169,17 @@ static void drawNode(tinyxml2::XMLNode *pRoot, map<string, int> models){
 	}
 	for (unsigned int i = 0; i < modelos.size(); i++){
 		//desenhar modelos
-		drawVertices(models[modelos[i]]);
+		drawVertices(modelos[i]);
 	}
 	modelos.clear();
 
 	//desenhar os filhos
-	drawNode(pRoot->FirstChildElement("grupo"), models);
+	n=drawNode(pRoot->FirstChildElement("grupo"), n);
 	//depois desenhar os irmaos
-	drawNode(pRoot->NextSiblingElement("grupo"), models);
+	drawNode(pRoot->NextSiblingElement("grupo"), n);
 }
 
-void drawScene(char *filename, map<string, int> models){
+void drawScene(char *filename){
 	//Carregar o ficheiro xml
 	using namespace tinyxml2;
 	XMLNode *pRoot;
@@ -189,7 +190,7 @@ void drawScene(char *filename, map<string, int> models){
 	else{
 		pRoot = xmlDoc.FirstChild()->FirstChildElement("grupo");
 	}
-	drawNode(pRoot, models);
+	drawNode(pRoot, 0);
 }
 
 /*
@@ -205,25 +206,54 @@ void drawVertices(int vboIndex){
 
 /*
 	Função auxiliar que obtem um triângulo de um elemento XML.
-	Caso este elemento não tenha 3 pontos, é atirada um excepção que sinaliza o evento erróneo.
-	A função aceita um vetor, que ja pode ter elementos, coloca os 3 pontos no fim do vetor, e
-	retorna o mesmo.
+	Caso este elemento não tenha 3 vértices e 3 normais, é atirada um excepção que sinaliza o evento erróneo.
+	A função aceita uma estrutura do tipo Model, e atualiza com a informação necessária.
 	*/
-static vector<GLfloat> readVertices_aux(tinyxml2::XMLElement *pElement, vector<GLfloat> vertices){
+static void readVertices_aux(tinyxml2::XMLElement *pElement, Model *model){
 	int i = 0;
-	float x, y, z;
+	// EM CASO DE OMISSÃO DE VALORES, ASSUMIMOS HIPOTETICO VALOR COMO 0
+	float x=0, y=0, z=0;
+	float nx=0, ny=0, nz=0;
+	float u=0, v=0;
 	const char *aux;
+	pElement = pElement->FirstChildElement("vertex");
 	while (pElement != NULL) {
-		aux = pElement->GetText();
-		sscanf_s(aux, "X=%f Y=%f Z=%f", &x, &y, &z);
-		vertices.push_back(x);
-		vertices.push_back(y);
-		vertices.push_back(z);
+		sscanf_s(pElement->GetText(), "X=%f Y=%f Z=%f", &x, &y, &z);
+		model->vertices.push_back(x);
+		model->vertices.push_back(y);
+		model->vertices.push_back(z);
 		pElement = pElement->NextSiblingElement("vertex");
 		i++;
 	}
-	if (i != 3) throw 1;
-	return vertices;
+	if (i != 3) throw CG_INCOMPLETE_TRIANGLE;
+	/* pARA JA NAO TEMOS NORMAIS NEM TEXTURAS
+	i = 0;
+	pElement = pElement->FirstChildElement("normal");
+	while (pElement != NULL) {
+		pElement->QueryFloatAttribute("X", &x);
+		pElement->QueryFloatAttribute("Y", &y);
+		pElement->QueryFloatAttribute("Z", &z);
+		model->normais.push_back(x);
+		model->normais.push_back(y);
+		model->normais.push_back(z);
+		pElement = pElement->NextSiblingElement("normal");
+		i++;
+	}
+	if (i != 3) throw CG_INCOMPLETE_TRIANGLE;
+	i = 0;
+	pElement = pElement->FirstChildElement("texcoord");
+	while (pElement != NULL) {
+		pElement->QueryFloatAttribute("X", &x);
+		pElement->QueryFloatAttribute("Y", &y);
+		pElement->QueryFloatAttribute("Z", &z);
+		model->texcoords.push_back(x);
+		model->texcoords.push_back(y);
+		model->texcoords.push_back(z);
+		pElement = pElement->NextSiblingElement("texcoord");
+		i++;
+	}
+	if (i>0 && i!=3) throw CG_INCOMPLETE_TRIANGLE;
+	*/
 }
 
 /*
@@ -234,9 +264,9 @@ static vector<GLfloat> readVertices_aux(tinyxml2::XMLElement *pElement, vector<G
 	A função irá retornar um vetor com todos os pontos, bem definidos e prontos a serem desenhados.
 	*/
 
-static vector<GLfloat> readVertices(const char *filename) {
+static Model readVertices(const char *filename) {
 	using namespace tinyxml2;
-	vector<GLfloat> vec;
+	Model model;
 	tinyxml2::XMLDocument xmlDoc;
 	XMLError eResult = xmlDoc.LoadFile(filename);
 	XMLNode * pRoot = xmlDoc.FirstChild();
@@ -246,14 +276,14 @@ static vector<GLfloat> readVertices(const char *filename) {
 	}
 	pElement = pRoot->FirstChildElement("triangle");
 	while (pElement != NULL){
-		vec = readVertices_aux(pElement->FirstChildElement("vertex"), vec);
+        readVertices_aux(pElement, &model);
 		pElement = pElement->NextSiblingElement("triangle");
 	}
-	return vec;
+	return model;
 }
 
-//passar map por referencia
-static void auxPrepare(map<string, vector<GLfloat>> *modelos, tinyxml2::XMLNode *pRoot){
+//auxiliar que preenche obtem os modelos
+static void auxPrepare(vector<Model> *modelos, tinyxml2::XMLNode *pRoot){
 	using namespace tinyxml2;
 	if (pRoot == NULL)
 		return;
@@ -267,10 +297,8 @@ static void auxPrepare(map<string, vector<GLfloat>> *modelos, tinyxml2::XMLNode 
 			const char * nome;
 			nome = modelo->Attribute("ficheiro");
 			if (nome) {
-				if (modelos->count(nome) == 0){
 					//guardar modelos no map
-					(*modelos)[string(nome)] = readVertices(nome);
-				}
+					modelos->push_back(readVertices(nome));
 			}
 			modelo = modelo->NextSiblingElement("modelo");
 		}
@@ -280,10 +308,9 @@ static void auxPrepare(map<string, vector<GLfloat>> *modelos, tinyxml2::XMLNode 
 }
 
 /*
-	Função que lê uma cena XML e armazena todos os modelos a desenhar nos respetivos buffers, e devolve um map com o nome
-	do modelo e do respetivo identificador do buffer
-	*/
-map<string, int> prepareModels(char *filename){
+	Função que lê uma cena XML e armazena todos os modelos a desenhar nos respetivos buffers
+*/
+void prepareModels(char *filename){
 	using namespace tinyxml2;
 	//Carregar o ficheiro xml
 	XMLError eResult = xmlDoc.LoadFile(filename);
@@ -307,7 +334,7 @@ map<string, int> prepareModels(char *filename){
 		throw CG_NO_XML_NODES; //ficheiro inválido
 	}
 	//Map que vai armazenar os modelos
-	map<string, vector<GLfloat>> modelos;
+	vector<Model> modelos;
 	//obter os modelos, auxPrepare analisa a cena XML
 	//e preenche o map com todos os modelos (sem repetições!)
 	auxPrepare(&modelos, pRoot);
@@ -318,25 +345,25 @@ map<string, int> prepareModels(char *filename){
 	//map que irá associar nome de modelo ao número do buffer
 	map<string, int> vboIndex;
 	//tipo do iterador
-	typedef map<string, vector<GLfloat>>::iterator it_type;
+	typedef vector<Model>::iterator it_type;
 	//inicializar indice
 	int index = 0;
 	//para todos os modelos obtidos criar um buffer
 	for (it_type iterator = modelos.begin(); iterator != modelos.end(); iterator++) {
-		//vértices do modelo
-		vector<GLfloat> vec = iterator->second;
-		//associar nome do modelo ao número do vbo
-		vboIndex[iterator->first] = index;
 		//atualizar vetor de tamanhos, para que na altura do 
 		//desenho se saiba o numero de triangulos a desenhar
-		sizes.push_back(vec.size());
+		sizes.push_back(iterator->vertices.size());
 		//fazer bind do buffer
 		glBindBuffer(GL_ARRAY_BUFFER, vbo[index]);
 		//guardar vértices do modelo no buffer
-		glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*vec.size(), &vec[0], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*iterator->vertices.size(), &iterator->vertices[0], GL_STATIC_DRAW);
+		//guardar normais
+		//glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*iterator->normais.size(), &iterator->normais[0], GL_STATIC_DRAW);
+		//guardar texturas SE EXISTIREM
+		//glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*iterator->texcoords.size(), &iterator->texcoords[0], GL_STATIC_DRAW);
+
 		//atualizar indice do buffer para a proxima iteração
 		index++;
 	}
-	return vboIndex;
 }
 
