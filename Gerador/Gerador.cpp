@@ -48,16 +48,16 @@ static void writeNormalToXML(tinyxml2::XMLNode * pRoot, float x, float y, float 
 static void writeTexCoordToXML(tinyxml2::XMLNode * pRoot, Point v){
 	using namespace tinyxml2;
 	char text[1024];
-	XMLElement *elem = xmlDoc.NewElement("normal");
+	XMLElement *elem = xmlDoc.NewElement("texcoord");
 	sprintf_s(text, "U=%f V=%f", v.x, v.y, v.z);
 	elem->SetText(text);
 	pRoot->InsertEndChild(elem);
 }
 
-static void writeNormalToXML(tinyxml2::XMLNode * pRoot, float u, float v){
+static void writeTexCoordToXML(tinyxml2::XMLNode * pRoot, float u, float v){
 	using namespace tinyxml2;
 	char text[1024];
-	XMLElement *elem = xmlDoc.NewElement("normal");
+	XMLElement *elem = xmlDoc.NewElement("texcoord");
 	sprintf_s(text, "U=%f V=%f", u, v);
 	elem->SetText(text);
 	pRoot->InsertEndChild(elem);
