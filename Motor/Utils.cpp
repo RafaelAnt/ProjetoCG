@@ -9,6 +9,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <GL/GLUT.h>
+#include <IL/il.h>
 
 #pragma comment(lib, "glew32.lib")
 
@@ -174,7 +175,7 @@ static int drawNode(tinyxml2::XMLNode *pRoot, int n){
 	modelos.clear();
 
 	//desenhar os filhos
-	n=drawNode(pRoot->FirstChildElement("grupo"), n);
+	n = drawNode(pRoot->FirstChildElement("grupo"), n);
 	//depois desenhar os irmaos
 	drawNode(pRoot->NextSiblingElement("grupo"), n);
 }
@@ -212,10 +213,9 @@ void drawVertices(int vboIndex){
 static void readVertices_aux(tinyxml2::XMLElement *pElement, Model *model){
 	int i = 0;
 	// EM CASO DE OMISSÃO DE VALORES, ASSUMIMOS HIPOTETICO VALOR COMO 0
-	float x=0, y=0, z=0;
-	float nx=0, ny=0, nz=0;
-	float u=0, v=0;
-	const char *aux;
+	float x = 0, y = 0, z = 0;
+	float nx = 0, ny = 0, nz = 0;
+	float u = 0, v = 0;
 	pElement = pElement->FirstChildElement("vertex");
 	while (pElement != NULL) {
 		sscanf_s(pElement->GetText(), "X=%f Y=%f Z=%f", &x, &y, &z);
@@ -230,27 +230,27 @@ static void readVertices_aux(tinyxml2::XMLElement *pElement, Model *model){
 	i = 0;
 	pElement = pElement->FirstChildElement("normal");
 	while (pElement != NULL) {
-		pElement->QueryFloatAttribute("X", &x);
-		pElement->QueryFloatAttribute("Y", &y);
-		pElement->QueryFloatAttribute("Z", &z);
-		model->normais.push_back(x);
-		model->normais.push_back(y);
-		model->normais.push_back(z);
-		pElement = pElement->NextSiblingElement("normal");
-		i++;
+	pElement->QueryFloatAttribute("X", &x);
+	pElement->QueryFloatAttribute("Y", &y);
+	pElement->QueryFloatAttribute("Z", &z);
+	model->normais.push_back(x);
+	model->normais.push_back(y);
+	model->normais.push_back(z);
+	pElement = pElement->NextSiblingElement("normal");
+	i++;
 	}
 	if (i != 3) throw CG_INCOMPLETE_TRIANGLE;
 	i = 0;
 	pElement = pElement->FirstChildElement("texcoord");
 	while (pElement != NULL) {
-		pElement->QueryFloatAttribute("X", &x);
-		pElement->QueryFloatAttribute("Y", &y);
-		pElement->QueryFloatAttribute("Z", &z);
-		model->texcoords.push_back(x);
-		model->texcoords.push_back(y);
-		model->texcoords.push_back(z);
-		pElement = pElement->NextSiblingElement("texcoord");
-		i++;
+	pElement->QueryFloatAttribute("X", &x);
+	pElement->QueryFloatAttribute("Y", &y);
+	pElement->QueryFloatAttribute("Z", &z);
+	model->texcoords.push_back(x);
+	model->texcoords.push_back(y);
+	model->texcoords.push_back(z);
+	pElement = pElement->NextSiblingElement("texcoord");
+	i++;
 	}
 	if (i>0 && i!=3) throw CG_INCOMPLETE_TRIANGLE;
 	*/
@@ -276,10 +276,33 @@ static Model readVertices(const char *filename) {
 	}
 	pElement = pRoot->FirstChildElement("triangle");
 	while (pElement != NULL){
-        readVertices_aux(pElement, &model);
+		readVertices_aux(pElement, &model);
 		pElement = pElement->NextSiblingElement("triangle");
 	}
 	return model;
+}
+
+static GLuint loadTexture(const char *texture){
+	unsigned int t, tw, th;
+	unsigned char *texData;
+	ilGenImages(1, &t);
+	ilBindImage(t);
+	ilLoadImage((ILstring)texture);
+	tw = ilGetInteger(IL_IMAGE_WIDTH);
+	th = ilGetInteger(IL_IMAGE_HEIGHT);
+	ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
+	texData = ilGetData();
+	GLuint texID;
+	glGenTextures(1, &texID); // unsigned int texID - variavel global;
+	glBindTexture(GL_TEXTURE_2D, texID);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tw, th, 0,
+		GL_RGBA, GL_UNSIGNED_BYTE, texData);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	return texID;
 }
 
 //auxiliar que preenche obtem os modelos
@@ -294,12 +317,25 @@ static void auxPrepare(vector<Model> *modelos, tinyxml2::XMLNode *pRoot){
 	if (modelosGroup){
 		modelo = modelosGroup->FirstChildElement("modelo");
 		while (modelo) {
-			const char * nome;
+			Model model;
+			const char * nome, *texture;
 			nome = modelo->Attribute("ficheiro");
 			if (nome) {
-					//guardar modelos no map
-					modelos->push_back(readVertices(nome));
+				//guardar modelos no map
+				model=readVertices(nome);
 			}
+			texture = modelo->Attribute("textura");
+			if (texture) {
+				model.hasTexture = true;
+				model.texID = loadTexture(texture);
+				if (model.texcoords.size() == 0)
+					throw CG_NO_TEXTURE_COORDINATES;
+			}
+			else{
+				model.hasTexture = false;
+			}
+			//ler cores e componentes (TO DO)
+			modelos->push_back(model);
 			modelo = modelo->NextSiblingElement("modelo");
 		}
 	}
@@ -309,7 +345,7 @@ static void auxPrepare(vector<Model> *modelos, tinyxml2::XMLNode *pRoot){
 
 /*
 	Função que lê uma cena XML e armazena todos os modelos a desenhar nos respetivos buffers
-*/
+	*/
 void prepareModels(char *filename){
 	using namespace tinyxml2;
 	//Carregar o ficheiro xml

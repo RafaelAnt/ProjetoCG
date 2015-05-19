@@ -35,10 +35,20 @@ typedef struct scale{
 	GLfloat z;
 }Scale;
 
+typedef struct Material{
+	GLfloat red;
+	GLfloat green;
+	GLfloat blue;
+	int type;
+}Material;
+
 typedef struct model{
 	vector<GLfloat> vertices;
 	vector<GLfloat> normais;
 	vector<GLfloat> texcoords;
+	vector<Material> material;
+	GLuint texID;
+	bool hasTexture;
 }Model;
 
 #define CG_REPEATED_TRANSFORM 99
@@ -51,6 +61,7 @@ typedef struct model{
 #define CG_XML_PARSE_ERROR 20
 #define CG_INCOMPLETE_TRIANGLE 90
 #define CG_INCORRECT_NORMALS_OR_TEX 89
+#define CG_NO_TEXTURE_COORDINATES 88
 
 /*
 	Desenha uma cena (filename), aplicando as transformações necessárias, utilizando o map models
