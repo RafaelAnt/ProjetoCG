@@ -161,6 +161,8 @@ int main(int argc, char **argv) {
 	glutCreateWindow("Projeto-CG");
 	glewInit();
 	ilInit();
+	ilEnable(IL_ORIGIN_SET);
+	ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
 
 	// registo de funcs
 	glutDisplayFunc(renderScene);
