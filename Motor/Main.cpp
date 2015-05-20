@@ -10,7 +10,7 @@
 #include "tinyxml2.h"
 #include "Utils.h"
 #include <windows.system.h>
- 
+
 using namespace std;
 
 #pragma comment(lib, "glew32.lib")
@@ -60,7 +60,19 @@ void renderScene(void) {
 	gluLookAt(raio*cos(beta)*sin(alfa), raio*sin(beta), raio*cos(beta)*cos(alfa),
 		0, 0, 0,
 		0.0f, 1.0f, 0.0f);
-	
+
+	//TESTE
+	GLfloat amb[3] = { 0.2, 0.2, 0.2 };
+	GLfloat diff[3] = { 1.0, 1.0, 1.0 };
+	GLfloat pos[4] = { 0.0, 20.0, 10.0, 0.0 };
+	// light position
+	glLightfv(GL_LIGHT0, GL_POSITION, pos);
+	// light colors
+	glLightfv(GL_LIGHT0, GL_AMBIENT, amb);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, diff);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+
 	try{ drawScene(sceneName); }
 	catch (int e){
 		exceptionHandler(e);
@@ -161,6 +173,7 @@ int main(int argc, char **argv) {
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_FRONT);
 	glFrontFace(GL_CCW);
+	glEnable(GL_LIGHTING);
 	createMenu();
 
 	try{ prepareModels(sceneName); }

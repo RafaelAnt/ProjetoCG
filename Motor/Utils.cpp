@@ -19,7 +19,9 @@ tinyxml2::XMLDocument xmlDoc;
 
 vector<Model> modelos_GLOBAL;
 bool loaded = false;
-GLuint *vbo;
+GLuint *vertexBuffer;
+GLuint *normalBuffer;
+GLuint *texBuffer;
 vector<int> sizes;
 
 void exceptionHandler(int e){
@@ -48,6 +50,15 @@ void exceptionHandler(int e){
 	else if (e == CG_XML_PARSE_ERROR){
 		puts("Erro de parsing do XML!");
 	}
+	else if (e == CG_NO_TEXTURE_COORDINATES){
+		puts("Um dos modelos não possui coordenadas de textura!");
+	}
+	else if (e == CG_INCORRECT_NORMALS_OR_TEX){
+		puts("Um dos modelos não possui as normais ou as coordenadas de textura necessárias!");
+	}
+	else if (e == CG_INCOMPLETE_TRIANGLE){
+		puts("Um dos triangulos dos modelos não possui a informaçãos toda!");
+	}
 	else{
 		puts("UNHANDLED EXCEPTION! ABORT");
 	}
@@ -66,10 +77,18 @@ void drawVertices(Model model){
 	}
 	glBindTexture(GL_TEXTURE_2D, model.texID);
 	glEnableClientState(GL_VERTEX_ARRAY);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo[model.index]);
+	glEnableClientState(GL_NORMAL_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer[model.index]);
 	glVertexPointer(3, GL_FLOAT, 0, NULL);
+	glBindBuffer(GL_ARRAY_BUFFER, normalBuffer[model.index]);
+	glNormalPointer(GL_FLOAT, 0, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, texBuffer[model.index]);
+	glTexCoordPointer(2, GL_FLOAT, 0, 0);
 	glDrawArrays(GL_TRIANGLES, 0, model.vertices.size() / 3);
 	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_NORMAL_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
@@ -227,6 +246,7 @@ static void readVertices_aux(tinyxml2::XMLElement *pElement, Model *model){
 	float nx = 0, ny = 0, nz = 0;
 	float u = 0, v = 0;
 	pElement = pElement->FirstChildElement("vertex");
+	tinyxml2::XMLElement *head = pElement;
 	while (pElement != NULL) {
 		sscanf_s(pElement->GetText(), "X=%f Y=%f Z=%f", &x, &y, &z);
 		model->vertices.push_back(x);
@@ -236,34 +256,30 @@ static void readVertices_aux(tinyxml2::XMLElement *pElement, Model *model){
 		i++;
 	}
 	if (i != 3) throw CG_INCOMPLETE_TRIANGLE;
-	/* pARA JA NAO TEMOS NORMAIS NEM TEXTURAS
 	i = 0;
-	pElement = pElement->FirstChildElement("normal");
+	pElement = head->NextSiblingElement("normal");
 	while (pElement != NULL) {
-	pElement->QueryFloatAttribute("X", &x);
-	pElement->QueryFloatAttribute("Y", &y);
-	pElement->QueryFloatAttribute("Z", &z);
-	model->normais.push_back(x);
-	model->normais.push_back(y);
-	model->normais.push_back(z);
-	pElement = pElement->NextSiblingElement("normal");
-	i++;
+		sscanf_s(pElement->GetText(), "X=%f Y=%f Z=%f", &x, &y, &z);
+		model->normais.push_back(x);
+		model->normais.push_back(y);
+		model->normais.push_back(z);
+		pElement = pElement->NextSiblingElement("normal");
+		i++;
 	}
 	if (i != 3) throw CG_INCOMPLETE_TRIANGLE;
 	i = 0;
-	pElement = pElement->FirstChildElement("texcoord");
+	pElement = head->NextSiblingElement("texcoord");
 	while (pElement != NULL) {
-	pElement->QueryFloatAttribute("X", &x);
-	pElement->QueryFloatAttribute("Y", &y);
-	pElement->QueryFloatAttribute("Z", &z);
-	model->texcoords.push_back(x);
-	model->texcoords.push_back(y);
-	model->texcoords.push_back(z);
-	pElement = pElement->NextSiblingElement("texcoord");
-	i++;
+		pElement->QueryFloatAttribute("X", &x);
+		pElement->QueryFloatAttribute("Y", &y);
+		pElement->QueryFloatAttribute("Z", &z);
+		model->texcoords.push_back(x);
+		model->texcoords.push_back(y);
+		model->texcoords.push_back(z);
+		pElement = pElement->NextSiblingElement("texcoord");
+		i++;
 	}
-	if (i>0 && i!=3) throw CG_INCOMPLETE_TRIANGLE;
-	*/
+	if (i!=3) throw CG_INCOMPLETE_TRIANGLE;
 }
 
 /*
@@ -332,7 +348,7 @@ static void auxPrepare(vector<Model> *modelos, tinyxml2::XMLNode *pRoot){
 			nome = modelo->Attribute("ficheiro");
 			if (nome) {
 				//guardar modelos no map
-				model=readVertices(nome);
+				model = readVertices(nome);
 			}
 			texture = modelo->Attribute("textura");
 			if (texture) {
@@ -411,8 +427,10 @@ void prepareModels(char *filename){
 	auxPrepare(&modelos, pRoot);
 	modelos_GLOBAL = modelos;
 	//inicializar buffers
-	vbo = new GLuint[modelos.size()];
-	glGenBuffers(modelos.size(), vbo);
+	vertexBuffer = new GLuint[modelos.size()];
+	normalBuffer = new GLuint[modelos.size()];
+	glGenBuffers(modelos.size(), vertexBuffer);
+	glGenBuffers(modelos.size(), normalBuffer);
 	//map que irá associar nome de modelo ao número do buffer
 	map<string, int> vboIndex;
 	//tipo do iterador
@@ -425,13 +443,17 @@ void prepareModels(char *filename){
 		//desenho se saiba o numero de triangulos a desenhar
 		sizes.push_back(iterator->vertices.size());
 		//fazer bind do buffer
-		glBindBuffer(GL_ARRAY_BUFFER, vbo[index]);
+		glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer[index]);
 		//guardar vértices do modelo no buffer
 		glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*iterator->vertices.size(), &iterator->vertices[0], GL_STATIC_DRAW);
+
+		glBindBuffer(GL_ARRAY_BUFFER, normalBuffer[index]);
 		//guardar normais
-		//glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*iterator->normais.size(), &iterator->normais[0], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*iterator->normais.size(), &iterator->normais[0], GL_STATIC_DRAW);
+		
+		glBindBuffer(GL_ARRAY_BUFFER, texBuffer[index]);
 		//guardar texturas SE EXISTIREM
-		//glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*iterator->texcoords.size(), &iterator->texcoords[0], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*iterator->texcoords.size(), &iterator->texcoords[0], GL_STATIC_DRAW);
 
 		//atualizar indice do buffer para a proxima iteração
 		index++;
