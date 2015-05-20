@@ -1,6 +1,7 @@
 #include <GL\glew.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <IL\il.h>
 #include <GL/glut.h>
 #include <time.h>
 #include <vector>
@@ -159,6 +160,7 @@ int main(int argc, char **argv) {
 	glutInitWindowSize(400, 400);
 	glutCreateWindow("Projeto-CG");
 	glewInit();
+	ilInit();
 
 	// registo de funcs
 	glutDisplayFunc(renderScene);
@@ -174,6 +176,7 @@ int main(int argc, char **argv) {
 	glCullFace(GL_FRONT);
 	glFrontFace(GL_CCW);
 	glEnable(GL_LIGHTING);
+	glEnable(GL_TEXTURE_2D);
 	createMenu();
 
 	try{ prepareModels(sceneName); }

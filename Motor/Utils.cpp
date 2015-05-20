@@ -352,6 +352,7 @@ static void auxPrepare(vector<Model> *modelos, tinyxml2::XMLNode *pRoot){
 			}
 			texture = modelo->Attribute("textura");
 			if (texture) {
+				printf("WOLOLOLOL\n");
 				model.texID = loadTexture(texture);
 				if (model.texcoords.size() == 0)
 					throw CG_NO_TEXTURE_COORDINATES;
@@ -429,8 +430,10 @@ void prepareModels(char *filename){
 	//inicializar buffers
 	vertexBuffer = new GLuint[modelos.size()];
 	normalBuffer = new GLuint[modelos.size()];
+	texBuffer = new GLuint[modelos.size()];
 	glGenBuffers(modelos.size(), vertexBuffer);
 	glGenBuffers(modelos.size(), normalBuffer);
+	glGenBuffers(modelos.size(), texBuffer);
 	//map que irá associar nome de modelo ao número do buffer
 	map<string, int> vboIndex;
 	//tipo do iterador
