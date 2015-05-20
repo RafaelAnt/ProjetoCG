@@ -270,12 +270,9 @@ static void readVertices_aux(tinyxml2::XMLElement *pElement, Model *model){
 	i = 0;
 	pElement = head->NextSiblingElement("texcoord");
 	while (pElement != NULL) {
-		pElement->QueryFloatAttribute("X", &x);
-		pElement->QueryFloatAttribute("Y", &y);
-		pElement->QueryFloatAttribute("Z", &z);
+		sscanf_s(pElement->GetText(), "U=%f V=%f", &x, &y);
 		model->texcoords.push_back(x);
 		model->texcoords.push_back(y);
-		model->texcoords.push_back(z);
 		pElement = pElement->NextSiblingElement("texcoord");
 		i++;
 	}
