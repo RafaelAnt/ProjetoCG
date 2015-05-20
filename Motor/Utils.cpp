@@ -17,6 +17,7 @@ using namespace std;
 
 tinyxml2::XMLDocument xmlDoc;
 
+vector<Model> modelos_GLOBAL;
 bool loaded = false;
 GLuint *vbo;
 vector<int> sizes;
@@ -52,18 +53,40 @@ void exceptionHandler(int e){
 	}
 }
 
-//proot é o grupo a desenhar, retorna o indice do proximo vbo a desenhar
+
+/*
+Funçao que desenha o array de vértices armazenados num dado buffer (vboIndex)
+*/
+void drawVertices(Model model){
+	float aux[4];
+	for (int i = 0; i < model.material.size(); i++){
+		Material m = model.material[i];
+		aux[0] = m.red; aux[1] = m.green; aux[2] = m.blue; aux[3] = 0;
+		glMaterialfv(GL_FRONT, model.material[i].type, aux);
+	}
+	glBindTexture(GL_TEXTURE_2D, model.texID);
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[model.index]);
+	glVertexPointer(3, GL_FLOAT, 0, NULL);
+	glDrawArrays(GL_TRIANGLES, 0, model.vertices.size() / 3);
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+//proot é o grupo a desenhar, n é o próximo modelo a desenhar
+//retorna o índice do modelo a desenhar para utilizar na chamada recursiva
 static int drawNode(tinyxml2::XMLNode *pRoot, int n){
 	//se null, fazer pop (chegamos ao fim da hierarquia)
 	if (pRoot == NULL){
 		glPopMatrix();
+		//esatmos num grupo "vazio" retornar o indice atual
 		return n;
 	}
 	//push matrix, transformações apenas efetuadas 
 	//aos modelos deste grupo e aos filhos
 	glPushMatrix();
 	using namespace tinyxml2;
-	//modelos a desenhar no fim
+	//indices dos modelos a desenhar no fim
 	vector<int> modelos;
 	//variaveis de controlo de transforms duplicadas
 	bool trans = false, esc = false, rot = false;
@@ -80,7 +103,6 @@ static int drawNode(tinyxml2::XMLNode *pRoot, int n){
 			const char * nome;
 			nome = modelo->Attribute("ficheiro");
 			if (nome) {
-				printf("%s %d\n", nome, n);
 				//guardar modelo
 				modelos.push_back(n++);
 			}
@@ -169,12 +191,11 @@ static int drawNode(tinyxml2::XMLNode *pRoot, int n){
 		aux = aux->NextSiblingElement();
 	}
 	for (unsigned int i = 0; i < modelos.size(); i++){
-		//desenhar modelos
-		drawVertices(modelos[i]);
+		drawVertices(modelos_GLOBAL[modelos[i]]);
 	}
 	modelos.clear();
 
-	//desenhar os filhos
+	//desenhar os filhos, tomar nota do último modelo desenhado neste grupo
 	n = drawNode(pRoot->FirstChildElement("grupo"), n);
 	//depois desenhar os irmaos
 	drawNode(pRoot->NextSiblingElement("grupo"), n);
@@ -192,17 +213,6 @@ void drawScene(char *filename){
 		pRoot = xmlDoc.FirstChild()->FirstChildElement("grupo");
 	}
 	drawNode(pRoot, 0);
-}
-
-/*
-	Funçao que desenha o array de vértices armazenados num dado buffer (vboIndex)
-	*/
-void drawVertices(int vboIndex){
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo[vboIndex]);
-	glVertexPointer(3, GL_FLOAT, 0, NULL);
-	glDrawArrays(GL_TRIANGLES, 0, sizes[vboIndex] / 3);
-	glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 /*
@@ -326,15 +336,40 @@ static void auxPrepare(vector<Model> *modelos, tinyxml2::XMLNode *pRoot){
 			}
 			texture = modelo->Attribute("textura");
 			if (texture) {
-				model.hasTexture = true;
 				model.texID = loadTexture(texture);
 				if (model.texcoords.size() == 0)
 					throw CG_NO_TEXTURE_COORDINATES;
 			}
 			else{
-				model.hasTexture = false;
+				model.texID = 0;
 			}
 			//ler cores e componentes (TO DO)
+			Material diffuse; diffuse.type = GL_DIFFUSE;
+			diffuse.red = -1; diffuse.green = -1; diffuse.blue = -1;
+			modelo->QueryFloatAttribute("diffR", &diffuse.red);
+			modelo->QueryFloatAttribute("diffG", &diffuse.green);
+			modelo->QueryFloatAttribute("diffB", &diffuse.blue);
+			if (!(diffuse.red == -1 || diffuse.green == -1 || diffuse.blue == -1))
+				model.material.push_back(diffuse);
+
+			Material ambient; ambient.type = GL_AMBIENT;
+			ambient.red = -1; ambient.green = -1; ambient.blue = -1;
+			modelo->QueryFloatAttribute("ambR", &ambient.red);
+			modelo->QueryFloatAttribute("ambG", &ambient.green);
+			modelo->QueryFloatAttribute("ambB", &ambient.blue);
+			if (!(ambient.red == -1 || ambient.green == -1 || ambient.blue == -1))
+				model.material.push_back(ambient);
+
+			Material specular; specular.type = GL_SPECULAR;
+			specular.red = 0; specular.green = 0; specular.blue = 0;
+			modelo->QueryFloatAttribute("specR", &specular.red);
+			modelo->QueryFloatAttribute("specG", &specular.green);
+			modelo->QueryFloatAttribute("specB", &specular.blue);
+			if (!(specular.red == -1 || specular.green == -1 || specular.blue == -1))
+				model.material.push_back(specular);
+
+			model.index = modelos->size();
+			printf("%d\n", model.index);
 			modelos->push_back(model);
 			modelo = modelo->NextSiblingElement("modelo");
 		}
@@ -374,7 +409,7 @@ void prepareModels(char *filename){
 	//obter os modelos, auxPrepare analisa a cena XML
 	//e preenche o map com todos os modelos (sem repetições!)
 	auxPrepare(&modelos, pRoot);
-
+	modelos_GLOBAL = modelos;
 	//inicializar buffers
 	vbo = new GLuint[modelos.size()];
 	glGenBuffers(modelos.size(), vbo);

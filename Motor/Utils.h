@@ -48,7 +48,7 @@ typedef struct model{
 	vector<GLfloat> texcoords;
 	vector<Material> material;
 	GLuint texID;
-	bool hasTexture;
+	int index;
 }Model;
 
 #define CG_REPEATED_TRANSFORM 99
@@ -68,11 +68,6 @@ typedef struct model{
 	para desenhar os modelos com eficiencia.
 	*/
 void drawScene(char *filename);
-
-/*
-	Desenha os vértices armazenados no buffer correspondente.
-	*/
-void drawVertices(int vboIndex);
 
 /*
 	Função que analisa o ficheiro XML e determina os modelos a desenhar
