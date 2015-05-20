@@ -124,7 +124,7 @@ void drawParallelpipedXML(float width, float height, float lenght, char* filenam
 	writeTexCoordToXML(triangle, 1, 0);
 	writeVertexToXML(triangle, width / 2, -height / 2, lenght / 2);
 	writeNormalToXML(triangle, 1.0f, 0.0f, 0.0f);
-	writeTexCoordToXML(triangle, 0, 1);
+	writeTexCoordToXML(triangle, 0, 0);
 	pRoot->InsertEndChild(triangle);
 
 	triangle = xmlDoc.NewElement("triangle");
@@ -212,7 +212,7 @@ void drawParallelpipedXML(float width, float height, float lenght, char* filenam
 	writeTexCoordToXML(triangle, 0, 1);
 	writeVertexToXML(triangle, -width / 2, height / 2, -lenght / 2);
 	writeNormalToXML(triangle, 0.0f, 0.0f, -1.0f);
-	writeTexCoordToXML(triangle, 1, 0);
+	writeTexCoordToXML(triangle, 1, 1);
 	pRoot->InsertEndChild(triangle);
 
 	triangle = xmlDoc.NewElement("triangle");
