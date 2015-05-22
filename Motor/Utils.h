@@ -62,6 +62,7 @@ typedef struct model{
 #define CG_INCOMPLETE_TRIANGLE 90
 #define CG_INCORRECT_NORMALS_OR_TEX 89
 #define CG_NO_TEXTURE_COORDINATES 88
+#define CG_LIGHT_WITHOUT_TYPE 87
 
 /*
 	Desenha uma cena (filename), aplicando as transformações necessárias, utilizando o map models
