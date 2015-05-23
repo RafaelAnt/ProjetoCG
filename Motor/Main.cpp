@@ -175,6 +175,7 @@ int main(int argc, char **argv) {
 	glCullFace(GL_FRONT);
 	glFrontFace(GL_CCW);
 	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
 	glEnable(GL_TEXTURE_2D);
 	createMenu();
 

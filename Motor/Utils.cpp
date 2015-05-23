@@ -76,25 +76,33 @@ Funçao que desenha o array de vértices armazenados num dado buffer (vboIndex)
 */
 void drawVertices(Model model){
 	float aux[4];
-	for (int i = 0; i < model.material.size(); i++){
+	for (unsigned int i = 0; i < model.material.size(); i++){
 		Material m = model.material[i];
 		aux[0] = m.red; aux[1] = m.green; aux[2] = m.blue; aux[3] = 0;
 		glMaterialfv(GL_FRONT, model.material[i].type, aux);
 	}
+	//selecionar textura do modelo
 	glBindTexture(GL_TEXTURE_2D, model.texID);
+	//enables dos VBO
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	//selecionar os vertices
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer[model.index]);
 	glVertexPointer(3, GL_FLOAT, 0, NULL);
+	//selecionar as normais
 	glBindBuffer(GL_ARRAY_BUFFER, normalBuffer[model.index]);
 	glNormalPointer(GL_FLOAT, 0, 0);
+	//selecionar as coordenadas de textura
 	glBindBuffer(GL_ARRAY_BUFFER, texBuffer[model.index]);
 	glTexCoordPointer(2, GL_FLOAT, 0, 0);
+	//desenhar
 	glDrawArrays(GL_TRIANGLES, 0, model.vertices.size() / 3);
+	//disable dos VBO
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_NORMAL_ARRAY);
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	//selecionar textura "nula"
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
@@ -225,7 +233,7 @@ static int drawNode(XMLNode *pRoot, int n){
 	drawNode(pRoot->NextSiblingElement("grupo"), n);
 }
 
-
+//node deverá ser a raiz do ficheiro XML
 static void prepareLights(XMLNode *node){
 	XMLNode *lightsGroup = node->FirstChildElement("luzes");
 	XMLElement *aux = lightsGroup->FirstChildElement("luz");
@@ -264,10 +272,9 @@ static void prepareLights(XMLNode *node){
 				glLightfv(GL_LIGHT0, GL_AMBIENT, arr);
 			}
 		}
+		//ver os outros elementos do grupo
 		aux = aux->NextSiblingElement("luz");
 	}
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
 }
 
 
@@ -287,8 +294,9 @@ void drawScene(char *filename){
 
 /*
 	Função auxiliar que obtem um triângulo de um elemento XML.
-	Caso este elemento não tenha 3 vértices e 3 normais, é atirada um excepção que sinaliza o evento erróneo.
-	A função aceita uma estrutura do tipo Model, e atualiza com a informação necessária.
+	Caso este elemento não tenha 3 vértices ,3 normais e 3 coordenadas de textura, 
+	é atirada um excepção que sinaliza o evento erróneo.
+	A função aceita uma estrutura do tipo Model, e atualiza a com a informação necessária.
 	*/
 static void readVertices_aux(XMLElement *pElement, Model *model){
 	int i = 0;
@@ -331,11 +339,11 @@ static void readVertices_aux(XMLElement *pElement, Model *model){
 }
 
 /*
-	Dado um nome de um ficheiro, esta função irá preencher um vetor com 3 pontos de cada vez, cada 3 pontos representam
-	um triângulo.
+	Dado um nome de um ficheiro, uma estrutura do tipo Model com as informações necessárias (normais, texturas, vertices, etc)
 	Caso se trate de um ficheiro XML inválido, serão atiradas as respetivas excepções.
-	Caso os elementos do ficheiro XML não contenham exatamente 3 pontos cada um, também irá ser atirada uma excepção.
-	A função irá retornar um vetor com todos os pontos, bem definidos e prontos a serem desenhados.
+	A função deteta os erros de mà formação dos modelos (falta de normais ou texturas, triangulos com um número de pontos errado)
+	A convenção é a seguinte: um triangulo contém 3 vértices, 3 normais e 3 coordenadas textura.
+	A função irá retornar a estrutura do tipo Model.
 	*/
 
 static Model readVertices(const char *filename) {
@@ -406,30 +414,27 @@ static void auxPrepare(vector<Model> *modelos, tinyxml2::XMLNode *pRoot){
 			else{
 				model.texID = 0;
 			}
-			//ler cores e componentes (TO DO)
+			//ler cores e componentes
 			Material diffuse; diffuse.type = GL_DIFFUSE;
-			diffuse.red = -1; diffuse.green = -1; diffuse.blue = -1;
+			diffuse.red = 0; diffuse.green = 0; diffuse.blue = 0;
 			modelo->QueryFloatAttribute("diffR", &diffuse.red);
 			modelo->QueryFloatAttribute("diffG", &diffuse.green);
 			modelo->QueryFloatAttribute("diffB", &diffuse.blue);
-			if (!(diffuse.red == -1 || diffuse.green == -1 || diffuse.blue == -1))
-				model.material.push_back(diffuse);
+			model.material.push_back(diffuse);
 
 			Material ambient; ambient.type = GL_AMBIENT;
-			ambient.red = -1; ambient.green = -1; ambient.blue = -1;
+			ambient.red = 0; ambient.green = 0; ambient.blue = 0;
 			modelo->QueryFloatAttribute("ambR", &ambient.red);
 			modelo->QueryFloatAttribute("ambG", &ambient.green);
 			modelo->QueryFloatAttribute("ambB", &ambient.blue);
-			if (!(ambient.red == -1 || ambient.green == -1 || ambient.blue == -1))
-				model.material.push_back(ambient);
+			model.material.push_back(ambient);
 
 			Material specular; specular.type = GL_SPECULAR;
 			specular.red = 0; specular.green = 0; specular.blue = 0;
 			modelo->QueryFloatAttribute("specR", &specular.red);
 			modelo->QueryFloatAttribute("specG", &specular.green);
 			modelo->QueryFloatAttribute("specB", &specular.blue);
-			if (!(specular.red == -1 || specular.green == -1 || specular.blue == -1))
-				model.material.push_back(specular);
+			model.material.push_back(specular);
 
 			model.index = modelos->size();
 			printf("%d\n", model.index);
@@ -467,11 +472,12 @@ void prepareModels(char *filename){
 	if (pRoot == NULL){
 		throw CG_NO_XML_NODES; //ficheiro inválido
 	}
-	//Map que vai armazenar os modelos
+	//vetor que armazena os modelos
 	vector<Model> modelos;
 	//obter os modelos, auxPrepare analisa a cena XML
 	//e preenche o map com todos os modelos (sem repetições!)
 	auxPrepare(&modelos, pRoot);
+	//variável global que armazena os modelos
 	modelos_GLOBAL = modelos;
 	//inicializar buffers
 	vertexBuffer = new GLuint[modelos.size()];
