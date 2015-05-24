@@ -194,3 +194,7 @@ FakesAssemblies/
 
 # Visual Studio 6 workspace options file
 *.opt
+Motor/cenaPara.xml
+Motor/paralelepipedo.3d
+Motor/parallelepiped-texture.jpg
+Motor/pedra.png
