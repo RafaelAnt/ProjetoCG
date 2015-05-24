@@ -416,24 +416,27 @@ static void auxPrepare(vector<Model> *modelos, tinyxml2::XMLNode *pRoot){
 			}
 			//ler cores e componentes
 			Material diffuse; diffuse.type = GL_DIFFUSE;
-			diffuse.red = 0; diffuse.green = 0; diffuse.blue = 0;
+			diffuse.red = -1; diffuse.green = -1; diffuse.blue = -1;
 			modelo->QueryFloatAttribute("diffR", &diffuse.red);
 			modelo->QueryFloatAttribute("diffG", &diffuse.green);
 			modelo->QueryFloatAttribute("diffB", &diffuse.blue);
-			model.material.push_back(diffuse);
+			if (diffuse.red !=-1 && diffuse.green != -1 && diffuse.blue !=-1)
+				model.material.push_back(diffuse);
 
 			Material ambient; ambient.type = GL_AMBIENT;
-			ambient.red = 0; ambient.green = 0; ambient.blue = 0;
+			ambient.red = -1; ambient.green = -1; ambient.blue = -1;
 			modelo->QueryFloatAttribute("ambR", &ambient.red);
 			modelo->QueryFloatAttribute("ambG", &ambient.green);
 			modelo->QueryFloatAttribute("ambB", &ambient.blue);
+			if (ambient.red != -1 && ambient.green != -1 && ambient.blue != -1)
 			model.material.push_back(ambient);
 
 			Material specular; specular.type = GL_SPECULAR;
-			specular.red = 0; specular.green = 0; specular.blue = 0;
+			specular.red = -1; specular.green = -1; specular.blue = -1;
 			modelo->QueryFloatAttribute("specR", &specular.red);
 			modelo->QueryFloatAttribute("specG", &specular.green);
 			modelo->QueryFloatAttribute("specB", &specular.blue);
+			if (specular.red != -1 && specular.green != -1 && specular.blue != -1)
 			model.material.push_back(specular);
 
 			model.index = modelos->size();
