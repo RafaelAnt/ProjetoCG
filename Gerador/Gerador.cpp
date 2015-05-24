@@ -71,15 +71,18 @@ static void writeTriangleToXML(tinyxml2::XMLNode * pRoot, Point v1, Point v2, Po
 	writeVertexToXML(triangle, v3);
 	pRoot->InsertEndChild(triangle);
 }
-static void writeTriangleToXML(tinyxml2::XMLNode * pRoot, Point v1, Point v2, Point v3, Point n1, Point n2, Point n3){
+static void writeTriangleToXML(tinyxml2::XMLNode * pRoot, Point v1, Point v2, Point v3, Point n1, Point n2, Point n3, Point t1, Point t2, Point t3){
 	using namespace tinyxml2;
 	XMLNode *triangle = xmlDoc.NewElement("triangle");
 	writeVertexToXML(triangle, v1);
 	writeNormalToXML(triangle, n1);
+	writeTexCoordToXML(triangle, t1);
 	writeVertexToXML(triangle, v2);
 	writeNormalToXML(triangle, n2);
+	writeTexCoordToXML(triangle, t2);
 	writeVertexToXML(triangle, v3);
 	writeNormalToXML(triangle, n3);
+	writeTexCoordToXML(triangle, t3);
 	pRoot->InsertEndChild(triangle);
 }
 
@@ -269,7 +272,7 @@ Point calculateSurfaceNormal(Point p1, Point p2, Point p3) {
 
 void drawPyramidXML(float base, float height, char *filename){
 	using namespace tinyxml2;
-	Point v1, v2, v3, normal;
+	Point v1, v2, v3, normal, t1, t2, t3;
 	XMLNode * pRoot = xmlDoc.NewElement("piramide");
 	xmlDoc.InsertFirstChild(pRoot);
 
@@ -278,35 +281,53 @@ void drawPyramidXML(float base, float height, char *filename){
 	v1.x = base; v1.y = 0; v1.z = -base;
 	v2.x = base; v2.y = 0; v2.z = base;
 	normal = calculateSurfaceNormal(v1, v2, v3);
-	writeTriangleToXML(pRoot, v1, v2, v3, normal, normal, normal);
+	t1.x = 0.5f; t1.y = 1.0f;
+	t2.x = 0.0f; t2.y = 0.0f;
+	t3.x = 1.0f; t3.y = 0.0f;
+	writeTriangleToXML(pRoot, v1, v2, v3, normal, normal, normal, t1, t2,t3);
 
 
 	v1.x = -base; v1.y = 0; v1.z = base;
 	v2.x = -base; v2.y = 0; v2.z = -base;
 	normal = calculateSurfaceNormal(v1, v2, v3);
-	writeTriangleToXML(pRoot, v1, v2, v3, normal, normal, normal);
+	t1.x = 0.5f; t1.y = 1.0f;
+	t2.x = 0.0f; t2.y = 0.0f;
+	t3.x = 1.0f; t3.y = 0.0f;
+	writeTriangleToXML(pRoot, v1, v2, v3, normal, normal, normal, t1, t2, t3);
 
 	v1.x = base; v1.y = 0; v1.z = base;
 	v2.x = -base; v2.y = 0; v2.z = base;
 	normal = calculateSurfaceNormal(v1, v2, v3);
-	writeTriangleToXML(pRoot, v1, v2, v3, normal, normal, normal);
+	t1.x = 0.5f; t1.y = 1.0f;
+	t2.x = 0.0f; t2.y = 0.0f;
+	t3.x = 1.0f; t3.y = 0.0f;
+	writeTriangleToXML(pRoot, v1, v2, v3, normal, normal, normal, t1, t2, t3);
 
 	v1.x = -base; v1.y = 0; v1.z = -base;
 	v2.x = base; v2.y = 0; v2.z = -base;
 	normal = calculateSurfaceNormal(v1, v2, v3);
-	writeTriangleToXML(pRoot, v1, v2, v3, normal, normal, normal);
+	t1.x = 0.5f; t1.y = 1.0f;
+	t2.x = 0.0f; t2.y = 0.0f;
+	t3.x = 1.0f; t3.y = 0.0f;
+	writeTriangleToXML(pRoot, v1, v2, v3, normal, normal, normal, t1, t2, t3);
 
 	v1.x = base; v1.y = 0; v1.z = base;
 	v2.x = base; v2.y = 0; v2.z = -base;
 	v3.x = -base; v3.y = 0; v3.z = base;
 	normal = calculateSurfaceNormal(v1, v2, v3);
-	writeTriangleToXML(pRoot, v1, v2, v3, normal, normal, normal);
+	t1.x = 1.0f; t1.y = 1.0f;
+	t2.x = 1.0f; t2.y = 0.0f;
+	t3.x = 0.0f; t3.y = 1.0f;
+	writeTriangleToXML(pRoot, v1, v2, v3, normal, normal, normal, t1, t2, t3);
 
 	v1.x = -base; v1.y = 0; v1.z = -base;
 	v2.x = -base; v2.y = 0; v2.z = base;
 	v3.x = base; v3.y = 0; v3.z = -base;
 	normal = calculateSurfaceNormal(v1, v2, v3);
-	writeTriangleToXML(pRoot, v1, v2, v3, normal, normal, normal);
+	t1.x = 0.0f; t1.y = 0.0f;
+	t2.x = 0.0f; t2.y = 1.0f;
+	t3.x = 1.0f; t3.y = 0.0f;
+	writeTriangleToXML(pRoot, v1, v2, v3, normal, normal, normal, t1, t2, t3);
 
 	xmlDoc.SaveFile(filename);
 }
