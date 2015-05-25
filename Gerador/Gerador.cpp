@@ -389,7 +389,7 @@ void drawSphereXML(float r, int stacks, int slices, char *filename){
 
 			Point tex2, n2 = normalize(vertex2);
 			tex2.x = phi2 / (2 * M_PI);
-			tex2.y = 1 -((theta1) / M_PI);
+			tex2.y = 1 - ((theta1) / M_PI);
 
 			Point vertex3;
 			vertex3.z = (float)r*sin(theta2)*cos(phi2);
@@ -398,7 +398,7 @@ void drawSphereXML(float r, int stacks, int slices, char *filename){
 
 			Point tex3, n3 = normalize(vertex3);
 			tex3.x = phi2 / (2 * M_PI);
-			tex3.y = 1- ((theta2) / M_PI);
+			tex3.y = 1 - ((theta2) / M_PI);
 
 			Point vertex4;
 			vertex4.z = (float)r*sin(theta2)*cos(phi1);
@@ -407,7 +407,7 @@ void drawSphereXML(float r, int stacks, int slices, char *filename){
 
 			Point tex4, n4 = normalize(vertex4);
 			tex4.x = phi1 / (2 * M_PI);
-			tex4.y = 1- ((theta2) / M_PI);
+			tex4.y = 1 - ((theta2) / M_PI);
 
 			if (t == 0){//camada inicial
 				writeTriangleToXML(pRoot, vertex1, vertex3, vertex4,
@@ -562,7 +562,7 @@ void drawConeXML(float height, float radius, int stacks, int slices, char *filen
 		vertex1.x = radius*sin(i);
 		vertex1.y = 0;
 		vertex1.z = radius*cos(i);
-		
+
 
 		Point vertex2;
 		vertex2.x = 0;
@@ -573,7 +573,7 @@ void drawConeXML(float height, float radius, int stacks, int slices, char *filen
 		vertex3.x = radius*sin(i + 2 * pi / slices);
 		vertex3.y = 0;
 		vertex3.z = radius*cos(i + 2 * pi / slices);
-		
+
 		normal = calculateSurfaceNormal(vertex1, vertex2, vertex3);
 		normal = invertNormal(normal);
 		t1.x = 1.0f; t1.y = 0.0f;
@@ -707,7 +707,7 @@ void drawBezierPatchesXML(vector<Point> vertices, vector<vector<unsigned int>> i
 	using namespace tinyxml2;
 	XMLNode * pRoot = xmlDoc.NewElement("beziersurface");
 	xmlDoc.InsertEndChild(pRoot);
-	Point a, b, c, d;
+	Point a, b, c, d, atex, btex, ctex, dtex;
 	for (unsigned int p = 0; p < indices.size(); p++) {
 		for (unsigned int ru = 0; ru < resu - 1; ru++){
 			for (unsigned int rv = 0; rv < resv - 1; rv++) {
@@ -716,10 +716,15 @@ void drawBezierPatchesXML(vector<Point> vertices, vector<vector<unsigned int>> i
 				b = vertices_res[p][ru][rv + 1];
 				c = vertices_res[p][ru + 1][rv + 1];
 				d = vertices_res[p][ru + 1][rv];
+
+				atex.x = ru / (resu - 1.0); atex.y = rv / (resv - 1.0);
+				btex.x = ru / (resu - 1.0); btex.y = (rv + 1) / (resv - 1.0);
+				ctex.x = (ru + 1) / (resu - 1.0); ctex.y = (rv + 1) / (resv - 1.0);
+				dtex.x = (ru + 1) / (resu - 1.0); dtex.y = rv / (resv - 1.0);
 				// CBA
-				writeTriangleToXML(pRoot, c, b, a);
+				writeTriangleToXML(pRoot, c, b, a, c, b, a, ctex, btex, atex);
 				// ADC
-				writeTriangleToXML(pRoot, a, d, c);
+				writeTriangleToXML(pRoot, a, d, c, a, d, c, atex, dtex, ctex);
 			}
 		}
 	}

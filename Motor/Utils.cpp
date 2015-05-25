@@ -387,7 +387,7 @@ static GLuint loadTexture(const char *texture){
 	return texID;
 }
 
-//auxiliar que preenche obtem os modelos
+//auxiliar que obtem os modelos
 static void auxPrepare(vector<Model> *modelos, tinyxml2::XMLNode *pRoot){
 	if (pRoot == NULL)
 		return;
@@ -402,7 +402,7 @@ static void auxPrepare(vector<Model> *modelos, tinyxml2::XMLNode *pRoot){
 			const char * nome, *texture;
 			nome = modelo->Attribute("ficheiro");
 			if (nome) {
-				//guardar modelos no map
+				//guardar model na estrutura
 				model = readVertices(nome);
 			}
 			texture = modelo->Attribute("textura");
@@ -420,7 +420,10 @@ static void auxPrepare(vector<Model> *modelos, tinyxml2::XMLNode *pRoot){
 			modelo->QueryFloatAttribute("diffR", &diffuse.red);
 			modelo->QueryFloatAttribute("diffG", &diffuse.green);
 			modelo->QueryFloatAttribute("diffB", &diffuse.blue);
-			if (diffuse.red !=-1 && diffuse.green != -1 && diffuse.blue !=-1)
+			if (diffuse.red !=-1 && 
+				diffuse.green != -1 && 
+				diffuse.blue !=-1)
+				
 				model.material.push_back(diffuse);
 
 			Material ambient; ambient.type = GL_AMBIENT;
@@ -428,16 +431,22 @@ static void auxPrepare(vector<Model> *modelos, tinyxml2::XMLNode *pRoot){
 			modelo->QueryFloatAttribute("ambR", &ambient.red);
 			modelo->QueryFloatAttribute("ambG", &ambient.green);
 			modelo->QueryFloatAttribute("ambB", &ambient.blue);
-			if (ambient.red != -1 && ambient.green != -1 && ambient.blue != -1)
-			model.material.push_back(ambient);
+			if (ambient.red != -1 && 
+				ambient.green != -1 &&
+				ambient.blue != -1)
+				
+				model.material.push_back(ambient);
 
 			Material specular; specular.type = GL_SPECULAR;
 			specular.red = -1; specular.green = -1; specular.blue = -1;
 			modelo->QueryFloatAttribute("specR", &specular.red);
 			modelo->QueryFloatAttribute("specG", &specular.green);
 			modelo->QueryFloatAttribute("specB", &specular.blue);
-			if (specular.red != -1 && specular.green != -1 && specular.blue != -1)
-			model.material.push_back(specular);
+			if (specular.red != -1 && 
+				specular.green != -1 && 
+				specular.blue != -1)
+
+				model.material.push_back(specular);
 
 			model.index = modelos->size();
 			printf("%d\n", model.index);
