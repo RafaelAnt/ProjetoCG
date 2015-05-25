@@ -550,6 +550,7 @@ void drawCylinderXML(float height, float radius, int stacks, int slices, char *f
 void drawConeXML(float height, float radius, int stacks, int slices, char *filename) {
 	using namespace tinyxml2;
 	XMLNode * pRoot = xmlDoc.NewElement("cone");
+	Point normal, t1, t2, t3;
 	xmlDoc.InsertFirstChild(pRoot);
 
 	float pi = 3.1415f;
@@ -561,6 +562,7 @@ void drawConeXML(float height, float radius, int stacks, int slices, char *filen
 		vertex1.x = radius*sin(i);
 		vertex1.y = 0;
 		vertex1.z = radius*cos(i);
+		
 
 		Point vertex2;
 		vertex2.x = 0;
@@ -571,6 +573,13 @@ void drawConeXML(float height, float radius, int stacks, int slices, char *filen
 		vertex3.x = radius*sin(i + 2 * pi / slices);
 		vertex3.y = 0;
 		vertex3.z = radius*cos(i + 2 * pi / slices);
+		
+		normal = calculateSurfaceNormal(vertex1, vertex2, vertex3);
+		normal = invertNormal(normal);
+		t1.x = 1.0f; t1.y = 0.0f;
+		t2.x = 0.0f; t2.y = 0.0f;
+		t3.x = 0.5f; t3.y = 1.0f;
+		writeTriangleToXML(pRoot, vertex1, vertex2, vertex3, normal, normal, normal, t1, t2, t3);
 
 		writeTriangleToXML(pRoot, vertex1, vertex3, vertex2);
 	}
