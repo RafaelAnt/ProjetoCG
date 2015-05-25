@@ -9,6 +9,15 @@
 
 tinyxml2::XMLDocument xmlDoc;
 
+Point normalize(Point p){
+	Point normalized;
+	float length = sqrt(p.x*p.x + p.y*p.y + p.z*p.z);
+	normalized.x = p.x / length;
+	normalized.y = p.y / length;
+	normalized.z = p.z / length;
+	return normalized;
+}
+
 static void writeVertexToXML(tinyxml2::XMLNode * pRoot, Point v){
 	using namespace tinyxml2;
 	char text[1024];
@@ -271,7 +280,7 @@ Point calculateSurfaceNormal(Point p1, Point p2, Point p3) {
 }
 
 Point invertNormal(Point p1) {
-	
+
 
 	p1.x = -p1.x;
 	p1.y = -p1.y;
@@ -295,7 +304,7 @@ void drawPyramidXML(float base, float height, char *filename){
 	normal = invertNormal(normal);
 	t1.x = 1.0f; t1.y = 0.0f;
 	t2.x = 0.0f; t2.y = 0.0f;
-	t3.x = 0.5f; t3.y = 1.0f;	
+	t3.x = 0.5f; t3.y = 1.0f;
 	writeTriangleToXML(pRoot, v1, v2, v3, normal, normal, normal, t1, t2, t3);
 
 
@@ -354,43 +363,69 @@ void drawSphereXML(float r, int stacks, int slices, char *filename){
 	XMLNode * pRoot = xmlDoc.NewElement("esfera");
 	xmlDoc.InsertFirstChild(pRoot);
 	int t, p;
-	for (t = 0; t < stacks; t++){ // stacks -> theta (theta é PI porque é na vertical (180º)
-		float theta1 = ((float)(t) / stacks)*(float)M_PI;
-		float theta2 = ((float)(t + 1) / stacks)*(float)M_PI;
 
-		for (p = 0; p < slices; p++){ // slices -> phi
-			float phi1 = ((float)(p) / slices) * 2 * (float)M_PI; // (phi é 2PI porque é na horizontal, tem que ser à volta da esfera
-			float phi2 = ((float)(p + 1) / slices) * 2 * (float)M_PI; // toda, ou seja, 360º = 2PI
+
+	for (p = 0; p < slices; p++){ // slices -> phi
+		float phi1 = ((float)(p) / slices) * 2 * (float)M_PI; // (phi é 2PI porque é na horizontal, tem que ser à volta da esfera
+		float phi2 = ((float)(p + 1) / slices) * 2 * (float)M_PI; // toda, ou seja, 360º = 2PI
+
+		for (t = 0; t < stacks; t++){ // stacks -> theta (theta é PI porque é na vertical (180º)
+			float theta1 = ((float)(t) / stacks)*(float)M_PI;
+			float theta2 = ((float)(t + 1) / stacks)*(float)M_PI;
 
 			Point vertex1;
-			vertex1.x = (float)r*sin(theta1)*cos(phi1);
-			vertex1.y = (float)r*sin(theta1)*sin(phi1);
+			vertex1.y = (float)r*sin(theta1)*cos(phi1);
+			vertex1.x = (float)r*sin(theta1)*sin(phi1);
 			vertex1.z = (float)r*cos(theta1);
 
+			Point tex1, n1 = normalize(vertex1);
+			tex1.x = phi1 / (2 * M_PI);
+			tex1.y = theta1 / M_PI;
+
 			Point vertex2;
-			vertex2.x = (float)r*sin(theta1)*cos(phi2);
-			vertex2.y = (float)r*sin(theta1)*sin(phi2);
+			vertex2.y = (float)r*sin(theta1)*cos(phi2);
+			vertex2.x = (float)r*sin(theta1)*sin(phi2);
 			vertex2.z = (float)r*cos(theta1);
 
+			Point tex2, n2 = normalize(vertex2);
+			tex2.x = phi2 / (2 * M_PI);
+			tex2.y = theta1 / M_PI;
+
 			Point vertex3;
-			vertex3.x = (float)r*sin(theta2)*cos(phi2);
-			vertex3.y = (float)r*sin(theta2)*sin(phi2);
+			vertex3.y = (float)r*sin(theta2)*cos(phi2);
+			vertex3.x = (float)r*sin(theta2)*sin(phi2);
 			vertex3.z = (float)r*cos(theta2);
 
+			Point tex3, n3 = normalize(vertex3);
+			tex3.x = phi2 / (2 * M_PI);
+			tex3.y = theta2 / M_PI;
+
 			Point vertex4;
-			vertex4.x = (float)r*sin(theta2)*cos(phi1);
-			vertex4.y = (float)r*sin(theta2)*sin(phi1);
+			vertex4.y = (float)r*sin(theta2)*cos(phi1);
+			vertex4.x = (float)r*sin(theta2)*sin(phi1);
 			vertex4.z = (float)r*cos(theta2);
 
+			Point tex4, n4 = normalize(vertex4);
+			tex4.x = phi1 / (2 * M_PI);
+			tex4.y = theta2 / M_PI;
+
 			if (t == 0){//camada inicial
-				writeTriangleToXML(pRoot, vertex1, vertex3, vertex4);
+				writeTriangleToXML(pRoot, vertex4, vertex3, vertex1,
+					n4, n3, n1,
+					tex4, tex3, tex1);
 			}
 			else if (t + 1 == stacks){ //camada final 
-				writeTriangleToXML(pRoot, vertex3, vertex1, vertex2);
+				writeTriangleToXML(pRoot, vertex2, vertex1, vertex3,
+					n2, n1, n3,
+					tex2, tex1, tex3);
 			}
 			else{
-				writeTriangleToXML(pRoot, vertex1, vertex2, vertex4);
-				writeTriangleToXML(pRoot, vertex2, vertex3, vertex4);
+				writeTriangleToXML(pRoot, vertex4, vertex2, vertex1,
+					n4, n2, n1,
+					tex4, tex2, tex1);
+				writeTriangleToXML(pRoot, vertex4, vertex3, vertex2,
+					n4, n3, n2,
+					tex4, tex3, tex2);
 			}
 			//os dois "if" iniciais servem para desenhar o "inicio" e o "fim" da esfera
 			//caso nao estejamos na ultima ou primeira camada, desenharemos os "quads" para formar a esfera (2triangles=1quad)
