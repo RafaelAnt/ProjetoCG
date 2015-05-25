@@ -550,7 +550,7 @@ void drawCylinderXML(float height, float radius, int stacks, int slices, char *f
 void drawConeXML(float height, float radius, int stacks, int slices, char *filename) {
 	using namespace tinyxml2;
 	XMLNode * pRoot = xmlDoc.NewElement("cone");
-	Point normal, t1, t2, t3;
+	Point normal, t1, t2, t3, t4 ;
 	xmlDoc.InsertFirstChild(pRoot);
 
 	float pi = 3.1415f;
@@ -574,23 +574,27 @@ void drawConeXML(float height, float radius, int stacks, int slices, char *filen
 		vertex3.y = 0;
 		vertex3.z = radius*cos(i + 2 * pi / slices);
 		
-		normal = calculateSurfaceNormal(vertex1, vertex2, vertex3);
+		normal = calculateSurfaceNormal(vertex1, vertex3, vertex2);
 		normal = invertNormal(normal);
-		t1.x = 1.0f; t1.y = 0.0f;
-		t2.x = 0.0f; t2.y = 0.0f;
-		t3.x = 0.5f; t3.y = 1.0f;
-		writeTriangleToXML(pRoot, vertex1, vertex2, vertex3, normal, normal, normal, t1, t2, t3);
+		t1.x = sin(i)/2+0.5; t1.y = cos(i)/2+0.5;
+		t2.x = 0.5; t2.y = 0.5;
+		t3.x = sin(i + 2 * pi / slices) / 2 + 0.5; t3.y = cos(i + 2 * pi / slices) / 2 + 0.5;
+		writeTriangleToXML(pRoot, vertex1, vertex3, vertex2, normal, normal, normal, t1, t3, t2);
 
-		writeTriangleToXML(pRoot, vertex1, vertex3, vertex2);
+		
 	}
 
 	//face curva
 	float rAct = radius;	//raio da camada actual
 	float r = radius / stacks;	//valor a diminuir ao raio da camada actual em cada camada
+	float slicesInc = 1.0f / slices;
+	printf("slicesInc= %d", slicesInc);
+	float stacksInc = 1.0f / stacks;
+	printf("StacksInc= %d", stacksInc);
 	// ciclo que gera as camadas
-	for (float l = height / stacks, h1 = 0.0f, h2 = l; h2 < height; h1 = h2, h2 = h2 + l) {
+	for (float l = height / stacks, k=0, h1 = 0.0f, h2 = l; h2 < height; h1 = h2, h2 = h2 + l, k++) {
 		//ciclo que gera triangulos da camada
-		for (float i = 0; i < 2 * pi; i += 2 * pi / slices) {
+		for (float j = 0, i = 0; i < 2 * pi; i += 2 * pi / slices, j++) {
 
 			Point vertex1;
 			vertex1.x = (rAct - r)*sin(i);
@@ -612,15 +616,28 @@ void drawConeXML(float height, float radius, int stacks, int slices, char *filen
 			vertex4.y = h1;
 			vertex4.z = rAct*cos(i + 2 * pi / slices);
 
-			writeTriangleToXML(pRoot, vertex1, vertex2, vertex3);
-			writeTriangleToXML(pRoot, vertex2, vertex4, vertex3);
+			normal = calculateSurfaceNormal(vertex1, vertex2, vertex3);
+			normal = invertNormal(normal);
+
+			t1.x = slicesInc*j; t1.y = stacksInc*(k + 1);
+			t2.x = slicesInc*(j + 1); t2.y = stacksInc*(k + 1);
+			t3.x = slicesInc*j; t3.y = stacksInc*(k);
+			t4.x = slicesInc*(j+ 1); t4.y = stacksInc*(k);
+
+			writeTriangleToXML(pRoot, vertex1, vertex2, vertex3, normal, normal, normal, t1, t2, t3);
+
+			normal = calculateSurfaceNormal(vertex2, vertex4, vertex3);
+			normal = invertNormal(normal);
+
+			writeTriangleToXML(pRoot, vertex2, vertex4, vertex3, normal, normal, normal, t2, t4, t3);
+			
 		}
 		rAct -= r;
 
 	}
 
 	//ciclo que gera a ultima camada do cone
-	for (float i = 0; i < 2 * pi; i += 2 * pi / slices) {
+	for (float i = 0, j =0; i < 2 * pi; i += 2 * pi / slices, j++) {
 
 		Point vertex1;
 		vertex1.x = 0;
@@ -638,7 +655,16 @@ void drawConeXML(float height, float radius, int stacks, int slices, char *filen
 		vertex3.y = height - height / stacks;
 		vertex3.z = r*cos(i + 2 * pi / slices);
 
-		writeTriangleToXML(pRoot, vertex1, vertex3, vertex2);
+		normal = calculateSurfaceNormal(vertex1, vertex3, vertex2);
+		normal = invertNormal(normal);
+		t1.x = slicesInc*j; t1.y = 1;
+		t3.x = slicesInc*j; t3.y = 1 - stacksInc;
+		t4.x = slicesInc*(j + 1); t4.y = 1-stacksInc;
+
+		writeTriangleToXML(pRoot, vertex1, vertex2, vertex3, normal, normal, normal, t1, t2, t3);
+		
+
+		
 
 	}
 
