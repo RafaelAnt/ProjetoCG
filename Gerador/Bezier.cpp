@@ -186,11 +186,14 @@ Point getBezierNormal(Point pontos[][NM + 1], float u, float v){
 	MMult1x4By4x4(aux2, M, aux);
 	resV[2] = MMult1x4By4x1(aux, derV);
 
+	normalizeVector(resU);
+	normalizeVector(resV);
+
 	calculaNormal(resU, resV, aux3);
 
-	normal.x = aux[0];
-	normal.y = aux[1];
-	normal.z = aux[2];
+	normal.x = aux3[0];
+	normal.y = aux3[1];
+	normal.z = aux3[2];
 
 	return normal;
 }

@@ -714,7 +714,7 @@ void drawBezierPatchesXML(vector<Point> vertices, vector<vector<unsigned int>> i
 		/*matriz com os pontos ao longo de u e v
 		esta matriz é uma grelha com todos os pontos
 		da superficie de bezier com resu colunas e resvv linhas*/
-		Patch patch(resu);
+		Patch patch; patch.normais.resize(resu); patch.vertices.resize(resu);
 		//superficies de bezier contem curvas de bezier ao longo de
 		//u e v, teremos que as percorrer e obter todos os pontos resultantes
 		for (unsigned int ru = 0; ru <= resu - 1; ru++) {
@@ -724,7 +724,8 @@ void drawBezierPatchesXML(vector<Point> vertices, vector<vector<unsigned int>> i
 				//colocar v entre 0 e 1
 				float v = rv / (float)(resv - 1);
 				//adicionar ponto no fim desta linha, posição (ru,rv)
-				patch[ru].push_back(getBezierPoint(pontos_control, u, v));
+				patch.vertices[ru].push_back(getBezierPoint(pontos_control, u, v));
+				patch.normais[ru].push_back(getBezierNormal(pontos_control, u, v));
 			}
 		}
 		vertices_res.push_back(patch);
@@ -734,24 +735,30 @@ void drawBezierPatchesXML(vector<Point> vertices, vector<vector<unsigned int>> i
 	using namespace tinyxml2;
 	XMLNode * pRoot = xmlDoc.NewElement("beziersurface");
 	xmlDoc.InsertEndChild(pRoot);
-	Point a, b, c, d, atex, btex, ctex, dtex;
+	Point a, b, c, d, atex, btex, ctex, dtex, na, nb, nc, nd;
 	for (unsigned int p = 0; p < indices.size(); p++) {
 		for (unsigned int ru = 0; ru < resu - 1; ru++){
 			for (unsigned int rv = 0; rv < resv - 1; rv++) {
 				// 1 quadrado ABCD = 2 triangles CBA + ADC
-				a = vertices_res[p][ru][rv];
-				b = vertices_res[p][ru][rv + 1];
-				c = vertices_res[p][ru + 1][rv + 1];
-				d = vertices_res[p][ru + 1][rv];
+				a = vertices_res[p].vertices[ru][rv];
+				b = vertices_res[p].vertices[ru][rv + 1];
+				c = vertices_res[p].vertices[ru + 1][rv + 1];
+				d = vertices_res[p].vertices[ru + 1][rv];
 
-				atex.x = ru / (resu - 1.0); atex.y = rv / (resv - 1.0);
+				atex.x = ru / (resu - 1.0); atex.y = rv / (resu - 1.0);
 				btex.x = ru / (resu - 1.0); btex.y = (rv + 1) / (resv - 1.0);
 				ctex.x = (ru + 1) / (resu - 1.0); ctex.y = (rv + 1) / (resv - 1.0);
 				dtex.x = (ru + 1) / (resu - 1.0); dtex.y = rv / (resv - 1.0);
+
+				na = vertices_res[p].normais[ru][rv];
+				nb = vertices_res[p].normais[ru][rv + 1];
+				nc = vertices_res[p].normais[ru + 1][rv + 1];
+				nd = vertices_res[p].normais[ru + 1][rv];
+
 				// CBA
-				writeTriangleToXML(pRoot, c, b, a, c, b, a, ctex, btex, atex);
+				writeTriangleToXML(pRoot, c, b, a, nc, nb, na, ctex, btex, atex);
 				// ADC
-				writeTriangleToXML(pRoot, a, d, c, a, d, c, atex, dtex, ctex);
+				writeTriangleToXML(pRoot, a, d, c, na, nd, nc, atex, dtex, ctex);
 			}
 		}
 	}
