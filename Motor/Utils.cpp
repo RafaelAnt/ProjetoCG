@@ -76,11 +76,14 @@ Funçao que desenha o array de vértices armazenados num dado buffer (vboIndex)
 */
 void drawVertices(Model model){
 	
-	float aux[4];
 	for (unsigned int i = 0; i < model.material.size(); i++){
 		Material m = model.material[i];
-		aux[0] = m.red; aux[1] = m.green; aux[2] = m.blue; aux[3] = 0;
-		glMaterialfv(GL_FRONT, model.material[i].type, aux);
+		glColor3f(m.red, m.green, m.blue);
+		glColorMaterial(GL_FRONT, model.material[i].type);
+	}
+	//se tiver um material especificado...
+	if (model.material.size()>0){
+		glEnable(GL_COLOR_MATERIAL);
 	}
 	//selecionar textura do modelo
 	glBindTexture(GL_TEXTURE_2D, model.texID);
@@ -105,6 +108,10 @@ void drawVertices(Model model){
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	//selecionar textura "nula"
 	glBindTexture(GL_TEXTURE_2D, 0);
+
+	if (model.material.size()>0){
+		glDisable(GL_COLOR_MATERIAL);
+	}
 }
 
 //proot é o grupo a desenhar, n é o próximo modelo a desenhar
