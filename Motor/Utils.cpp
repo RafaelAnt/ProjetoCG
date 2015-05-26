@@ -75,6 +75,7 @@ void exceptionHandler(int e){
 Funçao que desenha o array de vértices armazenados num dado buffer (vboIndex)
 */
 void drawVertices(Model model){
+	
 	float aux[4];
 	for (unsigned int i = 0; i < model.material.size(); i++){
 		Material m = model.material[i];
@@ -260,16 +261,14 @@ static void prepareLights(XMLNode *node){
 				tipoID = GL_SPECULAR;
 			else if (strcmp(tipo, "DIFUSA") == 0)
 				tipoID = GL_DIFFUSE;
-			else if (strcmp(tipo, "EMISSORA") == 0)
-				tipoID = GL_EMISSION;
-
+			
 			if (tipoID != -1){
 				GLfloat arr[4] = { 0.0, 0.0, 0.0, 0.0 };
 				aux->QueryFloatAttribute("R", &R);
 				aux->QueryFloatAttribute("G", &G);
 				aux->QueryFloatAttribute("B", &B);
 				arr[0] = R; arr[1] = G; arr[2] = B;
-				glLightfv(GL_LIGHT0, GL_AMBIENT, arr);
+				glLightfv(GL_LIGHT0, tipoID, arr);
 			}
 		}
 		//ver os outros elementos do grupo
@@ -367,9 +366,11 @@ static Model readVertices(const char *filename) {
 static GLuint loadTexture(const char *texture){
 	unsigned int t, tw, th;
 	unsigned char *texData;
+	ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
 	ilGenImages(1, &t);
 	ilBindImage(t);
 	ilLoadImage((ILstring)texture);
+	ilEnable(IL_ORIGIN_SET);	
 	tw = ilGetInteger(IL_IMAGE_WIDTH);
 	th = ilGetInteger(IL_IMAGE_HEIGHT);
 	ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
@@ -384,6 +385,7 @@ static GLuint loadTexture(const char *texture){
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tw, th, 0,
 		GL_RGBA, GL_UNSIGNED_BYTE, texData);
 	glBindTexture(GL_TEXTURE_2D, 0);
+	printf("Loaded %s texture ID=%d", texture, texID);
 	return texID;
 }
 
@@ -447,6 +449,17 @@ static void auxPrepare(vector<Model> *modelos, tinyxml2::XMLNode *pRoot){
 				specular.blue != -1)
 
 				model.material.push_back(specular);
+
+			Material emission; emission.type = GL_EMISSION;
+			emission.red = -1; emission.green = -1; emission.blue = -1;
+			modelo->QueryFloatAttribute("emiR", &emission.red);
+			modelo->QueryFloatAttribute("emiG", &emission.green);
+			modelo->QueryFloatAttribute("emiB", &emission.blue);
+			if (emission.red != -1 &&
+				emission.green != -1 &&
+				emission.blue != -1)
+
+				model.material.push_back(emission);
 
 			model.index = modelos->size();
 			printf("%d\n", model.index);

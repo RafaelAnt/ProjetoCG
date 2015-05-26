@@ -380,7 +380,7 @@ void drawSphereXML(float r, int stacks, int slices, char *filename){
 
 			Point tex1, n1 = normalize(vertex1);
 			tex1.x = phi1 / (2 * M_PI);
-			tex1.y = 1 - ((theta1) / M_PI);
+			tex1.y = ((theta1) / M_PI);
 
 			Point vertex2;
 			vertex2.z = (float)r*sin(theta1)*cos(phi2);
@@ -389,7 +389,7 @@ void drawSphereXML(float r, int stacks, int slices, char *filename){
 
 			Point tex2, n2 = normalize(vertex2);
 			tex2.x = phi2 / (2 * M_PI);
-			tex2.y = 1 - ((theta1) / M_PI);
+			tex2.y = ((theta1) / M_PI);
 
 			Point vertex3;
 			vertex3.z = (float)r*sin(theta2)*cos(phi2);
@@ -398,7 +398,7 @@ void drawSphereXML(float r, int stacks, int slices, char *filename){
 
 			Point tex3, n3 = normalize(vertex3);
 			tex3.x = phi2 / (2 * M_PI);
-			tex3.y = 1 - ((theta2) / M_PI);
+			tex3.y = ((theta2) / M_PI);
 
 			Point vertex4;
 			vertex4.z = (float)r*sin(theta2)*cos(phi1);
@@ -407,7 +407,7 @@ void drawSphereXML(float r, int stacks, int slices, char *filename){
 
 			Point tex4, n4 = normalize(vertex4);
 			tex4.x = phi1 / (2 * M_PI);
-			tex4.y = 1 - ((theta2) / M_PI);
+			tex4.y = ((theta2) / M_PI);
 
 			if (t == 0){//camada inicial
 				writeTriangleToXML(pRoot, vertex1, vertex3, vertex4,
@@ -550,7 +550,7 @@ void drawCylinderXML(float height, float radius, int stacks, int slices, char *f
 void drawConeXML(float height, float radius, int stacks, int slices, char *filename) {
 	using namespace tinyxml2;
 	XMLNode * pRoot = xmlDoc.NewElement("cone");
-	Point normal, t1, t2, t3, t4 ;
+	Point normal, t1, t2, t3, t4;
 	xmlDoc.InsertFirstChild(pRoot);
 
 	float pi = 3.1415f;
@@ -573,16 +573,16 @@ void drawConeXML(float height, float radius, int stacks, int slices, char *filen
 		vertex3.x = radius*sin(i + 2 * pi / slices);
 		vertex3.y = 0;
 		vertex3.z = radius*cos(i + 2 * pi / slices);
-		
+
 		normal = calculateSurfaceNormal(vertex1, vertex3, vertex2);
 
 		normal = invertNormal(normal);
-		t1.x = sin(i)/2+0.5; t1.y = cos(i)/2+0.5;
+		t1.x = sin(i) / 2 + 0.5; t1.y = cos(i) / 2 + 0.5;
 		t2.x = 0.5; t2.y = 0.5;
 		t3.x = sin(i + 2 * pi / slices) / 2 + 0.5; t3.y = cos(i + 2 * pi / slices) / 2 + 0.5;
 		writeTriangleToXML(pRoot, vertex1, vertex3, vertex2, normal, normal, normal, t1, t3, t2);
 
-		
+
 	}
 
 	//face curva
@@ -593,7 +593,7 @@ void drawConeXML(float height, float radius, int stacks, int slices, char *filen
 	float stacksInc = 1.0f / stacks;
 	printf("StacksInc= %d", stacksInc);
 	// ciclo que gera as camadas
-	for (float l = height / stacks, k=0, h1 = 0.0f, h2 = l; h2 < height; h1 = h2, h2 = h2 + l, k++) {
+	for (float l = height / stacks, k = 0, h1 = 0.0f, h2 = l; h2 < height; h1 = h2, h2 = h2 + l, k++) {
 		//ciclo que gera triangulos da camada
 		for (float j = 0, i = 0; i < 2 * pi; i += 2 * pi / slices, j++) {
 
@@ -623,7 +623,7 @@ void drawConeXML(float height, float radius, int stacks, int slices, char *filen
 			t1.x = slicesInc*j; t1.y = stacksInc*(k + 1);
 			t2.x = slicesInc*(j + 1); t2.y = stacksInc*(k + 1);
 			t3.x = slicesInc*j; t3.y = stacksInc*(k);
-			t4.x = slicesInc*(j+ 1); t4.y = stacksInc*(k);
+			t4.x = slicesInc*(j + 1); t4.y = stacksInc*(k);
 
 			writeTriangleToXML(pRoot, vertex1, vertex2, vertex3, normal, normal, normal, t1, t2, t3);
 
@@ -631,14 +631,14 @@ void drawConeXML(float height, float radius, int stacks, int slices, char *filen
 			normal = invertNormal(normal);
 
 			writeTriangleToXML(pRoot, vertex2, vertex4, vertex3, normal, normal, normal, t2, t4, t3);
-			
+
 		}
 		rAct -= r;
 
 	}
 
 	//ciclo que gera a ultima camada do cone
-	for (float i = 0, j =0; i < 2 * pi; i += 2 * pi / slices, j++) {
+	for (float i = 0, j = 0; i < 2 * pi; i += 2 * pi / slices, j++) {
 
 		Point vertex1;
 		vertex1.x = 0;
@@ -660,12 +660,12 @@ void drawConeXML(float height, float radius, int stacks, int slices, char *filen
 		normal = invertNormal(normal);
 		t1.x = slicesInc*j; t1.y = 1;
 		t3.x = slicesInc*j; t3.y = 1 - stacksInc;
-		t4.x = slicesInc*(j + 1); t4.y = 1-stacksInc;
+		t4.x = slicesInc*(j + 1); t4.y = 1 - stacksInc;
 
 		writeTriangleToXML(pRoot, vertex1, vertex2, vertex3, normal, normal, normal, t1, t2, t3);
-		
 
-		
+
+
 
 	}
 
