@@ -62,15 +62,6 @@ void renderScene(void) {
 		0, 0, 0,
 		0.0f, 1.0f, 0.0f);
 
-	//TESTE
-	GLfloat amb[3] = { 0.2, 0.2, 0.2 };
-	GLfloat diff[3] = { 1.0, 1.0, 1.0 };
-	// light colors
-	glLightfv(GL_LIGHT0, GL_AMBIENT, amb);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, diff);
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
-
 	try{ drawScene(sceneName); }
 	catch (int e){
 		exceptionHandler(e);

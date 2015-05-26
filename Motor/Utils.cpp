@@ -252,7 +252,7 @@ static void prepareLights(XMLNode *node){
 		float x = 0, y = 0, z = 0, R = 0, G = 0, B = 0;
 		//tipo ponto utiliza array com a localização no espaço
 		if (strcmp(tipo, "PONTO") == 0){
-			GLfloat arr[4] = { 0.0, 0.0, 0.0, 0.0 };
+			GLfloat arr[4] = { 0.0, 0.0, 0.0, 1 };
 			aux->QueryFloatAttribute("posX", &x);
 			aux->QueryFloatAttribute("posY", &y);
 			aux->QueryFloatAttribute("posZ", &z);
