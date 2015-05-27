@@ -109,13 +109,6 @@ void drawVertices(Model model){
 	//selecionar textura "nula"
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	glLineWidth(2.5);
-	glColor3f(1, 1, 1);
-	glBegin(GL_LINES);
-	glVertex3f(0, 0, 0);
-	glVertex3f(0, 5, 0);
-	glEnd();
-
 	if (model.material.size()>0){
 		glDisable(GL_COLOR_MATERIAL);
 	}
