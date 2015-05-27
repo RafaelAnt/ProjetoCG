@@ -109,6 +109,13 @@ void drawVertices(Model model){
 	//selecionar textura "nula"
 	glBindTexture(GL_TEXTURE_2D, 0);
 
+	glLineWidth(2.5);
+	glColor3f(1, 1, 1);
+	glBegin(GL_LINES);
+	glVertex3f(0, 0, 0);
+	glVertex3f(0, 5, 0);
+	glEnd();
+
 	if (model.material.size()>0){
 		glDisable(GL_COLOR_MATERIAL);
 	}
@@ -238,7 +245,8 @@ static int drawNode(XMLNode *pRoot, int n){
 	//desenhar os filhos, tomar nota do último modelo desenhado neste grupo
 	n = drawNode(pRoot->FirstChildElement("grupo"), n);
 	//depois desenhar os irmaos
-	drawNode(pRoot->NextSiblingElement("grupo"), n);
+	n = drawNode(pRoot->NextSiblingElement("grupo"), n);
+	return n;
 }
 
 //node deverá ser a raiz do ficheiro XML
@@ -373,11 +381,9 @@ static Model readVertices(const char *filename) {
 static GLuint loadTexture(const char *texture){
 	unsigned int t, tw, th;
 	unsigned char *texData;
-	ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
 	ilGenImages(1, &t);
 	ilBindImage(t);
 	ilLoadImage((ILstring)texture);
-	ilEnable(IL_ORIGIN_SET);	
 	tw = ilGetInteger(IL_IMAGE_WIDTH);
 	th = ilGetInteger(IL_IMAGE_HEIGHT);
 	ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);

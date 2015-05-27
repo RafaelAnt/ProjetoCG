@@ -69,6 +69,7 @@ static Point getCatmullRomPoint(float t, int *indices, vector<Point> p) {
 		if (i == 1)res.y = sumAux;
 		if (i == 2)res.z = sumAux;
 	}
+	
 	return res;
 }
 
