@@ -438,8 +438,14 @@ void drawCylinderXML(float height, float radius, int stacks, int slices, char *f
 	using namespace tinyxml2;
 	XMLNode * pRoot = xmlDoc.NewElement("cilindro");
 	xmlDoc.InsertFirstChild(pRoot);
-
+	float centroXTopo = 0.4375;
+	float centroXFundo = 0.8125;
+	float centroY = 0.1875;
+	float delta = 2.0f * M_PI / slices;
+	float raioTampa = 0.625 - centroXTopo;
 	float pi = 3.1415f;
+
+	Point normalUP = { 0, 1, 0 }, normalDOWN = { 0, -1, 0 };
 
 	//Ciclo que gera base superior
 	for (float i = 0; i < 2 * pi; i += 2 * pi / slices) {
@@ -447,18 +453,27 @@ void drawCylinderXML(float height, float radius, int stacks, int slices, char *f
 		vertex1.x = radius*sin(i);
 		vertex1.y = height;
 		vertex1.z = radius*cos(i);
+		Point tex1;
+		tex1.x = centroXTopo + raioTampa*cos(i);
+		tex1.y = centroY + raioTampa*sin(i);
 
 		Point vertex2;
 		vertex2.x = 0;
 		vertex2.y = height;
 		vertex2.z = 0;
+		Point tex2;
+		tex2.x = centroXTopo;
+		tex2.y = centroY;
 
 		Point vertex3;
 		vertex3.x = radius*sin(i + 2 * pi / slices);	//(i + 2 * pi / slices) = angulo do ponto da proxima fatia
 		vertex3.y = height;
 		vertex3.z = radius*cos(i + 2 * pi / slices);
+		Point tex3;
+		tex3.x = centroXTopo + raioTampa*cos(i + 2 * pi / slices);
+		tex3.y = centroY + raioTampa*sin(i + 2 * pi / slices);
 
-		writeTriangleToXML(pRoot, vertex1, vertex2, vertex3);
+		writeTriangleToXML(pRoot, vertex1, vertex2, vertex3, normalUP, normalUP, normalUP, tex1, tex2, tex3);
 	}
 
 	//Ciclo que gera base inferior
@@ -468,82 +483,149 @@ void drawCylinderXML(float height, float radius, int stacks, int slices, char *f
 		vertex1.x = radius*sin(i);
 		vertex1.y = 0;
 		vertex1.z = radius*cos(i);
+		Point tex1;
+		tex1.x = centroXTopo + raioTampa*cos(i);
+		tex1.y = centroY + raioTampa*sin(i);
 
 		Point vertex2;
 		vertex2.x = 0;
 		vertex2.y = 0;
 		vertex2.z = 0;
+		Point tex2;
+		tex2.x = centroXTopo;
+		tex2.y = centroY;
 
 		Point vertex3;
 		vertex3.x = radius*sin(i + 2 * pi / slices);
 		vertex3.y = 0;
 		vertex3.z = radius*cos(i + 2 * pi / slices);
+		Point tex3;
+		tex3.x = centroXTopo + raioTampa*cos(i + 2 * pi / slices);
+		tex3.y = centroY + raioTampa*sin(i + 2 * pi / slices);
 
-		writeTriangleToXML(pRoot, vertex1, vertex3, vertex2);
+		writeTriangleToXML(pRoot, vertex1, vertex3, vertex2, normalDOWN, normalDOWN, normalDOWN, tex1, tex3, tex2);
 	}
 
 	//face curva
 	//ciclo que gera as camadas da face 
-	for (float l = height / stacks, h1 = 0.0f, h2 = l; h2 < height; h1 = h2, h2 = h2 + l) {
+	float h1tex = 0.375;
+	float ltex = (1 - 0.375) / stacks;
+	float h2tex = h1tex+ltex;
+	/*for (float l = height / stacks, h1 = 0.0f, h2 = l; h2 < height; h1 = h2, h2 = h2 + l) {
 		// l  - altura de cada camada; ciclo termina antes de gerar ultima camada
 
 		//ciclo que gera os triangulos de cada camada
-		for (float i = 0; i < 2 * pi; i += 2 * pi / slices) {
+		for (float i = 0, t=0; i < 2 * pi; i += 2 * pi / slices,t++) {
 
 			Point vertex1;
 			vertex1.x = radius*sin(i);
 			vertex1.y = h2;
 			vertex1.z = radius*cos(i);
+			Point normal1;
+			normal1.x = sin(i);
+			normal1.y = 0;
+			normal1.z = cos(i);
+			Point tex1;
+			tex1.x = (float)(t) / slices;
+			tex1.y = h2tex;
 
 			Point vertex2;
 			vertex2.x = radius*sin(i + 2 * pi / slices);
 			vertex2.y = h2;
 			vertex2.z = radius*cos(i + 2 * pi / slices);
+			Point normal2;
+			normal2.x = sin(i + 2 * pi / slices);
+			normal2.y = 0;
+			normal2.z = cos(i + 2 * pi / slices);
+			Point tex2;
+			tex2.x = (float)(t+1) / slices;
+			tex2.y = h2tex;
+
 
 			Point vertex3;
 			vertex3.x = radius*sin(i);
 			vertex3.y = h1;
 			vertex3.z = radius*cos(i);
+			Point normal3=normal1;
+			Point tex3;
+			tex3.x = (float)(t) / slices;
+			tex3.y = h1tex;
 
 			Point vertex4;
 			vertex4.x = radius*sin(i + 2 * pi / slices);
 			vertex4.y = h1;
 			vertex4.z = radius*cos(i + 2 * pi / slices);
+			Point normal4;
+			normal4.x = sin(i + 2 * pi / slices);
+			normal4.y = 0;
+			normal4.z = cos(i + 2 * pi / slices);
+			Point tex4;
+			tex4.x = (float)(t+1) / slices;
+			tex4.y = h1tex;
 
-			writeTriangleToXML(pRoot, vertex1, vertex2, vertex3);
-			writeTriangleToXML(pRoot, vertex2, vertex4, vertex3);
+			h1tex = h2tex;
+			h2tex += ltex;
+
+			writeTriangleToXML(pRoot, vertex1, vertex2, vertex3, normal1, normal2, normal3, tex1, tex2, tex3);
+			writeTriangleToXML(pRoot, vertex2, vertex4, vertex3, normal2, normal4, normal3, tex2, tex4, tex3);
 		}
 
-	}
+	}*/
 	//ciclo que gera a ultima camada( solução para problema de arredondamento que por vezes levava a que a ultima camada nao fosse gerada)
-	for (float i = 0; i < 2 * pi; i += 2 * pi / slices) {
+	for (float i = 0,t=0; i < 2 * pi; i += 2 * pi / slices,t++) {
 
 		Point vertex1;
 		vertex1.x = radius*sin(i);
 		vertex1.y = height;
 		vertex1.z = radius*cos(i);
+		Point normal1;
+		normal1.x = sin(i);
+		normal1.y = 0;
+		normal1.z = cos(i);
+		Point tex1;
+		tex1.x = (float)(t) / slices;
+		tex1.y = 1;
+
 
 		Point vertex2;
 		vertex2.x = radius*sin(i + 2 * pi / slices);
 		vertex2.y = height;
 		vertex2.z = radius*cos(i + 2 * pi / slices);
+		Point normal2;
+		normal2.x = sin(i + 2 * pi / slices);
+		normal2.y = 0;
+		normal2.z = cos(i + 2 * pi / slices);
+		Point tex2;
+		tex2.x = (float)(t+1) / slices;
+		tex2.y = 1;
 
 		Point vertex3;
 		vertex3.x = radius*sin(i);
-		vertex3.y = height - height / stacks;
+		vertex3.y = 0;
 		vertex3.z = radius*cos(i);
+		Point normal3;
+		normal3.x = sin(i);
+		normal3.y = 0;
+		normal3.z = cos(i);
+		Point tex3;
+		tex3.x = (float)(t) / slices;
+		tex3.y = 0.375;
 
 		Point vertex4;
 		vertex4.x = radius*sin(i + 2 * pi / slices);
-		vertex4.y = height - height / stacks;
+		vertex4.y = 0;
 		vertex4.z = radius*cos(i + 2 * pi / slices);
+		Point normal4;
+		normal4.x = sin(i + 2 * pi / slices);
+		normal4.y = 0;
+		normal4.z = cos(i + 2 * pi / slices);
+		Point tex4;
+		tex4.x = (float)(t+1) / slices;
+		tex4.y = 0.375;
 
-		writeTriangleToXML(pRoot, vertex1, vertex2, vertex3);
-		writeTriangleToXML(pRoot, vertex2, vertex4, vertex3);
+		writeTriangleToXML(pRoot, vertex1, vertex2, vertex3, normal1, normal2, normal3, tex1, tex2, tex3);
+		writeTriangleToXML(pRoot, vertex2, vertex4, vertex3, normal2, normal4, normal3, tex2, tex4, tex3);
 	}
-
-
-
 	xmlDoc.SaveFile(filename);
 }
 
