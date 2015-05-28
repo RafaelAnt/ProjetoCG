@@ -79,7 +79,6 @@ void drawVertices(Model model){
 		Material m = model.material[i];
 		float aux[4] = { 0, 0, 0, 1 };
 		aux[0] = m.red; aux[1] = m.green; aux[2] = m.blue;
-		printf("%d %f %f %f \n", model.index, aux[0], aux[1], aux[2], aux[3]);
 		glMaterialfv(GL_FRONT_AND_BACK, m.type, aux);
 	}
 	//selecionar textura do modelo
