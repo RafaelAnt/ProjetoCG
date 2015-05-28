@@ -632,8 +632,9 @@ void drawCylinderXML(float height, float radius, int stacks, int slices, char *f
 void drawConeXML(float height, float radius, int stacks, int slices, char *filename) {
 	using namespace tinyxml2;
 	XMLNode * pRoot = xmlDoc.NewElement("cone");
-	Point normal, t1, t2, t3, t4;
+	Point normal, normal2, t1, t2, t3, t4;
 	xmlDoc.InsertFirstChild(pRoot);
+	float coneAngle = atan(radius / height);
 
 	float pi = 3.1415f;
 
@@ -699,20 +700,28 @@ void drawConeXML(float height, float radius, int stacks, int slices, char *filen
 			vertex4.y = h1;
 			vertex4.z = rAct*cos(i + 2 * pi / slices);
 
-			normal = calculateSurfaceNormal(vertex1, vertex2, vertex3);
-			normal = invertNormal(normal);
+			//normal = calculateSurfaceNormal(vertex1, vertex2, vertex3);
+			//normal = invertNormal(normal);
+
+			normal.x = cos(coneAngle) * cos(i+ 2 * pi / slices);
+			normal.y = sin(coneAngle);
+			normal.z = cos(coneAngle) * sin(i+ 2 * pi / slices);
+
+			normal2.x = cos(coneAngle) * cos(i + 2 * pi / slices);
+			normal2.y = sin(coneAngle);
+			normal2.z = cos(coneAngle) * sin(i + 2 * pi / slices);
 
 			t1.x = slicesInc*j; t1.y = stacksInc*(k + 1);
 			t2.x = slicesInc*(j + 1); t2.y = stacksInc*(k + 1);
 			t3.x = slicesInc*j; t3.y = stacksInc*(k);
 			t4.x = slicesInc*(j + 1); t4.y = stacksInc*(k);
 
-			writeTriangleToXML(pRoot, vertex1, vertex2, vertex3, normal, normal, normal, t1, t2, t3);
+			writeTriangleToXML(pRoot, vertex1, vertex2, vertex3, normal, normal2, normal, t1, t2, t3);
 
-			normal = calculateSurfaceNormal(vertex2, vertex4, vertex3);
-			normal = invertNormal(normal);
+			//normal = calculateSurfaceNormal(vertex2, vertex4, vertex3);
+			//normal = invertNormal(normal);
 
-			writeTriangleToXML(pRoot, vertex2, vertex4, vertex3, normal, normal, normal, t2, t4, t3);
+			writeTriangleToXML(pRoot, vertex2, vertex4, vertex3, normal2, normal2, normal, t2, t4, t3);
 
 		}
 		rAct -= r;
