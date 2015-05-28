@@ -79,12 +79,9 @@ void drawVertices(Model model){
 	for (unsigned int i = 0; i < model.material.size(); i++){
 		Material m = model.material[i];
 		glColor3f(m.red, m.green, m.blue);
-		glColorMaterial(GL_FRONT, model.material[i].type);
+		glColorMaterial(GL_FRONT, m.type);
 	}
-	//se tiver um material especificado...
-	if (model.material.size()>0){
-		glEnable(GL_COLOR_MATERIAL);
-	}
+	glEnable(GL_COLOR_MATERIAL);
 	//selecionar textura do modelo
 	glBindTexture(GL_TEXTURE_2D, model.texID);
 	//enables dos VBO
@@ -108,10 +105,8 @@ void drawVertices(Model model){
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	//selecionar textura "nula"
 	glBindTexture(GL_TEXTURE_2D, 0);
-
-	if (model.material.size()>0){
-		glDisable(GL_COLOR_MATERIAL);
-	}
+	glDisable(GL_COLOR_MATERIAL);
+	
 }
 
 //proot é o grupo a desenhar, n é o próximo modelo a desenhar
@@ -468,7 +463,6 @@ static void auxPrepare(vector<Model> *modelos, tinyxml2::XMLNode *pRoot){
 				model.material.push_back(emission);
 
 			model.index = modelos->size();
-			printf("%d\n", model.index);
 			modelos->push_back(model);
 			modelo = modelo->NextSiblingElement("modelo");
 		}
