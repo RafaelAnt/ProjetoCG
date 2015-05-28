@@ -75,13 +75,13 @@ void exceptionHandler(int e){
 Funçao que desenha o array de vértices armazenados num dado buffer (vboIndex)
 */
 void drawVertices(Model model){
-	
 	for (unsigned int i = 0; i < model.material.size(); i++){
 		Material m = model.material[i];
-		glColor3f(m.red, m.green, m.blue);
-		glColorMaterial(GL_FRONT, m.type);
+		float aux[4] = { 0, 0, 0, 1 };
+		aux[0] = m.red; aux[1] = m.green; aux[2] = m.blue;
+		printf("%d %f %f %f \n", model.index, aux[0], aux[1], aux[2], aux[3]);
+		glMaterialfv(GL_FRONT_AND_BACK, m.type, aux);
 	}
-	glEnable(GL_COLOR_MATERIAL);
 	//selecionar textura do modelo
 	glBindTexture(GL_TEXTURE_2D, model.texID);
 	//enables dos VBO
@@ -105,7 +105,6 @@ void drawVertices(Model model){
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	//selecionar textura "nula"
 	glBindTexture(GL_TEXTURE_2D, 0);
-	glDisable(GL_COLOR_MATERIAL);
 	
 }
 
@@ -386,7 +385,7 @@ static GLuint loadTexture(const char *texture){
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tw, th, 0,
 		GL_RGBA, GL_UNSIGNED_BYTE, texData);
 	glBindTexture(GL_TEXTURE_2D, 0);
-	printf("Loaded %s texture ID=%d", texture, texID);
+	printf("Loaded %s texture ID=%d\n", texture, texID);
 	return texID;
 }
 
