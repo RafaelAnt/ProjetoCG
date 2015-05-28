@@ -54,7 +54,6 @@ void renderScene(void) {
 	// clear buffers
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glShadeModel(GL_SMOOTH);
-	glColor3f(1, 0.2, 0.3);
 	// set the camera
 	glLoadIdentity();
 
