@@ -770,7 +770,7 @@ void drawPlaneXML(float largura, float altura, char *filename){
 	XMLNode * pRoot = xmlDoc.NewElement("cone");
 	xmlDoc.InsertEndChild(pRoot);
 
-	Point v1, v2, v3, v4;
+	Point v1, v2, v3, v4, normal, tex1, tex2, tex3, tex4;
 
 	v1.x = largura / 2;
 	v1.y = -altura / 2;
@@ -788,9 +788,16 @@ void drawPlaneXML(float largura, float altura, char *filename){
 	v4.y = altura / 2;
 	v4.z = 0;
 
+	normal = calculateSurfaceNormal( v2, v3, v1);
+	normal = invertNormal(normal);
 
-	writeTriangleToXML(pRoot, v2, v3, v1);
-	writeTriangleToXML(pRoot, v3, v4, v1);
+	tex1.x = 1; tex1.y = 0;
+	tex2.x = 0; tex2.y = 0;
+	tex3.x = 0; tex3.y = 1;
+	tex4.x = 1; tex4.y = 1;
+
+	writeTriangleToXML(pRoot, v2, v3, v1, normal, normal, normal, tex2, tex3, tex1);
+	writeTriangleToXML(pRoot, v3, v4, v1, normal, normal, normal, tex3, tex4, tex1);
 
 	xmlDoc.SaveFile(filename);
 
